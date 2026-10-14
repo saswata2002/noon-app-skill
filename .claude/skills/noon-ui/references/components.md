@@ -34,7 +34,7 @@ System icon from a noon / Figma design → `OriginIcon` (catalogue in `icons.md`
 | Carousel / other product tile | `ProductCard` |
 | Figma "SKU" rail card (134 wide, 134×174 image box, 1.2px blue "+", 15/20 price; Homepage 2025, Cart 2.0) | `SkuCard` (shared; `look="cart"` in cart carousels); don't use `ProductCard` for these rails |
 | Quick add-to-cart "+" that expands into a stepper | `QuickAdd` |
-| Wishlist heart toggle | `WishlistHeart` |
+| Wishlist heart toggle | `WishlistHeart` (own heart button: `LikeHeart`) |
 | Quantity −/+ control | `QuantityStepper` |
 | "Best Seller" corner tag | `CatalogTag` |
 | Estimated-delivery badge on a product card (minutes, supermall, express today / tomorrow / dated, market, global) | `EtaBadge` with `etaFor(product)` or an `etaUseCases.*` preset (`src/data/eta.ts`) |
@@ -546,9 +546,18 @@ Gotchas: `ProductCard` is the bappzaar NoonProductBoxVertical (0.8 image, 36 qui
 
 Behaviour: "+" → `addToCart` + toast; heart → `toggleWishlist` + toast (solid pink when saved, small pop). Price 15/20 Bold (`text15BoldLh20`) with the dirham sign via `currency`; struck price and % off from `discountPct`. Used by `src/flows/home/components/{ProductRail,RecommendedRail,BrandAdModule}.tsx` and `src/flows/cart/components/CartCarousel.tsx` (`look="cart"`).
 
+## LikeHeart
+
+`src/components/WishlistHeart/LikeHeart.tsx`. The wishlist heart glyph every wishlist toggle uses (`WishlistHeart`, `SkuCard`, Storefront PDP header + recommendation cards): a `size` × `size` slot that plays the `like` Lottie when `on` turns true and rests on the outline / filled frame otherwise. Drop it in place of a heart icon inside your own button; the ripple overflows the slot.
+
+| Prop | Type | Default |
+|---|---|---|
+| `on` | `boolean` (required): wishlisted | — |
+| `size` | `number` (required): the heart icon size it replaces | — |
+
 ## WishlistHeart
 
-`src/components/WishlistHeart/WishlistHeart.tsx`. NoonFavourite: heart in a white 70% circle; toggles DemoStore wishlist, pops with a particle burst, shows a toast.
+`src/components/WishlistHeart/WishlistHeart.tsx`. NoonFavourite: heart in a white 70% circle; toggles DemoStore wishlist, plays the `like` Lottie on favourite, shows a toast.
 
 | Prop | Type | Default |
 |---|---|---|

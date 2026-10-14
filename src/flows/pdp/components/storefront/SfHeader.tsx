@@ -1,10 +1,9 @@
 import { motion } from 'motion/react';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { OriginIcon, Pressable } from '../../../../components';
+import { LikeHeart, OriginIcon, Pressable } from '../../../../components';
 import { useDemoStore } from '../../../../kit/DemoStore';
 import { useNav } from '../../../../kit/Navigator';
 import type { Product } from '../../../../data';
-import { spring } from '../../../../motion/presets';
 import { copy } from '../../data';
 import { pdpTokens } from '../../tokens';
 import { pdpSfAFlowTokens } from '../../tokens.sfA';
@@ -84,7 +83,7 @@ function ExpandableSearch({ expanded, onPress }: { expanded: boolean; onPress: (
   );
 }
 
-/** Wishlist button: heart outline → heart-filled (wishlist pink) with a pop, toggles useDemoStore().wishlist + toast. */
+/** Wishlist button: plays the like Lottie (`LikeHeart`) on favourite, toggles useDemoStore().wishlist + toast. */
 function HeaderHeart({ productId }: { productId: string }) {
   const { isWishlisted, toggleWishlist } = useDemoStore();
   const nav = useNav();
@@ -99,9 +98,7 @@ function HeaderHeart({ productId }: { productId: string }) {
         nav.toast(added ? copy.addedToWishlist : copy.removedFromWishlist);
       }}
     >
-      <motion.span key={on ? 'on' : 'off'} className={styles.glyph} initial={{ scale: on ? 0.6 : 1 }} animate={{ scale: 1 }} transition={spring.bouncy}>
-        <OriginIcon name="heart" filled={on} size={20} color={on ? 'var(--nk-palette-pink600)' : ink} />
-      </motion.span>
+      <LikeHeart on={on} size={20} />
     </Pressable>
   );
 }

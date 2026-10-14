@@ -4,6 +4,13 @@ All notable changes to `@noon/flow-kit`. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
+
+- `PhoneFrame`: square corners (no squircle clip) and no status bar or home indicator; safe-area insets are unchanged and the `statusBar` / `time` props are accepted but draw nothing.
+- PLP Filter pill: the landing attention animation no longer runs the blue stroke round the border; the scale pulse, glass and icon Lottie remain.
+- `WishlistHeart`: favouriting plays the Wishlist Revamp like Lottie (`lotties.like`, `like-heart.lottie`) instead of the scale pop + particle burst.
+- New `LikeHeart` component (the like Lottie as a drop-in heart glyph); `SkuCard` and the Storefront PDP header + recommendation hearts use it too, so every wishlist heart plays the same animation. `src/assets/shared/sku/heart-outline.svg` removed (unused).
+
 ### Added
 
 - World-class UI bar for the skills: `.claude/resources/references/` (15 pattern files — home feed, search, listing, PDP, cart, checkout, tracking, membership, account, sheets, navigation, toasts, states, sign-in, reviews — each with the strongest Mobbin-linked screens from Airbnb, Apple, Revolut, Uber, Amazon, Instacart, Zara, talabat, Careem, Linear, Duolingo and peers, the bar, the noon build and what to avoid) and the craft gate `noon-ui/references/craft-rubric.md`, wired into SKILL.md, design-workflow, research, the screen skills, the DESIGN.md template and CLAUDE.md.

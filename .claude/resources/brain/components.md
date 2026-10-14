@@ -26,9 +26,10 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:HtmlText` | `src/components/HtmlText/HtmlText.tsx:50` | 0 | — | — |
 | `cmp:Icon` | `src/components/Icon/Icon.tsx:94` | 1 | home | — |
 | `cmp:IconButton` | `src/components/Header/Header.tsx:26` | 0 | — | Icon, Pressable |
+| `cmp:LikeHeart` | `src/components/WishlistHeart/LikeHeart.tsx:19` | 1 | home | — |
 | `cmp:ListGroup` | `src/components/ListRow/ListRow.tsx:96` | 0 | — | DashedDivider, Icon, OriginIcon, Pressable |
 | `cmp:ListRow` | `src/components/ListRow/ListRow.tsx:35` | 0 | — | DashedDivider, Icon, OriginIcon, Pressable |
-| `cmp:Lottie` | `src/components/Lottie/Lottie.tsx:124` | 0 | — | — |
+| `cmp:Lottie` | `src/components/Lottie/Lottie.tsx:127` | 0 | — | — |
 | `cmp:MarketplaceTag` | `src/components/Tag/MarketplaceTag.tsx:56` | 1 | home | — |
 | `cmp:MarketplaceWordmark` | `src/components/Tag/MarketplaceTag.tsx:84` | 0 | — | — |
 | `cmp:MaskIcon` | `src/components/MaskIcon/MaskIcon.tsx:7` | 1 | home | — |
@@ -55,7 +56,7 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:SheetFooter` | `src/components/BottomSheet/BottomSheet.tsx:82` | 0 | — | ActionBar, Button, OriginIcon, Pressable |
 | `cmp:SheetHeader` | `src/components/BottomSheet/BottomSheet.tsx:22` | 0 | — | ActionBar, Button, OriginIcon, Pressable |
 | `cmp:Skeleton` | `src/components/Skeleton/Skeleton.tsx:8` | 0 | — | — |
-| `cmp:SkuCard` | `src/components/SkuCard/SkuCard.tsx:52` | 0 | — | CatalogTag, MaskIcon, ProductImage |
+| `cmp:SkuCard` | `src/components/SkuCard/SkuCard.tsx:50` | 0 | — | CatalogTag, LikeHeart, ProductImage |
 | `cmp:Snackbar` | `src/components/Snackbar/Snackbar.tsx:36` | 0 | — | OriginIcon, Pressable |
 | `cmp:SnackbarStack` | `src/components/Snackbar/Snackbar.tsx:79` | 1 | home | OriginIcon, Pressable |
 | `cmp:Spinner` | `src/components/Spinner/Spinner.tsx:44` | 0 | — | — |
@@ -67,7 +68,7 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:TextArea` | `src/components/TextArea/TextArea.tsx:62` | 0 | — | — |
 | `cmp:TextField` | `src/components/TextField/TextField.tsx:70` | 0 | — | — |
 | `cmp:Toast` | `src/components/Toast/Toast.tsx:26` | 0 | — | — |
-| `cmp:WishlistHeart` | `src/components/WishlistHeart/WishlistHeart.tsx:15` | 1 | home | Icon |
+| `cmp:WishlistHeart` | `src/components/WishlistHeart/WishlistHeart.tsx:12` | 1 | home | Icon, LikeHeart |
 
 ## Flow-local (`src/flows/<flow>/components`)
 

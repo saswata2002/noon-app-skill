@@ -4,7 +4,7 @@
 
 The source of truth for component **names, props, types, defaults and variants**. Hand-written guidance (when to use, gotchas, examples) is in `references/components.md`; when the two disagree, this file is right and `references/components.md` is stale.
 
-60 shared components exported from `src/components/index.ts` · 362 flow-local components in `src/flows/*/components/`. "—" = no static default; `?` = optional. Variants = props typed as a union of string literals.
+61 shared components exported from `src/components/index.ts` · 362 flow-local components in `src/flows/*/components/`. "—" = no static default; `?` = optional. Variants = props typed as a union of string literals.
 
 ## Shared components
 
@@ -382,7 +382,7 @@ White r14 card of ListRows separated by dashed lines.
 
 ### Lottie
 
-`src/components/Lottie/Lottie.tsx:124`
+`src/components/Lottie/Lottie.tsx:127`
 
 `onLoad` fires once the animation data has loaded (playback starts then when autoplay); `onComplete` when a non-looping play ends. Reduced motion: see `useLottieReducedMotion` (no autoplay; a held representative frame — `reducedMotionFrame` pins it — and `onComplete` still on time).
 
@@ -400,7 +400,7 @@ White r14 card of ListRows separated by dashed lines.
 | `reducedMotionFrame?` | `LottiePoster` | `'auto'` |  |
 
 Variants:
-- `name`: `atcCheck` · `boxAnim` · `favourite` · `orderConf` · `orderConfirmedCheck` · `reviewCheck` · `sliderArrow` · `starLoading`
+- `name`: `atcCheck` · `boxAnim` · `favourite` · `like` · `orderConf` · `orderConfirmedCheck` · `reviewCheck` · `sliderArrow` · `starLoading`
 
 ### MaskIcon
 
@@ -757,7 +757,7 @@ Shimmer block (NewLoadingState / ShimmerBackground). Reduced motion: a still blo
 
 ### SkuCard
 
-`src/components/SkuCard/SkuCard.tsx:52` · props `SkuCardProps`
+`src/components/SkuCard/SkuCard.tsx:50` · props `SkuCardProps`
 
 SkuCard — the 134px product card of every noon product rail (Figma component "SKU", shared by the Homepage Revamp 2025 rails and the Cart 2.0 carousels). Image box 134×174 r10 with the wishlist heart (24 circle, white 20%), the blue "+" quick add (white, 1.2px `link`, r8, p4) and the tags; info p4 gap 8: title 14/18 500 (2 lines), rating pill, price 15/20 700 with the dirham sign + 12/14 strike + 12/14 600 "%", delivery line and the express pill. Tap → PDP, "+" → add to cart, heart → wishlist (DemoStore).
 
@@ -1096,11 +1096,22 @@ Self-dismissing toast / snackbar host (bappzaar `src/components/Toast`, `NoonSna
 
 Also accepts 336 inherited DOM / React / motion props (not listed; e.g. `className` `style` `onClick` `role` `aria-label` `id` `initial` `animate` `exit` `transition` `whileTap` `layout`).
 
+### LikeHeart
+
+`src/components/WishlistHeart/LikeHeart.tsx:19`
+
+Drop-in wishlist heart glyph: a `size` × `size` slot (the old heart icon's box) that plays the like Lottie when `on` turns true, and rests on frame 0 (outline) / the last frame (filled) otherwise. Un-favouriting and reduced motion jump straight to the resting frame. Used by every wishlist heart: `WishlistHeart`, `SkuCard`, the Storefront PDP header and recommendation cards.
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `on` | `boolean` | — |  |
+| `size` | `number` | — |  |
+
 ### WishlistHeart
 
-`src/components/WishlistHeart/WishlistHeart.tsx:15`
+`src/components/WishlistHeart/WishlistHeart.tsx:12`
 
-NoonFavourite: 24px heart in a white 70% circle. Pops to 1.25 when favouriting with a particle burst (web stand-in for the favouriteAnimatedV2 lottie).
+NoonFavourite: heart in a white 70% circle. Favouriting plays the like Lottie from its first frame; un-favouriting (or reduced motion) jumps straight to the resting frame (`LikeHeart`).
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
@@ -1381,14 +1392,14 @@ Search these before you create a component (`references/components.md` → "Sear
 | pdp | `SfFbtCard` | `src/flows/pdp/components/storefront/SfFbtCard.tsx:21` | `ids` |
 | pdp | `SfFreeGifts` | `src/flows/pdp/components/storefront/SfFreeGifts.tsx:13` | `items` |
 | pdp | `SfGallery` | `src/flows/pdp/components/storefront/SfGallery.tsx:34` | `product` `scrollY` |
-| pdp | `SfHeader` | `src/flows/pdp/components/storefront/SfHeader.tsx:27` | `product` `solid` |
+| pdp | `SfHeader` | `src/flows/pdp/components/storefront/SfHeader.tsx:26` | `product` `solid` |
 | pdp | `SfMainInfo` | `src/flows/pdp/components/storefront/SfMainInfo.tsx:58` | `product` `content` `onReviews` |
 | pdp | `SfNewerModelCard` | `src/flows/pdp/components/storefront/SfNewerModelCard.tsx:50` | `product` `successor` |
 | pdp | `SfPaymentOffers` | `src/flows/pdp/components/storefront/SfPaymentOffers.tsx:24` | `content` |
 | pdp | `SfProductDetails` | `src/flows/pdp/components/storefront/SfProductDetails.tsx:75` | `content` `product` `aiOverview` `onAccordionOpen` |
 | pdp | `SfProductFeatures` | `src/flows/pdp/components/storefront/SfProductFeatures.tsx:30` | `content` `product` |
-| pdp | `SfRecommendations` | `src/flows/pdp/components/storefront/SfRecommendations.tsx:36` | `title` `items` `sponsored` `variant` |
-| pdp | `SfRecoCard` | `src/flows/pdp/components/storefront/SfRecommendations.tsx:58` | `product` `sponsored` |
+| pdp | `SfRecommendations` | `src/flows/pdp/components/storefront/SfRecommendations.tsx:35` | `title` `items` `sponsored` `variant` |
+| pdp | `SfRecoCard` | `src/flows/pdp/components/storefront/SfRecommendations.tsx:57` | `product` `sponsored` |
 | pdp | `SfStars` | `src/flows/pdp/components/storefront/SfReviewsCard.tsx:28` | `rating` `size` |
 | pdp | `SfReviewsCard` | `src/flows/pdp/components/storefront/SfReviewsCard.tsx:52` | `product` `content` |
 | pdp | `SfSellerCard` | `src/flows/pdp/components/storefront/SfSellerCard.tsx:54` | `content` `onOffers` |

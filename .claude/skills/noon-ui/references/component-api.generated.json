@@ -1207,7 +1207,7 @@
     {
       "name": "Lottie",
       "file": "src/components/Lottie/Lottie.tsx",
-      "line": 124,
+      "line": 127,
       "doc": "`onLoad` fires once the animation data has loaded (playback starts then when autoplay); `onComplete` when a non-looping play ends. Reduced motion: see `useLottieReducedMotion` (no autoplay; a held representative frame — `reducedMotionFrame` pins it — and `onComplete` still on time).",
       "generic": false,
       "forwardRef": false,
@@ -1272,6 +1272,7 @@
           "atcCheck",
           "boxAnim",
           "favourite",
+          "like",
           "orderConf",
           "orderConfirmedCheck",
           "reviewCheck",
@@ -2358,7 +2359,7 @@
     {
       "name": "SkuCard",
       "file": "src/components/SkuCard/SkuCard.tsx",
-      "line": 52,
+      "line": 50,
       "doc": "SkuCard — the 134px product card of every noon product rail (Figma component \"SKU\", shared by the Homepage Revamp 2025 rails and the Cart 2.0 carousels). Image box 134×174 r10 with the wishlist heart (24 circle, white 20%), the blue \"+\" quick add (white, 1.2px `link`, r8, p4) and the tags; info p4 gap 8: title 14/18 500 (2 lines), rating pill, price 15/20 700 with the dirham sign + 12/14 strike + 12/14 600 \"%\", delivery line and the express pill. Tap → PDP, \"+\" → add to cart, heart → wishlist (DemoStore).",
       "generic": false,
       "forwardRef": false,
@@ -3519,10 +3520,30 @@
       "propsType": "ToastProps<T>"
     },
     {
+      "name": "LikeHeart",
+      "file": "src/components/WishlistHeart/LikeHeart.tsx",
+      "line": 19,
+      "doc": "Drop-in wishlist heart glyph: a `size` × `size` slot (the old heart icon's box) that plays the like Lottie when `on` turns true, and rests on frame 0 (outline) / the last frame (filled) otherwise. Un-favouriting and reduced motion jump straight to the resting frame. Used by every wishlist heart: `WishlistHeart`, `SkuCard`, the Storefront PDP header and recommendation cards.",
+      "generic": false,
+      "forwardRef": false,
+      "props": [
+        {
+          "name": "on",
+          "type": "boolean",
+          "optional": false
+        },
+        {
+          "name": "size",
+          "type": "number",
+          "optional": false
+        }
+      ]
+    },
+    {
       "name": "WishlistHeart",
       "file": "src/components/WishlistHeart/WishlistHeart.tsx",
-      "line": 15,
-      "doc": "NoonFavourite: 24px heart in a white 70% circle. Pops to 1.25 when favouriting with a particle burst (web stand-in for the favouriteAnimatedV2 lottie).",
+      "line": 12,
+      "doc": "NoonFavourite: heart in a white 70% circle. Favouriting plays the like Lottie from its first frame; un-favouriting (or reduced motion) jumps straight to the resting frame (`LikeHeart`).",
       "generic": false,
       "forwardRef": false,
       "props": [
@@ -6941,7 +6962,7 @@
       "flow": "pdp",
       "name": "SfHeader",
       "file": "src/flows/pdp/components/storefront/SfHeader.tsx",
-      "line": 27,
+      "line": 26,
       "doc": "Storefront PDP header (Figma 2ldJbjmQq4RkhnrNFCfXQB · 3499:75879): white → transparent gradient (white to 40%), header stack 56 (padding 8·12, gap 8) with four ",
       "props": [
         "product",
@@ -7009,7 +7030,7 @@
       "flow": "pdp",
       "name": "SfRecommendations",
       "file": "src/flows/pdp/components/storefront/SfRecommendations.tsx",
-      "line": 36,
+      "line": 35,
       "doc": "Product rail, two looks (New PDP, All flows Af34gfmhQ1D0wstXUEHSIF · 64:5571): - `card` (default; \"Products related to this\" 89:62855, Storefront 3499:75876 / 3",
       "props": [
         "title",
@@ -7028,7 +7049,7 @@
       "flow": "pdp",
       "name": "SfRecoCard",
       "file": "src/flows/pdp/components/storefront/SfRecommendations.tsx",
-      "line": 58,
+      "line": 57,
       "doc": "Figma \"Product card\" (134, 0.5px Blue-Gray/200, r10): 3:4 image box (2% tint, image 87.5% tall) with Best Seller tag, wishlist (16 heart in a 24 white-20% circl",
       "props": [
         "product",

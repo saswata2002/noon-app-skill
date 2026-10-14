@@ -34,7 +34,6 @@
   background: var(--nk-palette-white-alpha90);
   cursor: pointer;
 }
-.glyph { display: flex; }
 
 /* NoonExpandableSearch: flex 1, aligned to the end, so the button grows from the wishlist side towards the back button */
 .searchWrap { flex: 1 1 0; min-width: 0; display: flex; justify-content: flex-end; }

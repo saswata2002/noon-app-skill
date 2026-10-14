@@ -223,7 +223,7 @@ Variables come from `get_variable_defs` on `1337:5102`. "Fill" rows are raw fill
 | Sticky tab strip | CSS `position: sticky; top: <pinned header height>` inside the `.nk-scroll` container. No JS |
 | Module entry as the feed scrolls | `Reveal` (whileInView, once, `duration.slow`) per module, or `Stagger` on rail cards (first 8) |
 | Quick add "+" → stepper → count | `QuickAdd` (`spring.bouncy` / `spring.gentle`, toast) |
-| Wishlist heart | `WishlistHeart` (pop + particle burst) |
+| Wishlist heart | `WishlistHeart` (`like` Lottie) |
 | Video tile autoplay / mute | native `<video muted autoPlay loop playsInline>`. Mute icon swap via `AnimatePresence` + `Pop` |
 | Bottom tab press / switch | `TabBar` (`tabBar.pressScale` 0.9, `nav.switchTab`, no transition) |
 | Navigation out (tile → PLP, card → PDP, search → search) | Navigator default `push`. Search may use `slide-left` (the noon search push) |

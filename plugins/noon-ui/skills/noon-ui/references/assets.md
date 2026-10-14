@@ -109,7 +109,8 @@ Registered names (`lotties` in `src/components/Lottie/Lottie.tsx`, all in `src/a
 |---|---|---|
 | `atcCheck` | `atc-check.lottie` | `flows/pdp/AddedSheet.tsx` (added-to-cart tick) |
 | `boxAnim` | `box-anim.lottie` | `flows/checkout/PlacingScreen.tsx` (placing order, loop) |
-| `favourite` | `favouriteAnimatedV2.lottie` | unused, available (wishlist heart burst; `WishlistHeart` draws a CSS stand-in) |
+| `favourite` | `favouriteAnimatedV2.lottie` | unused, available (bappzaar wishlist heart burst; superseded by `like`) |
+| `like` | `like-heart.lottie` | `components/WishlistHeart/LikeHeart.tsx` → every wishlist heart (Wishlist Revamp like: outline → pink fill + ripple) |
 | `orderConf` | `order-conf-lottie.lottie` | `flows/checkout/PlacingScreen.tsx`, `flows/returns/ReturnDetailsScreen.tsx` |
 | `orderConfirmedCheck` | `order-confirmed-checkmark.lottie` | `flows/returns/ReturnDetailsScreen.tsx` (also imported directly in `flows/returns/assets.ts`) |
 | `reviewCheck` | `noon-review-check-mark-animation.lottie` | unused, available |

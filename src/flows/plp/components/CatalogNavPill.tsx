@@ -35,7 +35,7 @@ function Tinted({ src, size, color, w, h }: { src: string; size?: number; color:
 }
 
 export interface CatalogNavPillHandle {
-  /** the idle Filter pill's one-time attention animation (NoonFilterPillAnimation + the filter-pill Lottie) */
+  /** the idle Filter pill's one-time attention animation (NoonFilterPillAnimation pulse + the filter-pill Lottie; no border stroke) */
   play: () => boolean;
 }
 
@@ -60,7 +60,7 @@ export const CatalogNavPill = forwardRef<
 
   useImperativeHandle(ref, () => ({
     play: () => {
-      // reduced motion: no attention pass (border, pulse or icon Lottie)
+      // reduced motion: no attention pass (pulse or icon Lottie)
       if (!idleFilter || !attn.current || reduce) return false;
       attn.current.play();
       lottie.current?.play();
@@ -129,37 +129,9 @@ export const CatalogNavPill = forwardRef<
   return idleFilter ? <FilterPillAttention ref={attn}>{pill}</FilterPillAttention> : pill;
 });
 
-/* ── NoonFilterPillAnimation: 75 × 30 idle Filter pill ─────────────────────────────────────────────────────── */
+/* ── NoonFilterPillAnimation: 75 × 30 idle Filter pill — pulse + glass only, no travelling border stroke ─────── */
 const DURATION = 4.5; // FILTER_PILL_ANIMATION_DURATION 4500
 export const FILTER_PILL_LOTTIE_SPEED = 2 / DURATION;
-const W = 75;
-const H = 30;
-const STROKE = 1.5;
-const INSET = STROKE / 2;
-const R = Math.min((H - STROKE) / 2, (W - STROKE) / 2);
-const [L, RT, T, B] = [INSET, W - INSET, INSET, H - INSET];
-/** the pill outline, drawn once round and then on to the right-hand end again so the travelling segment can leave cleanly */
-const PATH = [
-  `M ${RT - R} ${T}`,
-  `A ${R} ${R} 0 0 1 ${RT} ${T + R}`,
-  `L ${RT} ${B - R}`,
-  `A ${R} ${R} 0 0 1 ${RT - R} ${B}`,
-  `L ${L + R} ${B}`,
-  `A ${R} ${R} 0 0 1 ${L} ${B - R}`,
-  `L ${L} ${T + R}`,
-  `A ${R} ${R} 0 0 1 ${L + R} ${T}`,
-  `L ${RT - R} ${T}`,
-  `A ${R} ${R} 0 0 1 ${RT} ${T + R}`,
-  `L ${RT} ${B - R}`,
-  `A ${R} ${R} 0 0 1 ${RT - R} ${B}`,
-].join(' ');
-const INNER_W = RT - L;
-const INNER_H = B - T;
-const PERIMETER = 2 * (INNER_W + INNER_H - 4 * R) + 2 * Math.PI * R;
-const PATH_LEN = PERIMETER + INNER_H - 2 * R + Math.PI * R;
-const SEG = Math.max(INNER_W * 0.45, STROKE) / PATH_LEN;
-const FADE = (STROKE * 2) / PATH_LEN;
-const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
 interface FilterPillAttentionHandle {
   play: () => void;
@@ -168,18 +140,11 @@ interface FilterPillAttentionHandle {
 const FilterPillAttention = forwardRef<FilterPillAttentionHandle, { children: ReactNode }>(function FilterPillAttention({ children }, ref) {
   const reduce = useReduceMotion();
   const attention = useMotionValue(0);
-  const border = useMotionValue(0);
   const scale = useTransform(attention, (a) => 1 + a * 0.04);
-  const start = useTransform(border, (p) => clamp01(p * (1 + SEG) - SEG));
-  const end = useTransform(border, (p) => clamp01(p * (1 + SEG)));
-  const len = useTransform([start, end], ([s, e]: number[]) => e - s);
-  const opacity = useTransform(len, (l) => clamp01(l / FADE));
 
   useImperativeHandle(ref, () => ({
     play: () => {
       if (reduce) return;
-      // withSpring(1, { dampingRatio 0.75, duration 4500, overshootClamping }) — a clamped, eased-out run round the pill
-      animate(border, 1, { duration: DURATION, ease: [0.16, 1, 0.3, 1] });
       // withDelay(396, sequence(440ms out-cubic → 1, 633ms in-out-cubic → 0))
       animate(attention, [0, 0, 1, 0], {
         duration: 0.396 + 0.44 + 0.633,
@@ -198,17 +163,6 @@ const FilterPillAttention = forwardRef<FilterPillAttentionHandle, { children: Re
         <motion.span className={styles.backGlass} style={{ opacity: attention }} />
       </span>
       {children}
-      {/* front: a 1.5px primaryBlue segment (45% of the width) travels once round the border */}
-      <svg className={styles.front} width={W} height={H} viewBox={`0 0 ${W} ${H}`} aria-hidden>
-        <motion.path
-          d={PATH}
-          fill="none"
-          stroke="var(--nk-palette-primary-blue)"
-          strokeWidth={STROKE}
-          strokeLinecap="round"
-          style={{ pathLength: len, pathOffset: start, opacity }}
-        />
-      </svg>
     </motion.span>
   );
 });

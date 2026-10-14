@@ -31,4 +31,3 @@
 .backShadow { box-shadow: 0 0 16px var(--nk-palette-charcoal-navy-alpha12); }
 .backFill { background: var(--nk-palette-white); }
 .backGlass { background: var(--nk-color-plp-filter-glass); }
-.front { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; overflow: visible; }

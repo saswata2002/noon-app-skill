@@ -17,7 +17,6 @@
 /* heart — 16 icon in a 24 circle (white 20%, p4) at top 4 / right 4 */
 .heart { position: absolute; right: var(--nk-space-s4); top: var(--nk-space-s4); display: flex; align-items: center; justify-content: center; padding: var(--nk-space-s4); border: 0; border-radius: var(--nk-radius-full); background: var(--nk-palette-white-alpha20); cursor: pointer; }
 .sku[data-look='cart'] .heart { right: 3px; top: 3px; }
-.heartIcon { display: block; width: 16px; height: 16px; }
 
 /* quick add — 24 "+" in a white box, 1.2px Blue/600, r8, p4, at 94/136 */
 .add { position: absolute; left: 94px; top: 136px; display: flex; align-items: center; padding: var(--nk-space-s4); background: var(--nk-color-bg-surface); border: 1.2px solid var(--nk-color-link); border-radius: var(--nk-radius-r8); cursor: pointer; }

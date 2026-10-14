@@ -16,6 +16,7 @@ export * from './ProductImage/ProductImage';
 export * from './ProductCard/ProductCard';
 export * from './ProductBoxVertical/ProductBoxVertical';
 export * from './WishlistHeart/WishlistHeart';
+export * from './WishlistHeart/LikeHeart';
 export * from './QuantityStepper/QuantityStepper';
 export * from './Tag/Tag';
 export * from './Tag/MarketplaceTag';

@@ -5,6 +5,8 @@ import { useReduceMotion } from '../../motion/reducedMotion';
 import atcCheck from '@assets/lotties/atc-check.lottie';
 import boxAnim from '@assets/lotties/box-anim.lottie';
 import favourite from '@assets/lotties/favouriteAnimatedV2.lottie';
+// Wishlist Revamp like animation (Like_Lottie_2): played by WishlistHeart
+import like from '@assets/lotties/like-heart.lottie';
 import orderConf from '@assets/lotties/order-conf-lottie.lottie';
 import orderConfirmedCheck from '@assets/lotties/order-confirmed-checkmark.lottie';
 import reviewCheck from '@assets/lotties/noon-review-check-mark-animation.lottie';
@@ -16,6 +18,7 @@ export const lotties = {
   atcCheck,
   boxAnim,
   favourite,
+  like,
   orderConf,
   orderConfirmedCheck,
   reviewCheck,

@@ -1,8 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import etaExpressToday from '@assets/pdp/new-pdp/eta-express-today.svg';
-import { OriginIcon, ProductImage, type OriginIconName } from '../../../../components';
-import { ref } from '../../../../foundations/tokens';
+import { LikeHeart, OriginIcon, ProductImage, type OriginIconName } from '../../../../components';
 import { useDemoStore } from '../../../../kit/DemoStore';
 import { useNav } from '../../../../kit/Navigator';
 import { currency, discountPct, formatPrice, type Product, type ProductNudge } from '../../../../data';
@@ -89,9 +88,7 @@ export function SfRecoCard({ product: p, sponsored }: { product: Product; sponso
             nav.toast(added ? copy.addedToWishlist : copy.removedFromWishlist);
           }}
         >
-          <motion.span key={wished ? 'on' : 'off'} initial={wished ? { scale: 0.6 } : false} animate={{ scale: 1 }} transition={spring.bouncy} className={styles.heartIcon}>
-            <OriginIcon name="heart" filled={wished} size={16} color={wished ? ref.palette('pink600') : 'var(--nk-color-text-strong)'} />
-          </motion.span>
+          <LikeHeart on={wished} size={16} />
         </motion.button>
         <motion.button
           type="button"

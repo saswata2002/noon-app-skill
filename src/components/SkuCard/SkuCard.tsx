@@ -2,12 +2,10 @@ import { motion } from 'motion/react';
 import { useDemoStore } from '../../kit/DemoStore';
 import { useNav } from '../../kit/Navigator';
 import { currency, discountPct, formatPrice, type Product } from '../../data';
-import { ref } from '../../foundations/tokens';
 import { spring } from '../../motion/presets';
 import { CatalogTag } from '../Tag/Tag';
 import { ProductImage } from '../ProductImage/ProductImage';
-import { MaskIcon } from '../MaskIcon/MaskIcon';
-import heartOutline from '@assets/shared/sku/heart-outline.svg';
+import { LikeHeart } from '../WishlistHeart/LikeHeart';
 import plusBlue from '@assets/shared/sku/plus-blue.svg';
 import star from '@assets/shared/sku/star.svg';
 import truck from '@assets/shared/sku/truck.svg';
@@ -86,13 +84,7 @@ export function SkuCard({ product: p, look = 'feed', badge, sponsored, rating, d
             nav.toast(added ? 'Added to Wishlist' : 'Removed from Wishlist');
           }}
         >
-          {wished ? (
-            <motion.span key="on" initial={{ scale: 0.6 }} animate={{ scale: 1 }} transition={spring.bouncy} className={styles.heartIcon}>
-              <MaskIcon src={heartOutline} size={16} color={ref.palette('pink600')} />
-            </motion.span>
-          ) : (
-            <img src={heartOutline} alt="" className={styles.heartIcon} />
-          )}
+          <LikeHeart on={wished} size={16} />
         </motion.button>
         <motion.button
           type="button"
