@@ -15,6 +15,8 @@ import { taf } from '../data';
 import { NoonOneCtaReveal } from './NoonOneCtaReveal';
 import styles from './NoonOneSection.module.css';
 import { useReduceMotion } from '../../../motion/reducedMotion';
+import { duration, easing, handoff } from '../../../motion/presets';
+import { haptic } from '../../../motion/haptics';
 
 const { checkout: a } = entryTokens;
 const green = { color: 'var(--nk-color-best-price-ink)' };
@@ -25,7 +27,32 @@ const ctaStyle: HtmlStylesheet = { green };
 /** CTA_REVEAL_LAYOUT_TIMEOUT */
 const REVEAL_LAYOUT_TIMEOUT_MS = 1000;
 
-const fade = { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: a.ms / 1000 } };
+/*
+ * The toggle, smooth and natural (timing: the Test01 motion reference). The knob flips on the tap itself (the
+ * enrolment is committed after the checkout update); then, together: the green blooms out behind the card, the CTA
+ * strip collapses while the savings subtitle grows in (their heights crossfade on the Test01 spring, so the card glides
+ * to its new height instead of popping), and the "First month FREE" nudge opens one stagger step later. No `layout`
+ * scaling (it stretched the text); every gap travels with its element (animated margins), so nothing snaps.
+ */
+const grow = (gap: number, delay = 0) => ({
+  initial: { height: 0, marginTop: 0, opacity: 0 },
+  animate: {
+    height: 'auto',
+    marginTop: gap,
+    opacity: 1,
+    transition: {
+      height: { ...handoff.spring, delay },
+      marginTop: { ...handoff.spring, delay },
+      opacity: { duration: handoff.fade.out, ease: handoff.easeOut, delay: delay + 0.06 },
+    },
+  },
+  exit: {
+    height: 0,
+    marginTop: 0,
+    opacity: 0,
+    transition: { height: handoff.spring, marginTop: handoff.spring, opacity: { duration: handoff.fade.io * 0.7, ease: handoff.easeInOut } },
+  },
+});
 
 /**
  * NoonCheckoutNoonOneSection (sectionsOrder `integrated_noonone`): white card with "Get FREE delivery with [one]" +
@@ -66,18 +93,52 @@ export function NoonOneSection({ variant = 'master' }: { variant?: 'master' | 'b
     return () => clearTimeout(id);
   }, [revealing, geom]);
 
+  // the switch answers the tap at once; the store follows once the checkout update has run
+  const [on, setOn] = useState(enrolled);
+  const pending = useRef(false);
+  useEffect(() => {
+    if (!pending.current) setOn(enrolled);
+  }, [enrolled]);
+
   if (member) return null;
 
-  const toggle = () => checkoutStore.update({}).then(() => checkoutEnrollmentStore.patch({ enrolled: !enrolled }));
-  const radius = enrolled ? 'var(--nk-radius-chk-noon-one-on)' : 'var(--nk-radius-chk-noon-one)';
+  const toggle = () => {
+    const next = !on;
+    setOn(next);
+    haptic('tap');
+    pending.current = true;
+    checkoutStore
+      .update({})
+      .then(() => checkoutEnrollmentStore.patch({ enrolled: next }))
+      .finally(() => {
+        pending.current = false;
+      });
+  };
+  const radius = on ? 'var(--nk-radius-chk-noon-one-on)' : 'var(--nk-radius-chk-noon-one)';
+  const gap = banner ? 12 : 14; // .container gap (master 14 / banner 12), now a margin that collapses with the strip
 
   return (
-    <motion.div className={banner ? `${styles.outer} ${styles.banner}` : styles.outer} animate={{ borderRadius: radius, padding: enrolled ? '2px 2px 0' : '0px 0px 0' }} transition={{ duration: a.ms / 1000 }} layout>
-      <motion.div className={styles.gradient} initial={false} animate={{ scale: enrolled ? a.gradientScale : 0, opacity: enrolled ? 1 : 0 }} transition={{ duration: a.gradientMs / 1000 }} />
-      <motion.div ref={cardRef} className={styles.card} layout>
-        <div className={[styles.container, enrolled && styles.enrolled].filter(Boolean).join(' ')}>
+    <motion.div
+      className={banner ? `${styles.outer} ${styles.banner}` : styles.outer}
+      initial={false}
+      animate={{ borderRadius: radius, padding: on ? '2px 2px 0px' : '0px 0px 0px' }}
+      transition={{ borderRadius: { duration: duration.medium, ease: easing.inOut }, padding: handoff.spring }}
+    >
+      {/* the green blooms out from the card's centre (and folds back in when switched off) */}
+      <motion.div
+        className={styles.gradient}
+        initial={false}
+        animate={{ scale: on ? a.gradientScale : 0, opacity: on ? 1 : 0 }}
+        transition={
+          on
+            ? { scale: { duration: duration.slower, ease: easing.out }, opacity: { duration: duration.medium, ease: easing.out } }
+            : { scale: { duration: duration.slow, ease: easing.inOut }, opacity: { duration: duration.slow, ease: easing.inOut } }
+        }
+      />
+      <motion.div ref={cardRef} className={styles.card}>
+        <motion.div className={styles.container} initial={false} animate={{ paddingTop: on ? 10 : gap }} transition={handoff.spring}>
           <div className={styles.info}>
-            <button type="button" className={`nk-pressable ${styles.toggle}`} onClick={toggle}>
+            <button type="button" className={`nk-pressable ${styles.toggle}`} onClick={toggle} aria-pressed={on}>
               <span className={styles.titleRow}>
                 <HtmlText base value={banner ? taf.noonOneTitle : data.title} stylesheet={titleStyle} className={styles.titleText} />
                 {banner ? (
@@ -89,30 +150,34 @@ export function NoonOneSection({ variant = 'master' }: { variant?: 'master' | 'b
                   <img className={styles.icon} src={noonOneIcon} alt="noon One" />
                 )}
               </span>
-              <Switch as="span" value={enrolled} width={34} height={20} knob={16} inset={2} onColor="var(--nk-color-best-price-ink)" offColor="var(--nk-color-border)" />
+              <Switch as="span" value={on} width={34} height={20} knob={16} inset={2} onColor="var(--nk-color-best-price-ink)" offColor="var(--nk-color-border)" />
             </button>
             <AnimatePresence initial={false}>
-              {enrolled && (
-                <motion.div key="sub" className={styles.subtitle} {...fade}>
-                  <HtmlText base value={data.subtitle} stylesheet={subtitleStyle} />
+              {on && (
+                <motion.div key="sub" className={styles.grow} {...grow(4)}>
+                  <div className={styles.subtitle}>
+                    <HtmlText base value={data.subtitle} stylesheet={subtitleStyle} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           <AnimatePresence initial={false}>
-            {!enrolled && (
-              <motion.div key="cta" ref={ctaRef} className={styles.cta} {...fade}>
-                {/* the strip carries the CTA copy the reveal settles into ("Save Đ 15 on this order") — no separate banner line */}
-                {/* hidden while the reveal plays: its settled text lands exactly here and hands over in one frame */}
-                <span style={{ display: 'block', visibility: revealing && geom ? 'hidden' : 'visible' }}>
-                  <HtmlText base value={data.cta} stylesheet={ctaStyle} className={banner ? styles.bannerCta : undefined} />
-                </span>
+            {!on && (
+              <motion.div key="cta" ref={ctaRef} className={`${styles.cta} ${styles.grow}`} {...grow(gap)}>
+                <div className={styles.ctaPad}>
+                  {/* the strip carries the CTA copy the reveal settles into ("Save Đ 15 on this order") — no separate banner line */}
+                  {/* hidden while the reveal plays: its settled text lands exactly here and hands over in one frame */}
+                  <span style={{ display: 'block', visibility: revealing && geom ? 'hidden' : 'visible' }}>
+                    <HtmlText base value={data.cta} stylesheet={ctaStyle} className={banner ? styles.bannerCta : undefined} />
+                  </span>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
         <AnimatePresence>
-          {revealing && !enrolled && geom && data.animation && (
+          {revealing && !on && geom && data.animation && (
             <motion.div key="reveal" className={styles.revealHost}>
               <NoonOneCtaReveal card={geom.card} cta={geom.cta} animation={data.animation} onDone={() => setRevealing(false)} />
             </motion.div>
@@ -120,27 +185,24 @@ export function NoonOneSection({ variant = 'master' }: { variant?: 'master' | 'b
         </AnimatePresence>
       </motion.div>
       <AnimatePresence initial={false}>
-        {enrolled && (
-          <motion.button
-            key="nudge"
-            type="button"
-            className={`nk-pressable ${styles.nudge}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: a.ms / 1000 }}
-            onClick={() => nav.push('noonone/plans', { source: '/checkout' })}
-          >
-            <span className={styles.nudgeText}>
-              <span className={styles.nudgeStrong}>{data.discountNudge}</span>
-              {/* !planDiscountPercentage && planTrialValid → noon_checkout_noon_one_plan_amount */}
-              {!data.planDiscountPercentage && <span className={styles.nudgePlan}>{`, then ${CURRENCY} ${data.planAmount}/mo`}</span>}
-            </span>
-            {/* NoonIcons.chevronThick (chevron-thick.svg) inline: a tiny SVG is inlined by Vite as an unquoted data URL, which breaks CSS masks */}
-            <svg className={styles.chevron} width={12} height={12} viewBox="0 0 17 16" fill="var(--nk-color-text-inverse)" stroke="var(--nk-color-text-inverse)" aria-hidden>
-              <path fillRule="evenodd" clipRule="evenodd" d="M9.20985 8.70574C9.60038 8.31522 9.60038 7.68205 9.20985 7.29153L6.06807 4.14975C5.83376 3.91543 5.83376 3.53553 6.06807 3.30122C6.30238 3.0669 6.68228 3.0669 6.9166 3.30122L10.9069 7.29153C11.2974 7.68205 11.2974 8.31522 10.9069 8.70574L6.9166 12.696C6.68228 12.9304 6.30238 12.9304 6.06807 12.696C5.83376 12.4617 5.83376 12.0818 6.06807 11.8475L9.20985 8.70574Z" />
-            </svg>
-          </motion.button>
+        {on && (
+          <motion.div key="nudge" className={styles.grow} {...grow(0, handoff.stagger.in)}>
+            <button type="button" className={`nk-pressable ${styles.nudge}`} onClick={() => nav.push('noonone/plans', { source: '/checkout' })}>
+              <span className={styles.nudgeText}>
+                <span className={styles.nudgeStrong}>{data.discountNudge}</span>
+                {/* !planDiscountPercentage && planTrialValid → noon_checkout_noon_one_plan_amount */}
+                {!data.planDiscountPercentage && <span className={styles.nudgePlan}>{`, then ${CURRENCY} ${data.planAmount}/mo`}</span>}
+              </span>
+              {/* NoonIcons.chevronThick (chevron-thick.svg) inline: a tiny SVG is inlined by Vite as an unquoted data URL, which breaks CSS masks */}
+              <svg className={styles.chevron} width={12} height={12} viewBox="0 0 17 16" fill="var(--nk-color-text-inverse)" stroke="var(--nk-color-text-inverse)" aria-hidden>
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M9.20985 8.70574C9.60038 8.31522 9.60038 7.68205 9.20985 7.29153L6.06807 4.14975C5.83376 3.91543 5.83376 3.53553 6.06807 3.30122C6.30238 3.0669 6.68228 3.0669 6.9166 3.30122L10.9069 7.29153C11.2974 7.68205 11.2974 8.31522 10.9069 8.70574L6.9166 12.696C6.68228 12.9304 6.30238 12.9304 6.06807 12.696C5.83376 12.4617 5.83376 12.0818 6.06807 11.8475L9.20985 8.70574Z"
+                />
+              </svg>
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </motion.div>

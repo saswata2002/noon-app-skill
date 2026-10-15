@@ -6,15 +6,18 @@
     radial-gradient(circle closest-side at 50% 50%, var(--nk-color-chk-noon-one-ocean95) 0%, var(--nk-color-chk-noon-one-ocean) 70%, var(--nk-color-bg-muted) 100%);
 }
 .card { position: relative; background: var(--nk-color-bg-surface); border-radius: var(--nk-radius-chk-noon-one); overflow: hidden; }
-.container { display: flex; flex-direction: column; gap: var(--nk-space-s14); padding: var(--nk-space-s14) var(--nk-space-s2) var(--nk-space-s2); }
-.enrolled { padding-top: var(--nk-space-s10); }
-.info { display: flex; flex-direction: column; gap: var(--nk-space-s4); padding: 0 var(--nk-space-s10); }
+.container { display: flex; flex-direction: column; padding: var(--nk-space-s14) var(--nk-space-s2) var(--nk-space-s2); } /* the 14 gap → the strip's animated marginTop; padding-top animated 14 ⇄ 10 */
+.info { display: flex; flex-direction: column; padding: 0 var(--nk-space-s10); } /* the 4 gap → the subtitle's animated marginTop */
+/* a block that grows / collapses with the toggle: clipped while its height animates */
+.grow { overflow: hidden; }
 .toggle { display: flex; flex-direction: row; gap: var(--nk-space-s8); justify-content: space-between; align-items: center; width: 100%; text-align: start; }
 .titleRow { display: flex; flex-direction: row; align-items: center; gap: var(--nk-space-s4); min-width: 0; }
 .titleText { flex-shrink: 1; }
 .icon { width: var(--nk-layout-chk-noon-one-icon-w); height: var(--nk-layout-chk-noon-one-icon-h); object-fit: contain; }
 .subtitle { padding-bottom: var(--nk-space-s12); }
-.cta { position: relative; padding: 7px var(--nk-space-s12); background: var(--nk-color-chk-noon-one-cta-bg); border-radius: 0 0 var(--nk-radius-r12) var(--nk-radius-r12); text-align: center; }
+.cta { position: relative; background: var(--nk-color-chk-noon-one-cta-bg); border-radius: 0 0 var(--nk-radius-r12) var(--nk-radius-r12); text-align: center; }
+/* the strip's padding lives inside, so the strip itself can collapse to 0 */
+.ctaPad { padding: 7px var(--nk-space-s12); }
 .revealHost { position: absolute; inset: 0; z-index: 2; border-radius: inherit; overflow: hidden; pointer-events: none; }
 .nudge { position: relative; display: flex; flex-direction: row; justify-content: center; align-items: center; padding: 8.5px var(--nk-space-s16); width: 100%; }
 .nudgeText { flex-shrink: 1; color: var(--nk-color-text-inverse); }
@@ -25,8 +28,7 @@
 
 /* ── Figma "All flows" Banner/.base 127:44088 (variant="banner") ── */
 /* .base: pt 12, px 4, pb 4, gap 12, r15 */
-.banner .container { gap: var(--nk-space-s12); padding: var(--nk-space-s12) var(--nk-space-s4) var(--nk-space-s4); }
-.banner .enrolled { padding-top: var(--nk-space-s10); }
+.banner .container { padding: var(--nk-space-s12) var(--nk-space-s4) var(--nk-space-s4); }
 /* title row px 12, gap 2 */
 .banner .info { padding: 0 var(--nk-space-s12); }
 .banner .toggle { gap: var(--nk-space-s2); }
@@ -39,7 +41,7 @@
 .lozengeA { left: 0.85px; top: 2.92px; }
 .lozengeB { left: 5.83px; top: 8.66px; }
 /* _secondary strip: Sementic/BG/positive, py 7, bottom r12 */
-.banner .cta { padding: 7px 0; } /* token-lint: geometry (Figma py 7) */
+.banner .ctaPad { padding: 7px 0; } /* token-lint: geometry (Figma py 7) */
 /* Primary/Label4/Semibold 12/14 (-0.12) Savings green; struck amount Medium @ 64% */
 .bannerCta { display: block; width: 100%; text-align: center; font: var(--nk-type-text12-semibold-lh14); color: var(--nk-color-best-price-ink); } /* = the reveal's settled text (ctaRevealTextGreen 12/600 grass700) */
 /* Line 1281: 30.05 wide, rotated −12°, centred on the struck amount */

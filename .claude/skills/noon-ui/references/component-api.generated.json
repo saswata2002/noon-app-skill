@@ -5059,7 +5059,7 @@
       "flow": "checkout",
       "name": "NoonOneSection",
       "file": "src/flows/checkout/components/NoonOneSection.tsx",
-      "line": 38,
+      "line": 65,
       "doc": "`variant=\"banner\"` = Figma \"All flows\" Banner/.base (127:44088): same toggle behaviour, Figma title copy (\"Get free delivery with\" + the 35×24 \"one\" lozenge win",
       "props": [
         "variant"
@@ -5290,8 +5290,8 @@
       "flow": "checkout",
       "name": "Reloader",
       "file": "src/flows/checkout/components/Reloader.tsx",
-      "line": 7,
-      "doc": "FeedbackView RELOADING: overlayLoader rgba(255,255,255,0.6) over the screen + Loader (react-native-spinkit \"Pulse\", size 37, loaderColor #3866DF).",
+      "line": 6,
+      "doc": "FeedbackView RELOADING without the loader (user request 2026-10-15: no dot loaders anywhere): the pulsing blue dot and the white 60% wash are gone; while `visib",
       "props": [
         "visible"
       ]
@@ -6499,8 +6499,8 @@
       "flow": "noonone",
       "name": "Reloader",
       "file": "src/flows/noonone/components/payment/Reloader.tsx",
-      "line": 7,
-      "doc": "FeedbackView RELOADING (src/components/FeedbackView): overlayLoader rgba(255,255,255,0.6) over the content + Loader (react-native-spinkit \"Pulse\", size 37, Them",
+      "line": 6,
+      "doc": "FeedbackView RELOADING without the loader (user request 2026-10-15: no dot loaders anywhere): the pulsing blue dot and the white 60% wash are gone; while `visib",
       "props": [
         "visible",
         "fixed"

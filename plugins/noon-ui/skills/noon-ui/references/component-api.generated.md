@@ -1258,7 +1258,7 @@ Search these before you create a component (`references/components.md` → "Sear
 | checkout | `DynamicInvoice` | `src/flows/checkout/components/DynamicInvoice.tsx:44` | `sections` |
 | checkout | `EarnCallout` | `src/flows/checkout/components/EarnCallout.tsx:16` | — |
 | checkout | `NoonOneCtaReveal` | `src/flows/checkout/components/NoonOneCtaReveal.tsx:131` | `card` `cta` `animation` `onDone` |
-| checkout | `NoonOneSection` | `src/flows/checkout/components/NoonOneSection.tsx:38` | `variant` |
+| checkout | `NoonOneSection` | `src/flows/checkout/components/NoonOneSection.tsx:65` | `variant` |
 | checkout | `PaymentCard` | `src/flows/checkout/components/PaymentCard.tsx:20` | `card` `showCVV` `isDisabled` `cvv` `onUpdateCvv` `isLargeIcon` `message` `cvvInputRef` `onCvvInputPress` |
 | checkout | `PaymentMethods` | `src/flows/checkout/components/PaymentMethods.tsx:51` | `cvvInputRef` |
 | checkout | `PaymentSummary` | `src/flows/checkout/components/PaymentSummary.tsx:50` | `totals` `coupon` `flush` |
@@ -1275,7 +1275,7 @@ Search these before you create a component (`references/components.md` → "Sear
 | checkout | `TermsNote` | `src/flows/checkout/components/ProviderForm.tsx:300` | `text` `color` |
 | checkout | `OtpLoading` | `src/flows/checkout/components/ProviderForm.tsx:310` | `isLoading` |
 | checkout | `ReceiverDetails` | `src/flows/checkout/components/ReceiverDetails.tsx:22` | — |
-| checkout | `Reloader` | `src/flows/checkout/components/Reloader.tsx:7` | `visible` |
+| checkout | `Reloader` | `src/flows/checkout/components/Reloader.tsx:6` | `visible` |
 | checkout | `RichText` | `src/flows/checkout/components/RewardsPrimitives.tsx:18` | `value` `stylesheet` `className` `style` |
 | checkout | `ProviderLogo` | `src/flows/checkout/components/RewardsPrimitives.tsx:67` | `logo` `variant` `style` |
 | checkout | `ProviderTag` | `src/flows/checkout/components/RewardsPrimitives.tsx:120` | `tag` |
@@ -1368,7 +1368,7 @@ Search these before you create a component (`references/components.md` → "Sear
 | noonone | `ChevronLeft` | `src/flows/noonone/components/offers/Primitives.tsx:81` | `width` `height` `color` |
 | noonone | `SubscribeButton` | `src/flows/noonone/components/offers/SubscribeButton.tsx:17` | `title` `onPress` `onPaymentPress` `loading` `disabled` `payment` `className` `textClassName` `style` |
 | noonone | `LegacyOverlay` | `src/flows/noonone/components/payment/LegacyOverlay.tsx:20` | `children` `className` `renderCloseButton` `canBeClosed` |
-| noonone | `Reloader` | `src/flows/noonone/components/payment/Reloader.tsx:7` | `visible` `fixed` |
+| noonone | `Reloader` | `src/flows/noonone/components/payment/Reloader.tsx:6` | `visible` `fixed` |
 | noonone | `PlanCard` | `src/flows/noonone/components/plans/PlanCard.tsx:56` | `plan` `selected` `onSelect` |
 | noonone | `BundlePlanCard` | `src/flows/noonone/components/plans/PlanCard.tsx:97` | `bundle` `selectedPlanCode` `onSelect` `onBundleTag` |
 | noonone | `DashedBorder` | `src/flows/noonone/components/plans/parts.tsx:15` | `strokeWidth` `strokeSpacing` `strokeHeight` `color` `className` `style` |
