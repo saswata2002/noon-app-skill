@@ -6,7 +6,7 @@ import { spring } from '../../motion/presets';
 import { CatalogTag } from '../Tag/Tag';
 import { ProductImage } from '../ProductImage/ProductImage';
 import { LikeHeart } from '../WishlistHeart/LikeHeart';
-import plusBlue from '@assets/shared/sku/plus-blue.svg';
+import { QuickAdd } from '../ProductCard/ProductCard';
 import star from '@assets/shared/sku/star.svg';
 import truck from '@assets/shared/sku/truck.svg';
 import pillExpress from '@assets/shared/sku/pill-express.svg';
@@ -49,7 +49,7 @@ export interface SkuCardProps {
  */
 export function SkuCard({ product: p, look = 'feed', badge, sponsored, rating, deliveryNote, fulfilment, imageSize = 122, onPress }: SkuCardProps) {
   const nav = useNav();
-  const { addToCart, toggleWishlist, isWishlisted } = useDemoStore();
+  const { toggleWishlist, isWishlisted } = useDemoStore();
   const pct = discountPct(p);
   const wished = isWishlisted(p.id);
   const tag = badge === undefined ? p.tag : badge;
@@ -86,18 +86,10 @@ export function SkuCard({ product: p, look = 'feed', badge, sponsored, rating, d
         >
           <LikeHeart on={wished} size={16} />
         </motion.button>
-        <motion.button
-          type="button"
-          className={styles.add}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Add to cart"
-          onClick={(e) => {
-            e.stopPropagation();
-            addToCart(p.id); // no snackbar on a direct quick add (bappzaar useCartActions)
-          }}
-        >
-          <img src={plusBlue} alt="" />
-        </motion.button>
+        {/* the kit's one add-to-cart "+" (QuickAdd), anchored where the blue-outlined one sat */}
+        <span className={styles.add}>
+          <QuickAdd productId={p.id} />
+        </span>
       </div>
       <div className={styles.info}>
         <div className={styles.titleBlock}>

@@ -28,21 +28,25 @@ Values and recipes: `.claude/skills/noon-ui/references/motion.md` · per-flow mo
 
 | Id | Screens | Flows |
 |---|---|---|
+| `mo:haptics` | 1 | home |
 | `mo:preset/appleSpring` | 1 | home |
 | `mo:preset/duration.base` | 1 | home |
 | `mo:preset/duration.fast` | 1 | home |
 | `mo:preset/duration.medium` | 1 | home |
 | `mo:preset/duration.slow` | 1 | home |
 | `mo:preset/easing.backOut` | 1 | home |
-| `mo:preset/easing.ios` | 1 | home |
 | `mo:preset/easing.out` | 1 | home |
 | `mo:preset/easing.standard` | 1 | home |
 | `mo:preset/fieldMotion` | 1 | home |
 | `mo:preset/handoff.easeInOut` | 1 | home |
 | `mo:preset/handoff.easeOut` | 1 | home |
 | `mo:preset/handoff.fade` | 1 | home |
+| `mo:preset/handoff.parallax` | 1 | home |
 | `mo:preset/handoff.spring` | 1 | home |
 | `mo:preset/handoff.springs` | 1 | home |
+| `mo:preset/handoff.stagger` | 1 | home |
+| `mo:preset/handoff.travel` | 1 | home |
+| `mo:preset/pageLoader` | 1 | home |
 | `mo:preset/pressScale` | 1 | home |
 | `mo:preset/spring.bouncy` | 1 | home |
 | `mo:preset/spring.gentle` | 1 | home |

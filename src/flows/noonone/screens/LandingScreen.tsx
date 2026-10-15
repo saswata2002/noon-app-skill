@@ -4,7 +4,7 @@ import shimmerLottie from '@assets/vip/vip-loading-shimmer.lottie';
 import greenCheck from '@assets/vip/one-green-check.webp';
 import { Screen } from '../../../components';
 import { membershipStore, noonOneJourneyActions, useIsNoonOneMember, useMembership, useMembershipEligibility } from '../../../kit/membership';
-import { useIsTop, useNav } from '../../../kit/Navigator';
+import { useIsTop, useNav, useToastsEnabled } from '../../../kit/Navigator';
 import { CURRENCY, defaultPlan, findPlan, successMessage, toMembershipPlan, withEligibility } from '../data';
 import {
   benefitsModule,
@@ -60,6 +60,7 @@ export function LandingScreen() {
   const [paying, setPaying] = useState(false);
   const [success, setSuccess] = useState<{ title: string; subtitle: string } | null>(null);
   const [toast, setToast] = useState(!!params.reminder);
+  const toastsOn = useToastsEnabled();
   const [stickyHeight, setStickyHeight] = useState(200);
   const stickyRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -203,7 +204,7 @@ export function LandingScreen() {
         </motion.div>
       )}
 
-      {toast && (
+      {toastsOn && toast && (
         <motion.div className={styles.toast} initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
           <img className={styles.toastIcon} src={greenCheck} alt="" />
           <span className={styles.toastText}>{landingCopy.reminderSet}</span>

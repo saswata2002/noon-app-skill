@@ -1,13 +1,15 @@
 import { AnimatePresence, motion, useDragControls, type PanInfo } from 'motion/react';
 import { createContext, memo, Suspense, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type CSSProperties, type ReactNode } from 'react';
 import { getTransition as getTransitionRaw, reducedTransition, type TransitionName } from '../motion/transitions';
-import { duration, easing, spring } from '../motion/presets';
+import { duration, easing, pageLoader as pl, spring } from '../motion/presets';
+import { haptic } from '../motion/haptics';
 import { useReduceMotion } from '../motion/reducedMotion';
 import { TokenScope } from '../foundations/ThemeProvider';
 import { TabBar } from '../components/TabBar/TabBar';
 import { SnackbarStack } from '../components/Snackbar/Snackbar';
 import { preloadScreens } from './lazyScreen';
 import { resolveSheet, SheetCtx } from './sheet';
+import { enterPage, leavePage, PageLoader, type PageLoaderHandle } from './pageLoader';
 import type { Registry } from './registry';
 import type { NavigateOptions, Route, ScreenProps, StackEntry, TabId, ToastOptions } from './types';
 import type { TokenOverrides } from '../foundations/tokens';
@@ -69,7 +71,7 @@ function createStackStore(initial: StackEntry[]): StackStore {
 }
 
 // a stable value: navigating never re-renders a screen through this context
-const NavCtx = createContext<{ actions: NavActions; store: StackStore; canGoBack: (s: StackEntry[]) => boolean; registry: Registry } | null>(null);
+const NavCtx = createContext<{ actions: NavActions; store: StackStore; canGoBack: (s: StackEntry[]) => boolean; registry: Registry; pageLoader: boolean; toasts: boolean } | null>(null);
 const EntryCtx = createContext<StackEntry | null>(null);
 
 export const TAB_ROUTES: Record<TabId, Route> = {
@@ -138,6 +140,24 @@ export function useIsTop(): boolean {
   return useSyncExternalStore(nav.store.subscribe, get);
 }
 
+/**
+ * True when the Navigator runs the page loader (`pageLoader`). Screens whose own first-load state would show right after
+ * it (the bappzaar ProgressLoader sweep line above the tab bar on Cart / Categories) skip that state, since the page
+ * loader already covered the wait.
+ */
+export function usePageLoader(): boolean {
+  return useContext(NavCtx)?.pageLoader ?? false;
+}
+
+/**
+ * False when the Navigator runs with `toasts={false}`: `nav.toast()` shows nothing and the self-dismissing `Toast`
+ * host (voucher / address toasts, the cart snackbar) renders nothing while keeping its timer, so flows that wait for a
+ * toast to finish behave the same. True outside a Navigator.
+ */
+export function useToastsEnabled(): boolean {
+  return useContext(NavCtx)?.toasts ?? true;
+}
+
 /** Typed params helper: `const { productId } = useParams<{ productId: string }>()` */
 export function useParams<P>() {
   return useNav().params as P;
@@ -151,9 +171,17 @@ interface NavigatorProps {
   /** change this to force-reset the navigator from outside (playground sidebar) */
   resetSignal?: { route: Route; params?: Record<string, unknown>; nonce: number };
   overlay?: ReactNode;
+  /**
+   * Tab switches go page → loader → page (kit/pageLoader.tsx, 1:1 with the "Page Loader" project): the page zooms out
+   * under a #F2F3F7 layer, the looping loader Lottie holds `pageLoader.hold` (0.8s), then the new tab's page scales in.
+   * Every other navigation (push, back, replace, reset, sheets) keeps its own transition. Off by default.
+   */
+  pageLoader?: boolean;
+  /** false: no toasts or snackbars anywhere (`nav.toast()` is a no-op, `Toast` hosts draw nothing). Default true. */
+  toasts?: boolean;
 }
 
-export function Navigator({ registry, initialRoute, initialParams, onChange, resetSignal, overlay }: NavigatorProps) {
+export function Navigator({ registry, initialRoute, initialParams, onChange, resetSignal, overlay, pageLoader = false, toasts: toastsOn = true }: NavigatorProps) {
   const makeEntry = useCallback(
     (route: Route, params: Record<string, unknown> = {}, opts: NavigateOptions = {}, currentFlow?: string): StackEntry | null => {
       const resolved = registry.resolve(route, currentFlow);
@@ -192,6 +220,24 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
   const stack = useSyncExternalStore(store.subscribe, store.get);
   const setStack = store.set;
   const [instantExit, setInstantExit] = useState(false);
+  /*
+   * A newly opened screen holds its starting pose until it has painted twice, then its transition (and the covered
+   * screen's `under` parallax) start together. A heavy screen (the storefront PDP) spends its first frames on layout,
+   * paint and image decode; starting the clock at mount made the first visible frame jump ~30% into the slide.
+   */
+  const [armed, setArmed] = useState<ReadonlySet<string>>(() => new Set(store.get().map((e) => e.key)));
+  useLayoutEffect(() => {
+    const pending = stack.filter((e) => !armed.has(e.key)).map((e) => e.key);
+    if (!pending.length) return;
+    let r2 = 0;
+    const r1 = requestAnimationFrame(() => {
+      r2 = requestAnimationFrame(() => setArmed((a) => new Set([...a, ...pending])));
+    });
+    return () => {
+      cancelAnimationFrame(r1);
+      cancelAnimationFrame(r2);
+    };
+  }, [stack, armed]);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const stackRef = useMemo(() => ({ get current() { return store.get(); } }), [store]);
 
@@ -200,6 +246,74 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
   useEffect(() => preloadScreens(), []);
 
   const currentFlow = useCallback(() => stackRef.current.at(-1)?.route.split('/')[0], [stackRef]);
+
+  /* ── Page loader on tab switches: page → loader (hold) → page ──────────────────────────────────────────────────
+     The stack changes only while the loader covers the screen (instant, no screen transition); the leaving page's body
+     zooms out before, the arriving page's body scales in after. Another tab while loading retargets: the latest one
+     wins and the loader holds `pl.hold` more. Refs only, so the nav actions stay stable. */
+  const rootRef = useRef<HTMLDivElement>(null);
+  const loaderRef = useRef<PageLoaderHandle>(null);
+  const loading = useRef<{ commit: () => void; timer: ReturnType<typeof setTimeout>; barTab?: TabId } | null>(null);
+  const enterPending = useRef(false);
+  const reduceRef = useRef(false);
+  const topScreen = () => [...stackRef.current].reverse().find((e) => e.presentation !== 'sheet');
+  const tabOf = (route: Route) => {
+    const r = registry.resolve(route);
+    return r?.flow.tabBar?.screens.includes(r.screen.id) ? { tab: r.flow.tabBar.tab, variant: r.flow.tabBar.variant } : undefined;
+  };
+  const bodyOf = (key: string) => rootRef.current?.querySelector(`[data-key="${key}"] > .${styles.screenBody}`) ?? null;
+  const enterTop = () => {
+    enterPending.current = false;
+    const top = topScreen();
+    const body = top && bodyOf(top.key);
+    if (body) enterPage(body, pl.land, reduceRef.current);
+  };
+  const land = () => {
+    const cur = loading.current;
+    if (!cur) return;
+    loading.current = null;
+    enterPending.current = true;
+    cur.commit(); // → the layout effect below scales the new page in
+    requestAnimationFrame(() => enterPending.current && enterTop()); // the commit changed nothing (retargeted back)
+    loaderRef.current?.hide();
+    haptic('soft'); // the new page lands
+  };
+  const viaLoader = (commit: () => void, target?: Route) => {
+    if (!pageLoader) return commit();
+    // fetch the arriving screen's code now, so it is ready under the loader
+    if (target) (registry.resolve(target)?.screen.component as { preload?: () => Promise<unknown> } | undefined)?.preload?.().catch(() => undefined);
+    const to = target ? tabOf(target) : undefined;
+    const cur = loading.current;
+    if (cur) {
+      clearTimeout(cur.timer);
+      cur.commit = commit;
+      cur.timer = setTimeout(land, pl.hold);
+      if (cur.barTab && to) {
+        loaderRef.current?.setBar({ from: cur.barTab, to: to.tab, variant: to.variant });
+        cur.barTab = to.tab;
+      }
+      return;
+    }
+    const s = stackRef.current;
+    const top = topScreen();
+    const from = top && s[0]?.key === top.key ? tabOf(top.route) : undefined;
+    // the leaving page (and any sheet over it) zooms out and dissolves
+    if (top) {
+      const body = bodyOf(top.key);
+      if (body) leavePage(body, reduceRef.current);
+      for (const e of s.slice(s.indexOf(top) + 1)) {
+        const layer = rootRef.current?.querySelector(`[data-key="${e.key}"]`);
+        if (layer) leavePage(layer, reduceRef.current);
+      }
+    }
+    const barTab = from && to ? to.tab : undefined;
+    loading.current = { commit, timer: setTimeout(land, pl.artIn + pl.hold), barTab };
+    loaderRef.current?.show();
+    loaderRef.current?.setBar(from && to ? { from: from.tab, to: to.tab, variant: to.variant } : null);
+  };
+  const via = useRef(viaLoader);
+  via.current = viaLoader;
+  useEffect(() => () => clearTimeout(loading.current?.timer), []);
 
   const push = useCallback<NavApi['push']>(
     (route, params, opts) => {
@@ -270,20 +384,27 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
   );
   const switchTab = useCallback((tab: TabId) => {
     const target = TAB_ROUTES[tab];
-    if (stackRef.current.length === 1 && stackRef.current[0].route === target) return;
+    const there = () => stackRef.current.length === 1 && stackRef.current[0].route === target;
+    // while loading, a tap on the loader's tab bar retargets (even back to the page being left)
+    if (there() && !(pageLoader && loading.current)) return;
     const e = makeEntry(target, {}, { transition: 'none' });
-    if (e) {
+    if (!e) return;
+    const commit = () => {
+      if (there()) return; // retargeted back to where we were: the page just scales back in
       setInstantExit(true);
       setStack([e]);
-    }
-  }, [makeEntry, stackRef, setStack]);
+    };
+    if (pageLoader) return via.current(commit, target);
+    commit();
+  }, [makeEntry, stackRef, setStack, pageLoader]);
 
   const toast = useCallback<NavApi['toast']>((message, opts = {}) => {
+    if (!toastsOn) return; // toasts switched off
     const id = Date.now() + Math.random();
     // keep at most 3 queued: the newest shows in front, the stack card signals the rest
     setToasts((t) => [...t.slice(-2), { id, message, ...opts }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), opts.duration ?? 2600);
-  }, []);
+  }, [toastsOn]);
 
   useEffect(() => {
     if (resetSignal) reset(resetSignal.route, resetSignal.params);
@@ -292,6 +413,12 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
 
   // reduced motion: screens cross-fade instead of sliding / scaling (motion/react would only make the movement instant)
   const reduce = useReduceMotion();
+  reduceRef.current = reduce;
+  // page loader: the stack just changed under the loader → the new top page scales in
+  useLayoutEffect(() => {
+    if (enterPending.current) enterTop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stack]);
   const getTransition = (name: TransitionName) => (reduce ? reducedTransition(getTransitionRaw(name)) : getTransitionRaw(name));
 
   const nav = useMemo(
@@ -300,8 +427,10 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
       store,
       canGoBack: (s: StackEntry[]) => s.length > 1 || !!(s[0] && parentOf(s[0].route)),
       registry,
+      pageLoader,
+      toasts: toastsOn,
     }),
-    [push, replace, sheet, back, popToRoot, reset, switchTab, toast, preload, store, parentOf, registry],
+    [push, replace, sheet, back, popToRoot, reset, switchTab, toast, preload, store, parentOf, registry, pageLoader, toastsOn],
   );
 
   // for each screen entry, find the next *screen/modal* entry above it — that one's `under` styles apply
@@ -313,7 +442,7 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
   const front = toasts[toasts.length - 1];
   return (
     <NavCtx.Provider value={nav}>
-      <div className={styles.root}>
+      <div ref={rootRef} className={styles.root}>
         <AnimatePresence initial={false} custom={instantExit}>
           {stack.map((entry, i) => {
             const resolved = registry.resolve(entry.route)!;
@@ -323,11 +452,13 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
             const content = <ScreenHost entry={entry} Screen={Screen} tokens={resolved.flow.tokens} />;
 
             if (entry.presentation === 'sheet') {
-              return <SheetLayer key={entry.key} options={resolveSheet(resolved.screen.sheet)} onDismiss={back} isTop={isTop} zIndex={i} reduce={reduce}>{content}</SheetLayer>;
+              return <SheetLayer key={entry.key} dataKey={entry.key} options={resolveSheet(resolved.screen.sheet)} onDismiss={back} isTop={isTop} zIndex={i} reduce={reduce}>{content}</SheetLayer>;
             }
 
             const cover = coveredBy(i);
-            const under = cover ? getTransition(cover.transition).under : undefined;
+            // the screen below starts its parallax only once the one on top is armed (they move as one)
+            const under = cover && armed.has(cover.key) ? getTransition(cover.transition).under : undefined;
+            const holding = !armed.has(entry.key);
             const tab = i === 0 && resolved.flow.tabBar?.screens.includes(resolved.screen.id) ? resolved.flow.tabBar.tab : undefined;
 
             return (
@@ -342,13 +473,14 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
                   exit: (instant: boolean) => (instant ? { opacity: 0, transition: { duration: 0.12 } } : { ...t.exit, transition: t.transition }),
                 }}
                 initial="initial"
-                animate={under ? 'covered' : 'shown'}
+                animate={holding ? 'initial' : under ? 'covered' : 'shown'}
                 exit="exit"
                 transition={t.transition}
                 style={{ zIndex: i, pointerEvents: isTop ? 'auto' : 'none', background: resolved.screen.transparent ? 'transparent' : undefined }}
                 // a covered screen is out of the tab order and the accessibility tree (the sheet / screen on top is modal)
                 inert={!isTop}
                 data-route={entry.route}
+                data-key={entry.key}
               >
                 <div className={styles.screenBody}>{content}</div>
                 {tab && <TabBar active={tab} variant={resolved.flow.tabBar?.variant} autoHide={resolved.flow.tabBar?.scrollHide ?? true} covered={!isTop} />}
@@ -356,6 +488,8 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
             );
           })}
         </AnimatePresence>
+
+        {pageLoader && <PageLoader ref={loaderRef} reduce={reduce} />}
 
         {/* Origin M-Toast; two or more queued → M-Stacked Toast (newest in front, the next one peeking behind) */}
         <div className={styles.toastLayer}>
@@ -406,7 +540,7 @@ const ScreenHost = memo(function ScreenHost({ entry, Screen, tokens }: { entry: 
   );
 });
 
-function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce }: { children: ReactNode; options: ReturnType<typeof resolveSheet>; onDismiss: () => void; isTop: boolean; zIndex: number; reduce: boolean }) {
+function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce, dataKey }: { children: ReactNode; options: ReturnType<typeof resolveSheet>; onDismiss: () => void; isTop: boolean; zIndex: number; reduce: boolean; dataKey: string }) {
   const drag = useDragControls();
   const onDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 120 || info.velocity.y > 600) onDismiss();
@@ -425,7 +559,7 @@ function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce }: { c
     </div>
   );
   return (
-    <motion.div className={styles.sheetLayer} style={{ pointerEvents: isTop ? 'auto' : 'none', zIndex }} initial="hidden" animate="shown" exit="hidden">
+    <motion.div className={styles.sheetLayer} style={{ pointerEvents: isTop ? 'auto' : 'none', zIndex }} initial="hidden" animate="shown" exit="hidden" data-key={dataKey}>
       <motion.div
         className={cls.scrim}
         variants={{ hidden: { opacity: 0 }, shown: { opacity: 1 } }}

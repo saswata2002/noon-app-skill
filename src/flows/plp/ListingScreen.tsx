@@ -80,6 +80,26 @@ export function ListingScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [list]);
 
+  // the grid mounts only the on-screen cards; the rest join below the fold in idle-time batches once those have landed
+  // (per epoch, so a filter swap starts small again)
+  const [grow, setGrow] = useState<{ epoch: number; n: number }>({ epoch: 0, n: T.animateFirst });
+  const limit = grow.epoch === shown.epoch ? grow.n : T.animateFirst;
+  useEffect(() => {
+    if (limit >= shown.list.length) return;
+    const start = limit === T.animateFirst ? ((shown.epoch === 0 ? T.cardsAt : 0) + T.animateFirst * handoff.stagger.in + T.settle) * 1000 : 0;
+    const epoch = shown.epoch;
+    let idle = 0;
+    const t = setTimeout(() => {
+      const next = () => setGrow({ epoch, n: limit + T.renderBatch });
+      idle = window.requestIdleCallback ? window.requestIdleCallback(next, { timeout: 500 }) : window.setTimeout(next, 16);
+    }, start);
+    return () => {
+      clearTimeout(t);
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+      else clearTimeout(idle);
+    };
+  }, [limit, shown.epoch, shown.list.length]);
+
   // filter / sort apply: the list restarts at the top, the bar shows, the header snaps back (onContentResetToTop + dataChange)
   const resetKey = `${keyOf(query, filters)}|${sort}`;
   const lastReset = useRef(resetKey);
@@ -157,7 +177,7 @@ export function ListingScreen() {
         </div>
         <>
           <div className={styles.grid}>
-            {shown.list.map((p, i) => {
+            {shown.list.slice(0, limit).map((p, i) => {
               const rises = i < T.animateFirst;
               return (
                 <motion.div key={`${shown.epoch}-${p.id}`} className={styles.cell} layout="position" transition={{ layout: { duration: 0.36, ease: [0.4, 0, 0.2, 1] } }}>

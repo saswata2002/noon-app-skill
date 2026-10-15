@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import etaExpressToday from '@assets/pdp/new-pdp/eta-express-today.svg';
-import { LikeHeart, OriginIcon, ProductImage, type OriginIconName } from '../../../../components';
+import { LikeHeart, OriginIcon, ProductImage, QuickAdd, type OriginIconName } from '../../../../components';
 import { useDemoStore } from '../../../../kit/DemoStore';
 import { useNav } from '../../../../kit/Navigator';
 import { currency, discountPct, formatPrice, type Product, type ProductNudge } from '../../../../data';
@@ -56,7 +56,7 @@ export function SfRecommendations({ title, items, sponsored, variant = 'card' }:
  */
 export function SfRecoCard({ product: p, sponsored }: { product: Product; sponsored?: boolean }) {
   const nav = useNav();
-  const { addToCart, toggleWishlist, isWishlisted } = useDemoStore();
+  const { toggleWishlist, isWishlisted } = useDemoStore();
   const wished = isWishlisted(p.id);
   const pct = discountPct(p);
   const name = p.brand && p.brand !== 'Generic' && !p.title.startsWith(p.brand) ? `${p.brand} ${p.title}` : p.title;
@@ -90,19 +90,10 @@ export function SfRecoCard({ product: p, sponsored }: { product: Product; sponso
         >
           <LikeHeart on={wished} size={16} />
         </motion.button>
-        <motion.button
-          type="button"
-          className={styles.add}
-          aria-label={copy.addToCart}
-          whileTap={{ scale: 0.9 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            addToCart(p.id);
-            nav.toast(copy.addedToCart);
-          }}
-        >
-          <OriginIcon name="plus" size={24} color="var(--nk-color-text-ink)" />
-        </motion.button>
+        {/* the kit's one add-to-cart "+" (QuickAdd), same bottom-right anchor */}
+        <span className={styles.add}>
+          <QuickAdd productId={p.id} />
+        </span>
       </div>
       <div className={styles.info}>
         <div className={styles.nameBlock}>

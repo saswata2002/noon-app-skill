@@ -19,9 +19,10 @@
 .sku[data-look='cart'] .heart { right: 3px; top: 3px; }
 
 /* quick add — 24 "+" in a white box, 1.2px Blue/600, r8, p4, at 94/136 */
-.add { position: absolute; left: 94px; top: 136px; display: flex; align-items: center; padding: var(--nk-space-s4); background: var(--nk-color-bg-surface); border: 1.2px solid var(--nk-color-link); border-radius: var(--nk-radius-r8); cursor: pointer; }
-.sku[data-look='cart'] .add { left: 95px; top: 135px; }
-.add img { width: 24px; height: 24px; display: block; }
+/* QuickAdd (36 → its 76 stepper grows leftwards): anchored by the old 34.4 box's bottom-right corner
+   (feed: right 134 − 128.4, bottom 174 − 170.4; cart: inside the 1px border, right 132 − 129.4, bottom 172 − 169.4) */
+.add { position: absolute; right: 5.6px; bottom: 3.6px; display: flex; }
+.sku[data-look='cart'] .add { right: 2.6px; bottom: 2.6px; }
 
 .info { display: flex; flex-direction: column; align-items: flex-start; row-gap: var(--nk-space-s8); padding: var(--nk-space-s4); }
 .titleBlock { display: flex; flex-direction: column; align-items: flex-start; row-gap: var(--nk-space-s4); align-self: stretch; }

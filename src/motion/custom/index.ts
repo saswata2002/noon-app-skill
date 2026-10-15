@@ -1,5 +1,5 @@
 import { registerTransition } from '../transitions';
-import { easing, handoff, spring } from '../presets';
+import { duration, easing, handoff, spring } from '../presets';
 
 /**
  * Put your own screen transitions here. They're registered on import (see src/index.ts)
@@ -12,7 +12,7 @@ registerTransition('card-flip', {
   animate: { rotateY: 0, opacity: 1 },
   exit: { rotateY: -90, opacity: 0 },
   under: { opacity: 0.6 },
-  transition: { duration: 0.5, ease: easing.inOut },
+  transition: { duration: duration.slower, ease: easing.inOut }, // Test01: spring-settle length on its S-curve
 });
 
 registerTransition('scale-up', {
@@ -28,7 +28,7 @@ registerTransition('slide-left', {
   initial: { x: '100%' },
   animate: { x: 0 },
   exit: { x: '100%' },
-  under: { x: '-52%' },
+  under: { x: `${-(handoff.parallax * 100).toFixed(2)}%` },
   transition: handoff.spring,
 });
 

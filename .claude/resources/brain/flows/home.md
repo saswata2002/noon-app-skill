@@ -21,7 +21,7 @@
 
 ## `home/home`
 
-- Module `src/flows/home/HomeScreen.tsx` · 34 own files, 82 in the import closure
+- Module `src/flows/home/HomeScreen.tsx` · 34 own files, 83 in the import closure
 - Source: bappzaar master ba159e20: NoonHomeScreen → NoonHomeToggleContent → Module/ModuleRenderer (live app home CMS payload order); header Figma iRE9RwO94eMAyW3j3XKNXW · 1337:5102 except the ExperienceSwitcher (useExperienceSwi…
 - Styles: components/AdProductLedDisplay.module.css, components/BannerModules.module.css, components/BzModuleWrapper.module.css, components/EidBanners.module.css, components/HomeHeader.module.css, components/ItemCarousel.module.css, components/MegaDeals.module.css, components/ProductCarousel.module.css, home.module.css, home2025.module.css
 - Data / helpers: data.eid.ts, data.feed.ts, data.header.ts, data.ts, tokens.eid.ts, tokens.feed.ts, tokens.header.ts, tokens.modules.ts, tokens.rails.ts, tokens.tabs.ts, tokens.ts

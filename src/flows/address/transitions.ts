@@ -1,5 +1,5 @@
 import { registerTransition } from '../../motion/transitions';
-import { easing } from '../../motion/presets';
+import { duration, easing, handoff } from '../../motion/presets';
 
 /**
  * Address modal animations from src/constants/AddressConstants.ts.
@@ -11,7 +11,7 @@ registerTransition('address-map', {
   initial: { opacity: 0, y: -15 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -15 },
-  transition: { duration: 0.33, ease: easing.inOut },
+  transition: { y: handoff.spring, opacity: { duration: handoff.fade.out, ease: handoff.easeOut } }, // Test01: spring + ease-out fade
 });
 
 // SearchScreen: modal with animations disabled + FadeIn(150) on the content
@@ -19,7 +19,7 @@ registerTransition('address-search', {
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
-  transition: { duration: 0.15, ease: easing.standard },
+  transition: { duration: duration.base, ease: easing.standard }, // Test01 S-curve fade
 });
 
 // AddressCreateSuccessScreenPushAnimations (alpha 0→1, 300ms) / DismissModalAnimations (alpha 1→0 + translationY → -screenHeight, 400ms)
@@ -27,5 +27,5 @@ registerTransition('address-success', {
   initial: { opacity: 0 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: '-100%' },
-  transition: { duration: 0.35, ease: easing.standard },
+  transition: { y: handoff.spring, opacity: { duration: duration.base, ease: easing.standard } }, // Test01
 });

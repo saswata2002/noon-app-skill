@@ -1649,7 +1649,7 @@
     {
       "name": "ProductCard",
       "file": "src/components/ProductCard/ProductCard.tsx",
-      "line": 25,
+      "line": 24,
       "doc": "NoonProductBoxVertical — the PLP / carousel product card. Anatomy: image (≈0.8 aspect, contain) · Best Seller tag top-left · heart top-right · quick-ATC bottom-right · title 14/500 2 lines · rating pill · price row · coupon · ETA badge (Origin `_ETA`, `EtaBadge` + `etaFor(product)`; small in the carousel).",
       "generic": false,
       "forwardRef": false,
@@ -1690,10 +1690,36 @@
       ]
     },
     {
+      "name": "QuickAddButton",
+      "file": "src/components/ProductCard/ProductCard.tsx",
+      "line": 100,
+      "doc": "The add-to-cart \"+\" look on its own (36×36 white, r8, hairline border, soft thumb shadow, 22px ink plus) with your own `onPress`, for tiles that aren't catalog products (e.g. the home Fashion spotlight). Catalog products use `QuickAdd`. `asDiv` for slots inside another button (a role=\"button\" div, so buttons never nest).",
+      "generic": false,
+      "forwardRef": false,
+      "props": [
+        {
+          "name": "onPress",
+          "type": "() => void",
+          "optional": false
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "optional": true,
+          "default": "'Add to cart'"
+        },
+        {
+          "name": "asDiv",
+          "type": "boolean",
+          "optional": true
+        }
+      ]
+    },
+    {
       "name": "QuickAdd",
       "file": "src/components/ProductCard/ProductCard.tsx",
-      "line": 101,
-      "doc": "NoonProductBoxAddToCart: 36×36 white \"+\" → (tap) adds 1 and expands into a 76×36 #3866DF stepper → collapses to a filled count badge after 2.5s idle. A product with sizes (`variant_overlay_url`) opens the variants sheet instead (useCart → showVariantsFlyout), which adds and shows the snackbar itself.",
+      "line": 190,
+      "doc": "NoonProductBoxAddToCart as one morphing shape: 36×36 white \"+\" → (tap) adds 1 and the shell stretches to the 76×36 #3866DF stepper (growing towards the card's inner edge) → after 2.5s idle it narrows back to 36 as a blue count badge (tap it to reopen the stepper); trash at 1 morphs it back to the white \"+\". The count shows at once and the cart store update is committed once the morph has settled (flushed on unmount). A product with sizes (`variant_overlay_url`) opens the variants sheet instead (useCart → showVariantsFlyout), which adds and shows the snackbar itself.",
       "generic": false,
       "forwardRef": false,
       "props": [
@@ -1805,6 +1831,12 @@
           "name": "width",
           "type": "number | string",
           "optional": true
+        },
+        {
+          "name": "surface",
+          "type": "boolean",
+          "optional": true,
+          "default": "true"
         }
       ],
       "variants": {
@@ -2111,7 +2143,7 @@
     {
       "name": "SearchInput",
       "file": "src/components/SearchBar/SearchBar.tsx",
-      "line": 159,
+      "line": 171,
       "doc": "Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `variant=\"field\"` (opt-in): Field DS M-SearchBar (`@field-ds/components` SearchBar/SearchBar.tsx, Figma 892:244) — H48 (padding 12, 24px icons, B14 Medium) or H44 (padding 10 / 12, 20px icons, B12 Medium), surfacePrimary, 1px borderSubtle, r12, gap 8, optional Sm `elevation`, Origin `search` icon (Field tertiary → primary once focused or typed), `iconRight` + `iconRightTwo` after a 1 × 24 divider, auto clear (x) while typing, placeholder Field textPrimary at rest / textTertiary focused, press scale .98 over 160ms. `fill`, `onFieldPress`, `onBack`, `onSubmit` work in both looks.",
       "generic": false,
       "forwardRef": false,
@@ -2160,6 +2192,12 @@
           "name": "fill",
           "type": "{ from: number; key: number }",
           "optional": true
+        },
+        {
+          "name": "committed",
+          "type": "boolean",
+          "optional": true,
+          "doc": "The query is being submitted (a suggestion was picked): the clear (x) crossfades into the camera the results bar shows, so the PLP's identical bar takes over without the icon popping. Default look only."
         },
         {
           "name": "variant",
@@ -2326,8 +2364,8 @@
     {
       "name": "Skeleton",
       "file": "src/components/Skeleton/Skeleton.tsx",
-      "line": 8,
-      "doc": "Shimmer block (NewLoadingState / ShimmerBackground). Reduced motion: a still block in the base grey, no sweep.",
+      "line": 12,
+      "doc": "Shimmer block (NewLoadingState / ShimmerBackground). Reduced motion: a still block in the base grey, no sweep. `look=\"band\"`: the Brand Widget PLP skeleton (#F6F5FA, one 195px band at 17° every 1.867s), used by the search page.",
       "generic": false,
       "forwardRef": false,
       "props": [
@@ -2345,7 +2383,7 @@
         },
         {
           "name": "radius",
-          "type": "number",
+          "type": "number | string",
           "optional": true,
           "default": "r.r6"
         },
@@ -2353,8 +2391,20 @@
           "name": "style",
           "type": "CSSProperties",
           "optional": true
+        },
+        {
+          "name": "look",
+          "type": "'default' | 'band'",
+          "optional": true,
+          "default": "'default'"
         }
-      ]
+      ],
+      "variants": {
+        "look": [
+          "band",
+          "default"
+        ]
+      }
     },
     {
       "name": "SkuCard",
@@ -3459,8 +3509,8 @@
     {
       "name": "Toast",
       "file": "src/components/Toast/Toast.tsx",
-      "line": 26,
-      "doc": "Self-dismissing toast / snackbar host (bappzaar `src/components/Toast`, `NoonSnackBar`, `AddressToastScreen`): mounts `item` with AnimatePresence, calls `onHide(item)` after `duration`, and animates out when the item clears. The look and motion come from the caller (className + initial/animate/exit/transition), e.g. - checkout voucher toast: fade 500ms linear, 2.5s - address toast: spring up from y 50, 3.4s - cart move-to-wishlist snackbar: spring from y 100%, 3s For a plain message toast use `useNav().toast(message)` instead.",
+      "line": 28,
+      "doc": "Self-dismissing toast / snackbar host (bappzaar `src/components/Toast`, `NoonSnackBar`, `AddressToastScreen`): mounts `item` with AnimatePresence, calls `onHide(item)` after `duration`, and animates out when the item clears. The look and motion come from the caller (className + initial/animate/exit/transition), e.g. - checkout voucher toast: fade 500ms linear, 2.5s - address toast: spring up from y 50, 3.4s - cart move-to-wishlist snackbar: spring from y 100%, 3s For a plain message toast use `useNav().toast(message)` instead. With the Navigator's `toasts={false}` it draws nothing but keeps its timer (`onHide` still fires after `duration`), so the caller's flow is unchanged.",
       "generic": true,
       "forwardRef": false,
       "props": [
@@ -3740,7 +3790,7 @@
       "flow": "address",
       "name": "AddressDetailsForm",
       "file": "src/flows/address/components/form.tsx",
-      "line": 147,
+      "line": 148,
       "doc": "LatLngCreateScreen / LatLngUpdateV2Screen body: AddressV2FormDetailsContainer (header + scroll + Save footer) wrapping the location summary (pin-island card wit",
       "props": [
         "initialValues",
@@ -3756,7 +3806,7 @@
       "flow": "address",
       "name": "MapPin",
       "file": "src/flows/address/components/map.tsx",
-      "line": 14,
+      "line": 15,
       "doc": "Pin + tooltip.",
       "props": [
         "title",
@@ -3770,7 +3820,7 @@
       "flow": "address",
       "name": "MapSearchButton",
       "file": "src/flows/address/components/map.tsx",
-      "line": 56,
+      "line": 57,
       "props": [
         "onBack",
         "onPress",
@@ -3785,7 +3835,7 @@
       "flow": "address",
       "name": "CurrentLocationButton",
       "file": "src/flows/address/components/map.tsx",
-      "line": 102,
+      "line": 103,
       "props": [
         "onPress"
       ]
@@ -3794,7 +3844,7 @@
       "flow": "address",
       "name": "SearchCurrentLocationButton",
       "file": "src/flows/address/components/map.tsx",
-      "line": 116,
+      "line": 117,
       "doc": "Search-screen variant (isSearchScreen + isChevronForward).",
       "props": [
         "description",
@@ -3806,7 +3856,7 @@
       "flow": "address",
       "name": "LocateOnMapButton",
       "file": "src/flows/address/components/map.tsx",
-      "line": 133,
+      "line": 134,
       "doc": "AddressV2LocateOnMapButton",
       "props": [
         "onPress",
@@ -3817,7 +3867,7 @@
       "flow": "address",
       "name": "LocationSummary",
       "file": "src/flows/address/components/map.tsx",
-      "line": 149,
+      "line": 150,
       "props": [
         "placeName",
         "area",
@@ -3836,7 +3886,7 @@
       "flow": "address",
       "name": "LocationLoading",
       "file": "src/flows/address/components/map.tsx",
-      "line": 177,
+      "line": 178,
       "props": [],
       "variants": {}
     },
@@ -3844,7 +3894,7 @@
       "flow": "address",
       "name": "UnserviceableView",
       "file": "src/flows/address/components/map.tsx",
-      "line": 192,
+      "line": 193,
       "doc": "MapV2ScreenUnServiceableView",
       "props": [
         "style"
@@ -3854,7 +3904,7 @@
       "flow": "address",
       "name": "FloatingOverlay",
       "file": "src/flows/address/components/map.tsx",
-      "line": 220,
+      "line": 222,
       "doc": "Floating card 12px from the edges, radius 16, sitting on the home-indicator inset.",
       "props": [
         "expanded",
@@ -3873,7 +3923,7 @@
       "flow": "address",
       "name": "Img",
       "file": "src/flows/address/components/primitives.tsx",
-      "line": 8,
+      "line": 9,
       "doc": "Plain `<Image resizeMode=\"contain\">`.",
       "props": [
         "src",
@@ -3887,7 +3937,7 @@
       "flow": "address",
       "name": "OverlayButton",
       "file": "src/flows/address/components/primitives.tsx",
-      "line": 16,
+      "line": 17,
       "doc": "AddressV2OverlayButton — 56px accent CTA, radius 12, press scale 0.96 (spring 300/20/0.5), grey ($grayColor) when disabled, white loader while submitting.",
       "props": [
         "title",
@@ -3901,7 +3951,7 @@
       "flow": "address",
       "name": "GradientTitle",
       "file": "src/flows/address/components/primitives.tsx",
-      "line": 32,
+      "line": 33,
       "doc": "MapV2GradientTitle — section caption in noonGrey1.",
       "props": [
         "title",
@@ -3912,7 +3962,7 @@
       "flow": "address",
       "name": "IconTap",
       "file": "src/flows/address/components/primitives.tsx",
-      "line": 41,
+      "line": 42,
       "doc": "Inline hit-slop button used for small icon actions.",
       "props": [
         "children",
@@ -3925,7 +3975,7 @@
       "flow": "address",
       "name": "AddressToastHost",
       "file": "src/flows/address/components/primitives.tsx",
-      "line": 64,
+      "line": 65,
       "doc": "AddressToastScreen — black pill at safeAreaBottom + 40 (+16 wrapper padding), springs up from 50px, holds 3s, springs back down.",
       "props": [],
       "variants": {}
@@ -3934,7 +3984,7 @@
       "flow": "address",
       "name": "SelectHeader",
       "file": "src/flows/address/components/select.tsx",
-      "line": 13,
+      "line": 14,
       "doc": "MapV2ScreenHeader as used by the SelectScreen Wrapper (back.webp tinted #262A33, title 18/600 black).",
       "props": [
         "title",
@@ -3945,7 +3995,7 @@
       "flow": "address",
       "name": "TabSwitcher",
       "file": "src/flows/address/components/select.tsx",
-      "line": 27,
+      "line": 28,
       "doc": "TabSwitcher — pill track, white indicator slides 300ms Easing.out(cubic).",
       "props": [
         "tabs",
@@ -3958,7 +4008,7 @@
       "flow": "address",
       "name": "SearchInput",
       "file": "src/flows/address/components/select.tsx",
-      "line": 43,
+      "line": 44,
       "doc": "AddressV2SearchInput — 12px radius white field, 17px search icon.",
       "props": [
         "value",
@@ -3971,7 +4021,7 @@
       "flow": "address",
       "name": "AddAddressButton",
       "file": "src/flows/address/components/select.tsx",
-      "line": 53,
+      "line": 54,
       "doc": "AddressV2AddAddressButton — accent icon + 15/600 text + blue chevron, press scale 0.97 spring 300/20/0.5.",
       "props": [
         "text",
@@ -3982,7 +4032,7 @@
       "flow": "address",
       "name": "LocationNudge",
       "file": "src/flows/address/components/select.tsx",
-      "line": 66,
+      "line": 67,
       "doc": "AddressV2LocationNudge",
       "props": [
         "onEnable"
@@ -3992,7 +4042,7 @@
       "flow": "address",
       "name": "ListingHeader",
       "file": "src/flows/address/components/select.tsx",
-      "line": 84,
+      "line": 85,
       "doc": "Header block of the listing: [location nudge + dotted divider] + add new address, in a white 16-radius card.",
       "props": [
         "children"
@@ -4002,7 +4052,7 @@
       "flow": "address",
       "name": "AddressCard",
       "file": "src/flows/address/components/select.tsx",
-      "line": 89,
+      "line": 90,
       "doc": "AddressV2AddressesListingItem (lat/lng).",
       "props": [
         "address",
@@ -4019,7 +4069,7 @@
       "flow": "address",
       "name": "ListingEmpty",
       "file": "src/flows/address/components/select.tsx",
-      "line": 174,
+      "line": 175,
       "doc": "AddressV2LatLngAddressesListingEmpty",
       "props": [
         "icon",
@@ -4033,7 +4083,7 @@
       "flow": "address",
       "name": "ListingLoading",
       "file": "src/flows/address/components/select.tsx",
-      "line": 202,
+      "line": 203,
       "doc": "AddressV2AddressesListingLoading — search field + add button + 5 card skeletons.",
       "props": [],
       "variants": {}
@@ -4042,7 +4092,7 @@
       "flow": "address",
       "name": "SearchResult",
       "file": "src/flows/address/components/select.tsx",
-      "line": 240,
+      "line": 241,
       "doc": "AddressV2SearchResult",
       "props": [
         "place",
@@ -4055,7 +4105,7 @@
       "flow": "address",
       "name": "SearchResultLoading",
       "file": "src/flows/address/components/select.tsx",
-      "line": 260,
+      "line": 261,
       "doc": "AddressV2SearchResultLoading — 50px circle + two 20px lines.",
       "props": [
         "style"
@@ -4065,7 +4115,7 @@
       "flow": "address",
       "name": "SearchResultsCard",
       "file": "src/flows/address/components/select.tsx",
-      "line": 274,
+      "line": 275,
       "doc": "White 16-radius card of search results with dotted separators (Listing search section / ResultScrollView).",
       "props": [
         "results",
@@ -4379,8 +4429,7 @@
       "flow": "cart",
       "name": "CartCarousel",
       "file": "src/flows/cart/components/CartCarousel.tsx",
-      "line": 9,
-      "doc": "Figma \"Product Carousel\" (10575:94169 offers · 10575:94308 wishlist): white r16 card, \"Cards Header\" (Label2/Bold 16/20 #0E0E0E + optional \"Sponsored\" 12/14 500",
+      "line": 16,
       "props": [
         "title",
         "sponsored",
@@ -7229,7 +7278,7 @@
       "flow": "plp",
       "name": "SkeletonCard",
       "file": "src/flows/plp/components/SkeletonCard.tsx",
-      "line": 5,
+      "line": 9,
       "doc": "NoonPLPSkeleton card: same footprint as ProductCard so the swap doesn't jump.",
       "props": [],
       "variants": {}
@@ -8278,16 +8327,32 @@
     },
     {
       "flow": "search",
+      "name": "GroupReveal",
+      "file": "src/flows/search/components/GroupReveal.tsx",
+      "line": 20,
+      "doc": "One element of the search page's first-open skeleton (Skeleton look=\"band\", the Brand Widget PLP skeleton) over its own box.",
+      "props": [
+        "intro",
+        "group",
+        "index",
+        "radius",
+        "children",
+        "style"
+      ]
+    },
+    {
+      "flow": "search",
       "name": "RecentSearches",
       "file": "src/flows/search/components/RecentSearches.tsx",
-      "line": 17,
+      "line": 18,
       "doc": "NoonRecentlySearchedModule: items = screen ÷ 5.2 wide, image h = w × 1.2, r = w ÷ 10.",
       "props": [
         "items",
         "editing",
         "onToggleEdit",
         "onRemove",
-        "onPress"
+        "onPress",
+        "intro"
       ]
     },
     {

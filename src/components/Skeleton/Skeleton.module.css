@@ -1,0 +1,38 @@
+/* look="band": the Brand Widget PLP skeleton 1:1 (product-upscale/styles.css .skel, measured from ref_02.mp4).
+   Base #F6F5FA; one band 195px wide leaning 17° (top leads), white core, sweeping −200 → 640px linear every 1.867s,
+   first pass `--nk-skeleton-at` (default 0.12s, as on the search page) after it mounts. Every block mounted together sweeps in step. */
+.band { position: relative; display: block; overflow: hidden; background: var(--nk-palette-skeleton-base); }
+.band::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 195px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0px,
+    color-mix(in srgb, var(--nk-palette-white) 22%, transparent) 20px,
+    color-mix(in srgb, var(--nk-palette-white) 45%, transparent) 40px,
+    color-mix(in srgb, var(--nk-palette-white) 70%, transparent) 60px,
+    color-mix(in srgb, var(--nk-palette-white) 90%, transparent) 75px,
+    color-mix(in srgb, var(--nk-palette-white) 70%, transparent) 87px,
+    color-mix(in srgb, var(--nk-palette-white) 78%, transparent) 95px,
+    color-mix(in srgb, var(--nk-palette-white) 67%, transparent) 107px,
+    color-mix(in srgb, var(--nk-palette-white) 56%, transparent) 123px,
+    color-mix(in srgb, var(--nk-palette-white) 30%, transparent) 137px,
+    color-mix(in srgb, var(--nk-palette-white) 22%, transparent) 155px,
+    color-mix(in srgb, var(--nk-palette-white) 12%, transparent) 175px,
+    transparent 195px
+  );
+  transform-origin: 0 0;
+  transform: translateX(-200px) skewX(-17deg);
+  animation: band 1.867s linear var(--nk-skeleton-at, 0.12s) infinite both;
+  will-change: transform;
+}
+@keyframes band {
+  from { transform: translateX(-200px) skewX(-17deg); }
+  to { transform: translateX(640px) skewX(-17deg); }
+}
+/* reduced motion: a still block in the base colour, no sweep (as the reference) */
+:global([data-nk-motion='reduce']) .band::after { animation: none; opacity: 0; }

@@ -96,8 +96,8 @@ export function SearchBarButton({
 
 /**
  * Editable search field (NoonSearchScreen): 52h, r12, 1px #DFDFDF, back icon inside.
- * `fill` plays the handoff "picked suggestion" fill: the text before `from` holds, the rest fades in on the
- * S-curve over 320ms (re-run it by changing `key`). `onFieldPress` makes the field a read-only button
+ * `fill` plays the "picked suggestion" fill: the text before `from` holds, the rest fades in where it will stay
+ * (opacity only, 300ms ease-out; re-run it by changing `key`). `onFieldPress` makes the field a read-only button
  * (the PLP's search bar: tapping it goes back to editing) and keeps the camera instead of the clear (x).
  */
 export interface SearchInputProps {
@@ -110,6 +110,11 @@ export interface SearchInputProps {
   onSubmit?: (v: string) => void;
   onFieldPress?: () => void;
   fill?: { from: number; key: number };
+  /**
+   * The query is being submitted (a suggestion was picked): the clear (x) crossfades into the camera the results bar
+   * shows, so the PLP's identical bar takes over without the icon popping. Default look only.
+   */
+  committed?: boolean;
   /** `field`: Field DS M-SearchBar look (opt-in); `default` (NoonSearchScreen) is unchanged */
   variant?: 'default' | 'field';
   /** field variant: `H48` (padding 12, 24 icons, B14 Medium, default) · `H44` (padding 10 / 12, 20 icons, B12 Medium) */
@@ -124,13 +129,19 @@ export interface SearchInputProps {
   iconRightTwo?: ReactNode;
 }
 
+/** how long the picked suggestion's text takes to fade in (s); the search page hands over to results only after it */
+export const SEARCH_FILL_FADE = 0.276; // Test01 long fade-in
+
 /** the handoff "picked suggestion" fill, shared by both SearchInput looks */
 function useFill(value: string, fill?: { from: number; key: number }) {
-  const [filling, setFilling] = useState(false);
+  // derived in render, not set in an effect: the new value and the fill copy land in the SAME paint (an effect turned
+  // the copy on one frame late, so the full text flashed at full ink, vanished and then faded in: the flicker)
+  const [doneKey, setDoneKey] = useState<number>();
+  const filling = !!fill && fill.key !== doneKey && fill.from < value.length;
   useEffect(() => {
-    if (!fill || fill.from >= value.length) return;
-    setFilling(true);
-    const t = setTimeout(() => setFilling(false), 400); // 320ms fade + a frame of slack (also when the tab is in the background)
+    if (!fill) return;
+    const key = fill.key;
+    const t = setTimeout(() => setDoneKey(key), SEARCH_FILL_FADE * 1000 + 60); // the fade + a frame of slack (also when the tab is in the background)
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fill?.key]);
@@ -141,7 +152,8 @@ function FillCopy({ value, fill }: { value: string; fill: { from: number; key: n
   return (
     <span className={styles.fillCopy} aria-hidden>
       <span>{value.slice(0, fill.from)}</span>
-      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.32, ease: handoff.easeInOut }}>
+      {/* the picked text fades in where it will stay: opacity only, no movement */}
+      <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: SEARCH_FILL_FADE, ease: handoff.easeOut }}>
         {value.slice(fill.from)}
       </motion.span>
     </span>
@@ -170,9 +182,10 @@ function KitSearchInput({
   onSubmit,
   onFieldPress,
   fill,
+  committed,
 }: SearchInputProps) {
   const filling = useFill(value, fill);
-  const showClear = !!value && !onFieldPress;
+  const showClear = !!value && !onFieldPress && !committed;
   return (
     <div className={`${styles.bar} ${styles.input}`}>
       {onBack && (
@@ -195,15 +208,24 @@ function KitSearchInput({
         />
         {filling && fill && <FillCopy value={value} fill={fill} />}
       </span>
-      {showClear ? (
-        <Pressable onClick={() => onChange('')} aria-label="Clear" style={{ display: 'flex' }}>
-          {/* NoonSearchBar clearIcon: clear-input.webp at its 18 × 18 size */}
-          <img src={clearIcon} alt="" width={18} height={18} />
-        </Pressable>
-      ) : (
-        // NoonSearchBarImageSearchButton: search-bar-camera.webp at 24 × 24
-        right ?? <img src={cameraIcon} alt="" width={24} height={24} />
-      )}
+      {/* clear (x) ⇄ camera share one end-aligned slot and crossfade, so swapping them never moves either */}
+      <span className={styles.trail}>
+        <AnimatePresence initial={false}>
+          {showClear ? (
+            <motion.span key="clear" className={styles.trailItem} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: handoff.fade.out, ease: handoff.easeOut }}>
+              <Pressable onClick={() => onChange('')} aria-label="Clear" style={{ display: 'flex' }}>
+                {/* NoonSearchBar clearIcon: clear-input.webp at its 18 × 18 size */}
+                <img src={clearIcon} alt="" width={18} height={18} />
+              </Pressable>
+            </motion.span>
+          ) : (
+            <motion.span key="camera" className={styles.trailItem} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: handoff.fade.out, ease: handoff.easeOut }}>
+              {/* NoonSearchBarImageSearchButton: search-bar-camera.webp at 24 × 24 */}
+              {right ?? <img src={cameraIcon} alt="" width={24} height={24} />}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </span>
     </div>
   );
 }

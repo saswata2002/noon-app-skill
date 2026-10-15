@@ -10,7 +10,7 @@ import { stepper as t } from '../../foundations/tokens';
  *  - `soft`  : wishlist ATC stepper — #EBF4FF, 1.2px #BDDBFF, #0F61FF
  * Values: `stepper` token group (src/foundations/tokens.ts).
  */
-export function QuantityStepper({ value, onChange, max = 10, variant = 'cart', width }: { value: number; onChange: (v: number) => void; max?: number; variant?: 'cart' | 'filled' | 'soft'; width?: number | string }) {
+export function QuantityStepper({ value, onChange, max = 10, variant = 'cart', width, surface = true }: { value: number; onChange: (v: number) => void; max?: number; variant?: 'cart' | 'filled' | 'soft'; width?: number | string; /** false: no background or border (the host draws them, e.g. QuickAdd's morphing shell) */ surface?: boolean }) {
   const v = {
     cart: { bg: t.cartBg, border: t.cartBorder, color: t.cartFg, text: t.cartValueFg, w: t.cartWidth, font: t.cartFont },
     filled: { bg: t.filledBg, border: t.filledBorder, color: t.filledFg, text: t.filledValueFg, w: t.filledWidth, font: t.filledFont },
@@ -23,8 +23,8 @@ export function QuantityStepper({ value, onChange, max = 10, variant = 'cart', w
         width: width ?? v.w,
         height: t.height,
         borderRadius: t.radius,
-        background: v.bg,
-        border: v.border,
+        background: surface ? v.bg : 'transparent',
+        border: surface ? v.border : 0,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

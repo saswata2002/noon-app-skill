@@ -21,7 +21,7 @@ initial `home/home` · group Discovery · tab `home` on `home`
 
 initial `search/search` · group Discovery
 
-- components/: RecentSearches, SuggestionRow
+- components/: GroupReveal, RecentSearches, SuggestionRow
 
 | Route | Title | Presentation | URL | Truth | Verified | Source |
 |---|---|---|---|---|---|---|

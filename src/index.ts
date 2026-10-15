@@ -5,7 +5,7 @@
  *   import '@noon/flow-kit/style.css';
  */
 export { NoonPrototype, type NoonPrototypeProps } from './kit/NoonPrototype';
-export { Navigator, useNav, useIsTop, useParams, TAB_ROUTES, type NavApi } from './kit/Navigator';
+export { Navigator, useNav, useIsTop, useParams, usePageLoader, useToastsEnabled, TAB_ROUTES, type NavApi } from './kit/Navigator';
 export { useStatusBar, type StatusBarTone } from './kit/statusBar';
 export { useSheet, type SheetContext } from './kit/sheet';
 export { defineFlow, defineScreen, createRegistry, screenTruth } from './kit/registry';

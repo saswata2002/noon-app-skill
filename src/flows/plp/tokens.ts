@@ -23,6 +23,12 @@ export const plpTokens = {
     skeletonOutAfter: 0.353,
     /** only the first cards play the rise; the rest are below the fold */
     animateFirst: 8,
+    /**
+     * Only those first cards mount with the page (rendering all ~70 at once stalled the search → results hand-off);
+     * once they have landed (`settle` s after they start) the rest join below the fold, `renderBatch` per idle slot.
+     */
+    renderBatch: 8,
+    settle: 0.6,
   },
   /** scroll states (bappzaar master, see MAPPING.md → "PLP scroll states") */
   scroll: {

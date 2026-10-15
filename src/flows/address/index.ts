@@ -31,7 +31,7 @@ export const addressFlow = defineFlow({
       component: SelectScreen,
       presentation: 'modal',
       notes:
-        'Skeleton for 650ms, then the saved cards (default = blue header). Tap another card → loader + "Address updated" toast and it becomes the default; tap the default → "Address already selected". ⋯ opens Edit/Share/Verify/Delete. "Add new address" opens the map. Type in the search field to filter cards and get "Search results" (tap one to open the map there). Switch to Locker/ Pickup for the collection empty state. Param locationDenied: true shows the "Location not enabled" nudge.',
+        'The page settles first, then the skeleton fades in and shimmers (650ms), then the search field, the header and each saved card resolve out of it top → bottom (default = blue header). Tap another card → loader + "Address updated" toast and it becomes the default; tap the default → "Address already selected". ⋯ opens Edit/Share/Verify/Delete. "Add new address" opens the map. Type in the search field to filter cards and get "Search results" (tap one to open the map there). Switch to Locker/ Pickup for the collection empty state. Param locationDenied: true shows the "Location not enabled" nudge.',
       source: `${SRC}/SelectScreen/{SelectScreen,Wrapper,styles}.ts(x), components/AddressV2/Select/**, components/AddressV2/Buttons/{AddAddress,LocationNudge}, components/AddressV2/Search/Input, components/TabSwitcher, components/MapV2/MapScreenHeader`,
     },
     {

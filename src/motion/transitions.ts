@@ -1,5 +1,5 @@
 import type { TargetAndTransition, Transition } from 'motion/react';
-import { duration, easing, spring } from './presets';
+import { duration, easing, handoff, spring } from './presets';
 
 /**
  * Screen transitions. A transition describes how a screen enters (initial → animate),
@@ -17,14 +17,17 @@ export interface ScreenTransition {
   transition: Transition;
 }
 
-const iosCurve: Transition = { duration: 0.42, ease: easing.ios };
+/** screen movement (push, modal): the Test01 spring (the recorded page push settles in ≈ 0.547s) */
+const iosCurve: Transition = handoff.spring;
+/** Test01 push parallax: the page underneath drifts 200 of the 382 the new one travels */
+const UNDER_X = `${-(handoff.parallax * 100).toFixed(2)}%`;
 
 const builtIn = {
   push: {
     initial: { x: '100%' },
     animate: { x: 0 },
     exit: { x: '100%' },
-    under: { x: '-28%', filter: 'brightness(0.92)' },
+    under: { x: UNDER_X, filter: 'brightness(0.92)' },
     transition: iosCurve,
   },
   fade: {
@@ -34,10 +37,11 @@ const builtIn = {
     transition: { duration: duration.base, ease: easing.standard },
   },
   'fade-up': {
-    initial: { opacity: 0, y: 24 },
+    // Test01 block: travels 20px on the spring while it fades in (ease-out 183ms)
+    initial: { opacity: 0, y: handoff.travel },
     animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: 24 },
-    transition: { duration: duration.medium, ease: easing.out },
+    exit: { opacity: 0, y: handoff.travel },
+    transition: { y: handoff.spring, opacity: { duration: handoff.fade.out, ease: handoff.easeOut } },
   },
   modal: {
     initial: { y: '100%' },

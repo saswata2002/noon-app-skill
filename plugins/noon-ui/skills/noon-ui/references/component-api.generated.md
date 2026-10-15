@@ -4,7 +4,7 @@
 
 The source of truth for component **names, props, types, defaults and variants**. Hand-written guidance (when to use, gotchas, examples) is in `references/components.md`; when the two disagree, this file is right and `references/components.md` is stale.
 
-61 shared components exported from `src/components/index.ts` · 362 flow-local components in `src/flows/*/components/`. "—" = no static default; `?` = optional. Variants = props typed as a union of string literals.
+62 shared components exported from `src/components/index.ts` · 363 flow-local components in `src/flows/*/components/`. "—" = no static default; `?` = optional. Variants = props typed as a union of string literals.
 
 ## Shared components
 
@@ -525,7 +525,7 @@ NoonProductBoxVertical, PLP layout: the search / listing result card, ported 1:1
 
 ### ProductCard
 
-`src/components/ProductCard/ProductCard.tsx:25`
+`src/components/ProductCard/ProductCard.tsx:24`
 
 NoonProductBoxVertical — the PLP / carousel product card. Anatomy: image (≈0.8 aspect, contain) · Best Seller tag top-left · heart top-right · quick-ATC bottom-right · title 14/500 2 lines · rating pill · price row · coupon · ETA badge (Origin `_ETA`, `EtaBadge` + `etaFor(product)`; small in the carousel).
 
@@ -538,11 +538,23 @@ NoonProductBoxVertical — the PLP / carousel product card. Anatomy: image (≈0
 | `carousel?` | `boolean` | — | bappzaar home productCarousel box (NoonProductCard isCarousel in NoonOptimizedProductCarousel): r8, no hairline, image 138 × 169 at 390 (`round((w − 14) · 1.361)`) with an r8 overlay (carouselImage), 24 heart circle, "+" lifted 2 (imageBottomWrapperCarousel), info inset 4 + marginBottom 2, price marginTop 6 with a 16/700 sign (saleCurrency), "n%" discount (hideOffText), the small ETA badge at 18h (was the express flag, NoonEstimatedDelivery isCarousel). Implies `compact`. |
 | `width?` | `number \| string` | — |  |
 
+### QuickAddButton
+
+`src/components/ProductCard/ProductCard.tsx:100`
+
+The add-to-cart "+" look on its own (36×36 white, r8, hairline border, soft thumb shadow, 22px ink plus) with your own `onPress`, for tiles that aren't catalog products (e.g. the home Fashion spotlight). Catalog products use `QuickAdd`. `asDiv` for slots inside another button (a role="button" div, so buttons never nest).
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `onPress` | `() => void` | — |  |
+| `label?` | `string` | `'Add to cart'` |  |
+| `asDiv?` | `boolean` | — |  |
+
 ### QuickAdd
 
-`src/components/ProductCard/ProductCard.tsx:101`
+`src/components/ProductCard/ProductCard.tsx:190`
 
-NoonProductBoxAddToCart: 36×36 white "+" → (tap) adds 1 and expands into a 76×36 #3866DF stepper → collapses to a filled count badge after 2.5s idle. A product with sizes (`variant_overlay_url`) opens the variants sheet instead (useCart → showVariantsFlyout), which adds and shows the snackbar itself.
+NoonProductBoxAddToCart as one morphing shape: 36×36 white "+" → (tap) adds 1 and the shell stretches to the 76×36 #3866DF stepper (growing towards the card's inner edge) → after 2.5s idle it narrows back to 36 as a blue count badge (tap it to reopen the stepper); trash at 1 morphs it back to the white "+". The count shows at once and the cart store update is committed once the morph has settled (flushed on unmount). A product with sizes (`variant_overlay_url`) opens the variants sheet instead (useCart → showVariantsFlyout), which adds and shows the snackbar itself.
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
@@ -582,6 +594,7 @@ Quantity steppers used across the app. - `cart` : NoonCartItemQuantitySelector �
 | `max?` | `number` | `10` |  |
 | `variant?` | `'cart' \| 'filled' \| 'soft'` | `'cart'` |  |
 | `width?` | `number \| string` | — |  |
+| `surface?` | `boolean` | `true` |  |
 
 Variants:
 - `variant`: `cart` · `filled` · `soft`
@@ -679,7 +692,7 @@ Variants:
 
 ### SearchInput
 
-`src/components/SearchBar/SearchBar.tsx:159` · props `SearchInputProps`
+`src/components/SearchBar/SearchBar.tsx:171` · props `SearchInputProps`
 
 Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `variant="field"` (opt-in): Field DS M-SearchBar (`@field-ds/components` SearchBar/SearchBar.tsx, Figma 892:244) — H48 (padding 12, 24px icons, B14 Medium) or H44 (padding 10 / 12, 20px icons, B12 Medium), surfacePrimary, 1px borderSubtle, r12, gap 8, optional Sm `elevation`, Origin `search` icon (Field tertiary → primary once focused or typed), `iconRight` + `iconRightTwo` after a 1 × 24 divider, auto clear (x) while typing, placeholder Field textPrimary at rest / textTertiary focused, press scale .98 over 160ms. `fill`, `onFieldPress`, `onBack`, `onSubmit` work in both looks.
 
@@ -694,6 +707,7 @@ Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `
 | `onSubmit?` | `(v: string) => void` | — |  |
 | `onFieldPress?` | `() => void` | — |  |
 | `fill?` | `{ from: number; key: number }` | — |  |
+| `committed?` | `boolean` | — | The query is being submitted (a suggestion was picked): the clear (x) crossfades into the camera the results bar shows, so the PLP's identical bar takes over without the icon popping. Default look only. |
 | `variant?` | `'default' \| 'field'` | — | `field`: Field DS M-SearchBar look (opt-in); `default` (NoonSearchScreen) is unchanged |
 | `fieldSize?` | `'H48' \| 'H44'` | — | field variant: `H48` (padding 12, 24 icons, B14 Medium, default) · `H44` (padding 10 / 12, 20 icons, B12 Medium) |
 | `elevation?` | `boolean` | — | field variant: Sm elevation shadow |
@@ -744,16 +758,20 @@ Variants:
 
 ### Skeleton
 
-`src/components/Skeleton/Skeleton.tsx:8`
+`src/components/Skeleton/Skeleton.tsx:12`
 
-Shimmer block (NewLoadingState / ShimmerBackground). Reduced motion: a still block in the base grey, no sweep.
+Shimmer block (NewLoadingState / ShimmerBackground). Reduced motion: a still block in the base grey, no sweep. `look="band"`: the Brand Widget PLP skeleton (#F6F5FA, one 195px band at 17° every 1.867s), used by the search page.
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
 | `width?` | `number \| string` | `'100%'` |  |
 | `height?` | `number \| string` | `14` |  |
-| `radius?` | `number` | `r.r6` |  |
+| `radius?` | `number \| string` | `r.r6` |  |
 | `style?` | `CSSProperties` | — |  |
+| `look?` | `'default' \| 'band'` | `'default'` |  |
+
+Variants:
+- `look`: `band` · `default`
 
 ### SkuCard
 
@@ -1081,9 +1099,9 @@ Variants:
 
 ### Toast
 
-`src/components/Toast/Toast.tsx:26` · props `ToastProps<T>` · generic
+`src/components/Toast/Toast.tsx:28` · props `ToastProps<T>` · generic
 
-Self-dismissing toast / snackbar host (bappzaar `src/components/Toast`, `NoonSnackBar`, `AddressToastScreen`): mounts `item` with AnimatePresence, calls `onHide(item)` after `duration`, and animates out when the item clears. The look and motion come from the caller (className + initial/animate/exit/transition), e.g. - checkout voucher toast: fade 500ms linear, 2.5s - address toast: spring up from y 50, 3.4s - cart move-to-wishlist snackbar: spring from y 100%, 3s For a plain message toast use `useNav().toast(message)` instead.
+Self-dismissing toast / snackbar host (bappzaar `src/components/Toast`, `NoonSnackBar`, `AddressToastScreen`): mounts `item` with AnimatePresence, calls `onHide(item)` after `duration`, and animates out when the item clears. The look and motion come from the caller (className + initial/animate/exit/transition), e.g. - checkout voucher toast: fade 500ms linear, 2.5s - address toast: spring up from y 50, 3.4s - cart move-to-wishlist snackbar: spring from y 100%, 3s For a plain message toast use `useNav().toast(message)` instead. With the Navigator's `toasts={false}` it draws nothing but keeps its timer (`onHide` still fires after `duration`), so the caller's flow is unchanged.
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
@@ -1143,33 +1161,33 @@ Search these before you create a component (`references/components.md` → "Sear
 | account | `CountryRow` | `src/flows/account/components/MenuGroup.tsx:76` | — |
 | account | `ProfileCard` | `src/flows/account/components/ProfileCard.tsx:22` | `noonOne` |
 | address | `StreetMap` | `src/flows/address/components/StreetMap.tsx:38` | `highlightPlaceId` `highlightKey` |
-| address | `AddressDetailsForm` | `src/flows/address/components/form.tsx:147` | `initialValues` `placeName` `area` `onClose` `onChangeLocation` `onSubmit` `startExpandedCustomer` |
-| address | `MapPin` | `src/flows/address/components/map.tsx:14` | `title` `isError` `isWarning` `isMapDragging` `pinScale` |
-| address | `MapSearchButton` | `src/flows/address/components/map.tsx:56` | `onBack` `onPress` `searchable` `value` `onChange` `autoFocus` `style` |
-| address | `CurrentLocationButton` | `src/flows/address/components/map.tsx:102` | `onPress` |
-| address | `SearchCurrentLocationButton` | `src/flows/address/components/map.tsx:116` | `description` `onPress` `loading` |
-| address | `LocateOnMapButton` | `src/flows/address/components/map.tsx:133` | `onPress` `style` |
-| address | `LocationSummary` | `src/flows/address/components/map.tsx:149` | `placeName` `area` `variant` `onChangePress` `style` |
-| address | `LocationLoading` | `src/flows/address/components/map.tsx:177` | — |
-| address | `UnserviceableView` | `src/flows/address/components/map.tsx:192` | `style` |
-| address | `FloatingOverlay` | `src/flows/address/components/map.tsx:220` | `expanded` `topContent` `collapsedContent` `expandedContent` `fixedAction` `onOverlayClose` `closing` `collapsedBg` `expandedBg` `slideIn` |
-| address | `Img` | `src/flows/address/components/primitives.tsx:8` | `src` `width` `height` `style` `className` |
-| address | `OverlayButton` | `src/flows/address/components/primitives.tsx:16` | `title` `onPress` `disabled` `loading` `style` |
-| address | `GradientTitle` | `src/flows/address/components/primitives.tsx:32` | `title` `style` |
-| address | `IconTap` | `src/flows/address/components/primitives.tsx:41` | `children` `onPress` `label` `disabled` |
-| address | `AddressToastHost` | `src/flows/address/components/primitives.tsx:64` | — |
-| address | `SelectHeader` | `src/flows/address/components/select.tsx:13` | `title` `onBack` |
-| address | `TabSwitcher` | `src/flows/address/components/select.tsx:27` | `tabs` `selected` `onPress` `tabWidth` |
-| address | `SearchInput` | `src/flows/address/components/select.tsx:43` | `value` `onChange` `disabled` `style` |
-| address | `AddAddressButton` | `src/flows/address/components/select.tsx:53` | `text` `onPress` |
-| address | `LocationNudge` | `src/flows/address/components/select.tsx:66` | `onEnable` |
-| address | `ListingHeader` | `src/flows/address/components/select.tsx:84` | `children` |
-| address | `AddressCard` | `src/flows/address/components/select.tsx:89` | `address` `isSelected` `isFirst` `isLoading` `disabled` `onPress` `onThreeDots` `onShare` |
-| address | `ListingEmpty` | `src/flows/address/components/select.tsx:174` | `icon` `title` `substring` `substrings` `onButtonPress` |
-| address | `ListingLoading` | `src/flows/address/components/select.tsx:202` | — |
-| address | `SearchResult` | `src/flows/address/components/select.tsx:240` | `place` `onPress` `loading` `disabled` |
-| address | `SearchResultLoading` | `src/flows/address/components/select.tsx:260` | `style` |
-| address | `SearchResultsCard` | `src/flows/address/components/select.tsx:274` | `results` `onPress` `style` |
+| address | `AddressDetailsForm` | `src/flows/address/components/form.tsx:148` | `initialValues` `placeName` `area` `onClose` `onChangeLocation` `onSubmit` `startExpandedCustomer` |
+| address | `MapPin` | `src/flows/address/components/map.tsx:15` | `title` `isError` `isWarning` `isMapDragging` `pinScale` |
+| address | `MapSearchButton` | `src/flows/address/components/map.tsx:57` | `onBack` `onPress` `searchable` `value` `onChange` `autoFocus` `style` |
+| address | `CurrentLocationButton` | `src/flows/address/components/map.tsx:103` | `onPress` |
+| address | `SearchCurrentLocationButton` | `src/flows/address/components/map.tsx:117` | `description` `onPress` `loading` |
+| address | `LocateOnMapButton` | `src/flows/address/components/map.tsx:134` | `onPress` `style` |
+| address | `LocationSummary` | `src/flows/address/components/map.tsx:150` | `placeName` `area` `variant` `onChangePress` `style` |
+| address | `LocationLoading` | `src/flows/address/components/map.tsx:178` | — |
+| address | `UnserviceableView` | `src/flows/address/components/map.tsx:193` | `style` |
+| address | `FloatingOverlay` | `src/flows/address/components/map.tsx:222` | `expanded` `topContent` `collapsedContent` `expandedContent` `fixedAction` `onOverlayClose` `closing` `collapsedBg` `expandedBg` `slideIn` |
+| address | `Img` | `src/flows/address/components/primitives.tsx:9` | `src` `width` `height` `style` `className` |
+| address | `OverlayButton` | `src/flows/address/components/primitives.tsx:17` | `title` `onPress` `disabled` `loading` `style` |
+| address | `GradientTitle` | `src/flows/address/components/primitives.tsx:33` | `title` `style` |
+| address | `IconTap` | `src/flows/address/components/primitives.tsx:42` | `children` `onPress` `label` `disabled` |
+| address | `AddressToastHost` | `src/flows/address/components/primitives.tsx:65` | — |
+| address | `SelectHeader` | `src/flows/address/components/select.tsx:14` | `title` `onBack` |
+| address | `TabSwitcher` | `src/flows/address/components/select.tsx:28` | `tabs` `selected` `onPress` `tabWidth` |
+| address | `SearchInput` | `src/flows/address/components/select.tsx:44` | `value` `onChange` `disabled` `style` |
+| address | `AddAddressButton` | `src/flows/address/components/select.tsx:54` | `text` `onPress` |
+| address | `LocationNudge` | `src/flows/address/components/select.tsx:67` | `onEnable` |
+| address | `ListingHeader` | `src/flows/address/components/select.tsx:85` | `children` |
+| address | `AddressCard` | `src/flows/address/components/select.tsx:90` | `address` `isSelected` `isFirst` `isLoading` `disabled` `onPress` `onThreeDots` `onShare` |
+| address | `ListingEmpty` | `src/flows/address/components/select.tsx:175` | `icon` `title` `substring` `substrings` `onButtonPress` |
+| address | `ListingLoading` | `src/flows/address/components/select.tsx:203` | — |
+| address | `SearchResult` | `src/flows/address/components/select.tsx:241` | `place` `onPress` `loading` `disabled` |
+| address | `SearchResultLoading` | `src/flows/address/components/select.tsx:261` | `style` |
+| address | `SearchResultsCard` | `src/flows/address/components/select.tsx:275` | `results` `onPress` `style` |
 | cards | `CardActionsOverlay` | `src/flows/cards/components/ActionsOverlay.tsx:79` | `card` `open` `onRequestClose` `onClosed` `onSetDefault` `onDelete` `onRename` `initialAction` |
 | cards | `AnimatedListCard` | `src/flows/cards/components/AnimatedListCard.tsx:59` | `card` `index` `isInFirstSection` `isLastInSection` `firstSectionCount` `activeId` `selection` `overScroll` `topStackVisible` `isLoading` `onLoad` `onSelect` |
 | cards | `SectionTitle` | `src/flows/cards/components/Bits.tsx:10` | `children` `style` |
@@ -1192,7 +1210,7 @@ Search these before you create a component (`references/components.md` → "Sear
 | cards | `PaymentButtonV2` | `src/flows/cards/components/primitives.tsx:23` | `title` `onPress` `disabled` `isLoading` `size` `variant` `icon` `className` `style` |
 | cards | `HeaderButton` | `src/flows/cards/components/primitives.tsx:50` | `icon` `onPress` `transparent` `reversed` `label` |
 | cards | `AdditionContainer` | `src/flows/cards/components/primitives.tsx:59` | `title` `className` `children` |
-| cart | `CartCarousel` | `src/flows/cart/components/CartCarousel.tsx:9` | `title` `sponsored` `items` |
+| cart | `CartCarousel` | `src/flows/cart/components/CartCarousel.tsx:16` | `title` `sponsored` `items` |
 | cart | `CartFooter` | `src/flows/cart/components/CartFooter.tsx:25` | `totals` `cart` `isTabRoot` `disabled` `onCheckout` `onHeightChange` |
 | cart | `CartGlassFooter` | `src/flows/cart/components/CartGlassFooter.tsx:32` | `totals` `cart` `disabled` `onCheckout` `onHeightChange` |
 | cart | `CartGroup` | `src/flows/cart/components/CartGroup.tsx:35` | `type` `lines` `subtotal` `onMovedToWishlist` |
@@ -1412,7 +1430,7 @@ Search these before you create a component (`references/components.md` → "Sear
 | plp | `CatalogNavPill` | `src/flows/plp/components/CatalogNavPill.tsx:42` | `kind` `label` `selected` `count` `icon` `onPress` |
 | plp | `MarketplaceStrip` | `src/flows/plp/components/MarketplaceStrip.tsx:37` | `active` `onSelect` |
 | plp | `RevealChip` | `src/flows/plp/components/NavPills.tsx:12` | `index` `children` `skeleton` |
-| plp | `SkeletonCard` | `src/flows/plp/components/SkeletonCard.tsx:5` | — |
+| plp | `SkeletonCard` | `src/flows/plp/components/SkeletonCard.tsx:9` | — |
 | returns | `AFSBackHeader` | `src/flows/returns/components/AFSBackHeader.tsx:11` | `title` `onBack` `blur` `solid` `titleClassName` `children` |
 | returns | `AFSButton` | `src/flows/returns/components/AFSButton.tsx:10` | `title` `onPress` `size` `variant` `disabled` `loading` `icon` `className` `style` `textClassName` |
 | returns | `Tap` | `src/flows/returns/components/AFSButton.tsx:56` | `children` `className` `onPress` `scale` `disabled` `style` |
@@ -1482,7 +1500,8 @@ Search these before you create a component (`references/components.md` → "Sear
 | reviews | `EyeIcon` | `src/flows/reviews/components/icons.tsx:8` | `off` `size` |
 | reviews | `SparkleIcon` | `src/flows/reviews/components/icons.tsx:20` | `size` |
 | reviews | `ExclamationIcon` | `src/flows/reviews/components/icons.tsx:30` | `size` |
-| search | `RecentSearches` | `src/flows/search/components/RecentSearches.tsx:17` | `items` `editing` `onToggleEdit` `onRemove` `onPress` |
+| search | `GroupReveal` | `src/flows/search/components/GroupReveal.tsx:20` | `intro` `group` `index` `radius` `children` `style` |
+| search | `RecentSearches` | `src/flows/search/components/RecentSearches.tsx:18` | `items` `editing` `onToggleEdit` `onRemove` `onPress` `intro` |
 | search | `SuggestionRow` | `src/flows/search/components/SuggestionRow.tsx:20` | `text` `query` `product` `category` `onPress` `onFill` |
 | wishlist | `CollectionTile` | `src/flows/wishlist/components/CollectionTile.tsx:13` | `name` `items` |
 | wishlist | `EmptyState` | `src/flows/wishlist/components/EmptyState.tsx:14` | — |

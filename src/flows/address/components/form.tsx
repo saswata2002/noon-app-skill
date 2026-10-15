@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { duration, easing } from '../../../motion/presets';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { icons } from '../assets';
 import { fieldLabels, t, tagLabels, type AddressTag } from '../data';
@@ -108,7 +109,7 @@ function FormHeader({ title, elevated, onBack }: { title: string; elevated: bool
     <motion.div
       className={styles.header}
       animate={{ backgroundColor: elevated ? palette.secondaryBackgroundColor : palette.kitGray97v2, boxShadow: elevated ? `0 5px 20px ${palette.kitGray41Alpha14}` : `0 5px 0px ${palette.kitGray41Alpha0}` }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: duration.medium, ease: easing.inOut }}
     >
       {onBack && (
         <button type="button" className={styles.backWrapper} onClick={onBack} aria-label="Back">
@@ -229,7 +230,7 @@ export function AddressDetailsForm({
                   <MaskIcon src={icons.inputPencil} size={20} color={tokenRef.color('textSecondary')} />
                 </button>
               ) : (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.fast, ease: easing.out }}>
                   <div className={styles.mainTitle}>{t.address_v2_receiver_details_for_address}</div>
                   <div className={styles.nameRow}>
                     <div className={styles.nameInput}>

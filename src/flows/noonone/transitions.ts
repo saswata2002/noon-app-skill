@@ -1,4 +1,5 @@
 import { registerTransition } from '../../motion/transitions';
+import { duration, easing } from '../../motion/presets';
 
 /**
  * noon One overlays (navigator.showOverlay → VIP*OverlayScreen wrapped in VIPOverlayBottomSheet) draw their own
@@ -10,7 +11,7 @@ registerTransition('noonone-overlay', {
   initial: { backgroundColor: 'transparent', boxShadow: 'none', opacity: 1 },
   animate: { backgroundColor: 'transparent', boxShadow: 'none', opacity: 1 },
   exit: { opacity: 0 },
-  transition: { duration: 0.2 },
+  transition: { duration: duration.base, ease: easing.standard }, // Test01 S-curve fade
 });
 
 /** Pushes with `animations.push.enabled: false` (deep-link redirects, VIPUtil.showLandingWithRedirect animatePush=false). */

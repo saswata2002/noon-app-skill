@@ -13,7 +13,7 @@
 | info · nav-dynamic | 9 |
 | info · no-entry | 94 |
 | info · untested | 155 |
-| info · unused-component | 38 |
+| info · unused-component | 40 |
 
 ## error · screen-module
 
@@ -324,6 +324,8 @@
 - cmp:Pill (src/components/Pill/Pill.tsx) is not reached from any registered screen
 - cmp:PillRow (src/components/Pill/Pill.tsx) is not reached from any registered screen
 - cmp:ProductBoxVertical (src/components/ProductBoxVertical/ProductBoxVertical.tsx) is not reached from any registered screen
+- cmp:QuantityStepper (src/components/QuantityStepper/QuantityStepper.tsx) is not reached from any registered screen
+- cmp:QuickAddButton (src/components/ProductCard/ProductCard.tsx) is not reached from any registered screen
 - cmp:Radio (src/components/Radio/Radio.tsx) is not reached from any registered screen
 - cmp:SearchInput (src/components/SearchBar/SearchBar.tsx) is not reached from any registered screen
 - cmp:SectionCard (src/components/SectionCard/SectionCard.tsx) is not reached from any registered screen

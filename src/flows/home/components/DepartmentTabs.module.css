@@ -74,7 +74,8 @@
 .spotMedia { position: relative; width: 100%; height: 179px; flex-shrink: 0; overflow: hidden; border-radius: 8px 8px 0 0; background: var(--nk-color-home-tab-sponsored-border); }
 .spotMedia > img { position: absolute; max-width: none; pointer-events: none; }
 .spotHeart { position: absolute; right: 3px; top: 4px; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--nk-palette-white-alpha20, transparent); }
-.spotAtc { position: absolute; right: 8px; bottom: 8px; display: flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 8px; border: 1.2px solid var(--nk-color-home-tab-cms-border) !important; background: var(--nk-color-bg-surface) !important; color: var(--nk-color-text-primary); }
+/* QuickAddButton (the kit's one add-to-cart look) at the same bottom-right anchor */
+.spotAtc { position: absolute; right: 8px; bottom: 8px; display: flex; }
 .spotAd { position: absolute; left: 6px; top: 158px; padding: 2px 4px; border-radius: 4px; background: var(--nk-color-bg-surface); font: var(--nk-type-home-tab-ad); color: var(--nk-color-text-secondary); }
 .spotBody { display: flex; flex-direction: column; gap: 6px; padding: 0 8px; }
 .spotName { margin: 0; height: 36px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font: var(--nk-type-product-title); letter-spacing: -0.14px; color: var(--nk-color-home-tab-sponsored-title); }

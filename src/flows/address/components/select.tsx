@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { handoff } from '../../../motion/presets';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { DottedDivider, MaskIcon, Pressable, Skeleton, Spinner } from '../../../components';
 import { icons } from '../assets';
@@ -34,7 +35,7 @@ export function TabSwitcher({ tabs, selected, onPress, tabWidth }: { tabs: strin
           </span>
         </button>
       ))}
-      <motion.div className={styles.tabIndicator} style={{ width: tabWidth }} animate={{ x: selected * tabWidth }} transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }} />
+      <motion.div className={styles.tabIndicator} style={{ width: tabWidth }} animate={{ x: selected * tabWidth }} transition={handoff.spring} />
     </div>
   );
 }
@@ -203,30 +204,30 @@ export function ListingLoading() {
   return (
     <div className={styles.loading}>
       <div className={styles.loadingInput}>
-        <Skeleton width={17} height={17} radius={4} />
-        <Skeleton height={14} radius={4} style={{ flex: 1, marginInlineStart: 20 }} />
+        <Skeleton look="band" width={17} height={17} radius={4} />
+        <Skeleton look="band" height={14} radius={4} style={{ flex: 1, marginInlineStart: 20 }} />
       </div>
       <div className={styles.loadingAdd}>
         <span className={styles.loadingAddLeft}>
-          <Skeleton width={20} height={20} radius={4} />
-          <Skeleton width={200} height={14} radius={4} style={{ marginInlineStart: 17 }} />
+          <Skeleton look="band" width={20} height={20} radius={4} />
+          <Skeleton look="band" width={200} height={14} radius={4} style={{ marginInlineStart: 17 }} />
         </span>
-        <Skeleton width={16} height={16} radius={4} />
+        <Skeleton look="band" width={16} height={16} radius={4} />
       </div>
       <div className={styles.loadingCards}>
         {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className={styles.loadingCard}>
             <div className={styles.loadingCardHeader}>
-              <Skeleton width={40} height={40} radius={8} style={{ marginInlineEnd: 12 }} />
-              <Skeleton height={20} radius={10} style={{ flex: 1, marginInlineEnd: 8 }} />
-              <Skeleton width={60} height={20} radius={10} />
+              <Skeleton look="band" width={40} height={40} radius={8} style={{ marginInlineEnd: 12 }} />
+              <Skeleton look="band" height={20} radius={10} style={{ flex: 1, marginInlineEnd: 8 }} />
+              <Skeleton look="band" width={60} height={20} radius={10} />
             </div>
             <div style={{ marginTop: 8 }}>
-              <Skeleton height={16} radius={8} style={{ marginBottom: 8 }} />
+              <Skeleton look="band" height={16} radius={8} style={{ marginBottom: 8 }} />
               <div className={styles.loadingCardDivider} />
               <div style={{ display: 'flex' }}>
-                <Skeleton width={120} height={16} radius={8} style={{ marginInlineEnd: 8 }} />
-                <Skeleton width={100} height={16} radius={8} />
+                <Skeleton look="band" width={120} height={16} radius={8} style={{ marginInlineEnd: 8 }} />
+                <Skeleton look="band" width={100} height={16} radius={8} />
               </div>
             </div>
           </div>
@@ -260,11 +261,11 @@ export function SearchResult({ place, onPress, loading, disabled }: { place: Pla
 export function SearchResultLoading({ style }: { style?: CSSProperties }) {
   return (
     <div className={styles.resultLoading} style={style}>
-      <Skeleton width={50} height={50} radius={25} style={{ marginInlineEnd: 10, flexShrink: 0 }} />
+      <Skeleton look="band" width={50} height={50} radius={25} style={{ marginInlineEnd: 10, flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
-        <Skeleton height={20} radius={8} />
+        <Skeleton look="band" height={20} radius={8} />
         <div style={{ height: 10 }} />
-        <Skeleton height={20} radius={8} />
+        <Skeleton look="band" height={20} radius={8} />
       </div>
     </div>
   );

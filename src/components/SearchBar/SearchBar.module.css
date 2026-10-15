@@ -11,7 +11,7 @@
 .divider { width: 1px; height: var(--nk-search-bar-divider-height); background: var(--nk-search-bar-border); margin: 0 var(--nk-search-bar-divider-gap); }
 .fieldWrap { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; }
 .fillCopy { position: absolute; inset: 0; padding: 1px 2px; /* the input's own UA padding, so the copy lands on its text */ display: flex; align-items: center; white-space: pre; overflow: hidden; pointer-events: none; font: var(--nk-search-bar-field-font); color: var(--nk-search-bar-field-fg); }
-.field { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: var(--nk-search-bar-field-font); color: var(--nk-search-bar-field-fg); }
+.field { flex: 1; min-width: 0; border: 0; outline: 0; padding: 1px 2px; /* explicit (not the UA's), so the fill copy lands on the text in every engine */ background: transparent; font: var(--nk-search-bar-field-font); color: var(--nk-search-bar-field-fg); }
 .field::placeholder { color: var(--nk-search-bar-field-placeholder); }
 /* icon + placeholder group: transparent in the default bar, its own 4px-gap row in the 2025 variant */
 .lead { display: contents; }
@@ -44,3 +44,6 @@
 .fieldInput::-webkit-search-cancel-button, .fieldInput::-webkit-search-decoration { appearance: none; }
 .fieldInput { appearance: none; }
 .fieldDivider { flex: none; width: 1px; height: 24px; background: var(--nk-field-border-subtle); }
+/* the default bar's end slot: clear (x) and camera stacked in one cell, end-aligned, so their crossfade never moves them */
+.trail { display: grid; flex-shrink: 0; min-width: 24px; justify-items: end; align-items: center; }
+.trailItem { grid-area: 1 / 1; display: flex; }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { useNav } from '../../kit/Navigator';
+import { useNav, useToastsEnabled } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
 import { postorderIcons, supportEmail as defaultEmail, tp } from './data.postorder';
 import styles from './postorder.module.css';
@@ -20,6 +20,7 @@ export function PaymentFailureHelpScreen({ params }: ScreenProps<NeedHelpParams>
   const email = params.supportEmail ?? defaultEmail;
   const orderId = params.orderId || 'NAEH50088421';
   const [toast, setToast] = useState(0);
+  const toastsOn = useToastsEnabled();
 
   const onCopy = (text: string) => {
     navigator.clipboard?.writeText(text).catch(() => {});
@@ -47,7 +48,7 @@ export function PaymentFailureHelpScreen({ params }: ScreenProps<NeedHelpParams>
         {row(tp.noon_payment_failure_need_help_order_id, orderId)}
       </div>
       <AnimatePresence>
-        {toast !== 0 && (
+        {toastsOn && toast !== 0 && (
           <motion.div key={toast} className={styles.helpToast} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} transition={{ duration: 0.25 }}>
             {tp.noon_gm_c_copied_clipboard}
           </motion.div>

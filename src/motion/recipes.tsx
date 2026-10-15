@@ -24,12 +24,12 @@ export function FadeIn({ children, delay = 0, y = 12, ...rest }: { children: Rea
   );
 }
 
-/** Staggers children in (PLP cards: rise 16px, 35ms stagger, spring 380/39). */
-export function Stagger({ children, gap = 0.035, y = 16, max = 8, className, style }: { children: ReactNode; gap?: number; y?: number; max?: number; className?: string; style?: React.CSSProperties }) {
+/** Staggers children in, Test01 style: rise 16px on the Test01 spring, 60ms apart, fast-start fade-in (183ms). */
+export function Stagger({ children, gap = handoff.stagger.in, y = 16, max = 8, className, style }: { children: ReactNode; gap?: number; y?: number; max?: number; className?: string; style?: React.CSSProperties }) {
   return (
     <div className={className} style={style}>
       {Children.map(children, (c, i) => (
-        <motion.div initial={i < max ? { opacity: 0, y } : false} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', stiffness: 380, damping: 39, delay: Math.min(i, max) * gap }}>
+        <motion.div initial={i < max ? { opacity: 0, y } : false} animate={{ opacity: 1, y: 0 }} transition={{ y: { ...handoff.spring, delay: Math.min(i, max) * gap }, opacity: { duration: handoff.fade.out, ease: handoff.easeOut, delay: Math.min(i, max) * gap } }}>
           {c}
         </motion.div>
       ))}

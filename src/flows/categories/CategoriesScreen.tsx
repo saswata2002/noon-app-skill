@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Screen, SearchBarButton } from '../../components';
-import { useNav, useParams } from '../../kit/Navigator';
+import { useNav, useParams, usePageLoader } from '../../kit/Navigator';
 import { AdBannerModule } from './components/AdBannerModule';
 import { CollapsibleBannerModule } from './components/CollapsibleBannerModule';
 import { ErrorView } from './components/ErrorView';
@@ -28,7 +28,9 @@ let warmed = false;
 export function CategoriesScreen() {
   const nav = useNav();
   const { state: pinned, open } = useParams<CategoriesParams>();
-  const [view, setView] = useState<ViewState>(pinned ?? (warmed ? 'content' : 'loading'));
+  // with the page loader the wait is already covered: no ProgressLoader sweep line after it
+  const pageLoader = usePageLoader();
+  const [view, setView] = useState<ViewState>(pinned ?? (warmed || pageLoader ? 'content' : 'loading'));
   const scrollerRef = useRef<HTMLDivElement>(null);
   const page = categoriesPage;
 

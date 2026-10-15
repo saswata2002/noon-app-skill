@@ -57,6 +57,8 @@ function scrollBy(el: HTMLDivElement | null, { by, ms }: typeof ACCORDION_SCROLL
 
 /** Mock CatalogService.getProductBySKU latency for an option tap (the options loader shows meanwhile). */
 const OPTION_RELOAD_MS = 600;
+/** below-the-fold sections join once the push has fully settled (armed after 2 frames + the 420ms iOS push + its tail) + an idle slot */
+const BELOW_FOLD_AFTER_MS = 640;
 
 /** NoonProductUtil.getVariant: keep the previously selected size when the new SKU has it, else the first in stock. */
 function initialSelection(content: PdpContent, prev?: { name?: string }): VariantSelection {
@@ -75,6 +77,26 @@ export function DetailScreen({ params }: ScreenProps<{ productId: string; delive
   const content = useMemo(() => pdpContent(product), [product]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  // First screen only (gallery, main info, bundle, sponsored row, delivery) mounts with the push; the ~20 sections below
+  // the fold join in an idle slot once the slide has settled (mounting them all in the tap frame stalled ~200ms, so the
+  // push's first visible frame was already half way in). Jumping to reviews mounts them at once.
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    if (full) return;
+    let idle = 0;
+    const t = window.setTimeout(() => {
+      idle = window.requestIdleCallback ? window.requestIdleCallback(() => setFull(true), { timeout: 400 }) : window.setTimeout(() => setFull(true), 16);
+    }, BELOW_FOLD_AFTER_MS);
+    return () => {
+      window.clearTimeout(t);
+      if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [full]);
+  const toReviews = () => {
+    if (!full) setFull(true);
+    requestAnimationFrame(() => reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
   const { scrollY } = useScroll({ container: scrollRef });
   const [solid, setSolid] = useState(false);
   const [showTop, setShowTop] = useState(false);
@@ -157,55 +179,59 @@ export function DetailScreen({ params }: ScreenProps<{ productId: string; delive
         {/* bottomWrapper (marginTop −20) + galleryBottomBackground: the page slides up over the pinned gallery as one
             opaque sheet from the gallery's bottom edge, so the image never shows between the cards */}
         <div className={styles.rest}>
-          <SfMainInfo product={shown} content={content} onReviews={() => reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
+          <SfMainInfo product={shown} content={content} onReviews={toReviews} />
           <SfBundleCard product={product} content={content} />
           <SfSponsoredRow product={product} content={content} />
           <SfDeliveryCard content={content} variant={deliveryVariants.includes(params.delivery as DeliveryVariant) ? params.delivery : undefined} />
-          <SfNewerModelCard product={product} />
-          <SfFreeGifts items={freebiesFor(product)} />
-          <div ref={variantsRef}>
-            <SfVariantsCard
-              product={product}
-              content={content}
-              selection={selection}
-              loading={optionsLoading}
-              onSelect={(g, i) => {
-                // NoonSizeVariantSelection → onSelectVariant: local switch, no fetch
-                if (g === 'size') return setSelection((s) => ({ ...s, size: i }));
-                // NoonOptionsSelection → onSelectOption: fetch the option's SKU (loader over the options), then update in place
-                if (optionsLoading) return;
-                const opt = content.groups.find((x) => x.name === g)?.options[i];
-                const prevSize = selection.size != null ? content.sizes?.options[selection.size] : undefined;
-                setOptionsLoading(true);
-                reloadTimer.current = window.setTimeout(() => {
-                  setOptionsLoading(false);
-                  if (opt?.productId && opt.productId !== product.id) {
-                    anchorTop.current = variantsRef.current?.getBoundingClientRect().top ?? null;
-                    setProductId(opt.productId);
-                    setSelection(initialSelection(pdpContent(productById(opt.productId)), prevSize));
-                  } else setSelection((s) => ({ ...s, [g]: i }));
-                }, OPTION_RELOAD_MS);
-              }}
-              onSizeGuide={() => nav.toast(copy.sizeGuide)}
-              onLearnMore={() => nav.toast(copy.learnMore)}
-            />
-          </div>
-          <SfPaymentOffers content={content} />
-          <SfTrustCard content={content} />
-          <SfProductDetails content={content} product={product} onAccordionOpen={() => scrollBy(scrollRef.current, ACCORDION_SCROLL)} />
-          <SfAdditionalInfo content={content} />
-          <SfBestsellerRow content={content} />
-          <SfSellerCard content={content} onOffers={() => nav.toast(copy.moreOffers)} />
-          <SfProductFeatures content={content} product={product} />
-          <SfSponsoredBrandCard product={product} />
-          <SfExtendedWarranty content={content} price={product.price} />
-          <SfFbtCard key={product.id} ids={content.fbt} />
-          <div ref={reviewsRef}>
-            <SfReviewsCard product={product} content={content} />
-          </div>
-          <SfRecommendations variant="bleed" title={copy.moreFrom(product.brand)} items={sameBrand.slice(0, 12)} sponsored />
-          <SfRecommendations variant="bleed" title={copy.customersAlsoViewed} items={others.slice(0, 8)} sponsored />
-          <SfRecommendations title={railCopy.relatedSponsored} items={related.length ? related : others.slice(8, 20)} sponsored />
+          {full && (
+            <>
+              <SfNewerModelCard product={product} />
+              <SfFreeGifts items={freebiesFor(product)} />
+              <div ref={variantsRef}>
+                <SfVariantsCard
+                  product={product}
+                  content={content}
+                  selection={selection}
+                  loading={optionsLoading}
+                  onSelect={(g, i) => {
+                    // NoonSizeVariantSelection → onSelectVariant: local switch, no fetch
+                    if (g === 'size') return setSelection((s) => ({ ...s, size: i }));
+                    // NoonOptionsSelection → onSelectOption: fetch the option's SKU (loader over the options), then update in place
+                    if (optionsLoading) return;
+                    const opt = content.groups.find((x) => x.name === g)?.options[i];
+                    const prevSize = selection.size != null ? content.sizes?.options[selection.size] : undefined;
+                    setOptionsLoading(true);
+                    reloadTimer.current = window.setTimeout(() => {
+                      setOptionsLoading(false);
+                      if (opt?.productId && opt.productId !== product.id) {
+                        anchorTop.current = variantsRef.current?.getBoundingClientRect().top ?? null;
+                        setProductId(opt.productId);
+                        setSelection(initialSelection(pdpContent(productById(opt.productId)), prevSize));
+                      } else setSelection((s) => ({ ...s, [g]: i }));
+                    }, OPTION_RELOAD_MS);
+                  }}
+                  onSizeGuide={() => nav.toast(copy.sizeGuide)}
+                  onLearnMore={() => nav.toast(copy.learnMore)}
+                />
+              </div>
+              <SfPaymentOffers content={content} />
+              <SfTrustCard content={content} />
+              <SfProductDetails content={content} product={product} onAccordionOpen={() => scrollBy(scrollRef.current, ACCORDION_SCROLL)} />
+              <SfAdditionalInfo content={content} />
+              <SfBestsellerRow content={content} />
+              <SfSellerCard content={content} onOffers={() => nav.toast(copy.moreOffers)} />
+              <SfProductFeatures content={content} product={product} />
+              <SfSponsoredBrandCard product={product} />
+              <SfExtendedWarranty content={content} price={product.price} />
+              <SfFbtCard key={product.id} ids={content.fbt} />
+              <div ref={reviewsRef}>
+                <SfReviewsCard product={product} content={content} />
+              </div>
+              <SfRecommendations variant="bleed" title={copy.moreFrom(product.brand)} items={sameBrand.slice(0, 12)} sponsored />
+              <SfRecommendations variant="bleed" title={copy.customersAlsoViewed} items={others.slice(0, 8)} sponsored />
+              <SfRecommendations title={railCopy.relatedSponsored} items={related.length ? related : others.slice(8, 20)} sponsored />
+            </>
+          )}
         </div>
       </div>
     </Screen>

@@ -183,3 +183,13 @@
   display: flex;
   justify-content: center;
 }
+
+/* Page loader (kit/pageLoader.tsx, 1:1 with the "Page Loader" project): above every screen and sheet, under the toasts.
+   Painted at opacity 0 when idle (never visibility: hidden) so showing it never waits on a first raster. #F2F3F7 behind
+   the Lottie. While it is up it swallows taps on the page underneath. */
+.loadview { position: absolute; inset: 0; z-index: 800; background: var(--nk-color-bg-page); opacity: 0; will-change: opacity; pointer-events: none; }
+.loadview[data-live] { pointer-events: auto; }
+.loadArt { position: absolute; inset: 0; opacity: 0; will-change: opacity, transform; }
+/* the tab bar above the loader while it switches between tab roots (only mounted while the loader is up, so its
+   full-screen box swallowing taps is the same as the loader doing it; the bar's own buttons stay tappable) */
+.loadBar { position: absolute; inset: 0; z-index: 810; }

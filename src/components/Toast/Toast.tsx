@@ -1,5 +1,6 @@
 import { AnimatePresence, motion, type HTMLMotionProps } from 'motion/react';
 import { useEffect, useRef, type ReactNode } from 'react';
+import { useToastsEnabled } from '../../kit/Navigator';
 
 export interface ToastProps<T> extends Omit<HTMLMotionProps<'div'>, 'children'> {
   /** the toast being shown (null = hidden). A new item (by key) restarts the timer and re-animates. */
@@ -21,16 +22,19 @@ export interface ToastProps<T> extends Omit<HTMLMotionProps<'div'>, 'children'> 
  *   - checkout voucher toast: fade 500ms linear, 2.5s
  *   - address toast: spring up from y 50, 3.4s
  *   - cart move-to-wishlist snackbar: spring from y 100%, 3s
- * For a plain message toast use `useNav().toast(message)` instead.
+ * For a plain message toast use `useNav().toast(message)` instead. With the Navigator's `toasts={false}` it draws
+ * nothing but keeps its timer (`onHide` still fires after `duration`), so the caller's flow is unchanged.
  */
 export function Toast<T>({ item, itemKey = (i) => (i as { id: string | number }).id, duration, onHide, layerClassName, children, ...motionProps }: ToastProps<T>) {
   const hide = useRef(onHide);
   hide.current = onHide;
+  const enabled = useToastsEnabled();
   useEffect(() => {
     if (!item) return;
     const timer = window.setTimeout(() => hide.current(item), duration);
     return () => window.clearTimeout(timer);
   }, [item, duration]);
+  if (!enabled) return null;
   const content = (
     <AnimatePresence>
       {item && (

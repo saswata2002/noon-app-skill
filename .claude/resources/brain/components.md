@@ -41,22 +41,23 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:Pressable` | `src/components/Pressable/Pressable.tsx:17` | 1 | home | — |
 | `cmp:Price` | `src/components/Price/Price.tsx:9` | 1 | home | — |
 | `cmp:ProductBoxVertical` | `src/components/ProductBoxVertical/ProductBoxVertical.tsx:42` | 0 | — | CatalogTag, EtaBadge, Icon, ProductImage, QuickAdd, WishlistHeart |
-| `cmp:ProductCard` | `src/components/ProductCard/ProductCard.tsx:25` | 1 | home | CatalogTag, CouponTag, EtaBadge, Icon, Price, ProductImage, QuantityStepper, RatingPill, Text, WishlistHeart |
+| `cmp:ProductCard` | `src/components/ProductCard/ProductCard.tsx:24` | 1 | home | CatalogTag, CouponTag, EtaBadge, Icon, Price, ProductImage, RatingPill, Text, WishlistHeart |
 | `cmp:ProductImage` | `src/components/ProductImage/ProductImage.tsx:9` | 1 | home | — |
-| `cmp:QuantityStepper` | `src/components/QuantityStepper/QuantityStepper.tsx:13` | 1 | home | Icon, Pressable |
-| `cmp:QuickAdd` | `src/components/ProductCard/ProductCard.tsx:101` | 1 | home | CatalogTag, CouponTag, EtaBadge, Icon, Price, ProductImage, QuantityStepper, RatingPill, Text, WishlistHeart |
+| `cmp:QuantityStepper` | `src/components/QuantityStepper/QuantityStepper.tsx:13` | 0 | — | Icon, Pressable |
+| `cmp:QuickAdd` | `src/components/ProductCard/ProductCard.tsx:190` | 1 | home | CatalogTag, CouponTag, EtaBadge, Icon, Price, ProductImage, RatingPill, Text, WishlistHeart |
+| `cmp:QuickAddButton` | `src/components/ProductCard/ProductCard.tsx:100` | 0 | — | CatalogTag, CouponTag, EtaBadge, Icon, Price, ProductImage, RatingPill, Text, WishlistHeart |
 | `cmp:Radio` | `src/components/Radio/Radio.tsx:33` | 0 | — | Pressable |
 | `cmp:RatingPill` | `src/components/Rating/Rating.tsx:15` | 1 | home | Icon, OriginIcon, Pressable |
 | `cmp:Screen` | `src/components/Screen/Screen.tsx:35` | 1 | home | — |
 | `cmp:SearchBarButton` | `src/components/SearchBar/SearchBar.tsx:22` | 1 | home | OriginIcon, Pressable |
-| `cmp:SearchInput` | `src/components/SearchBar/SearchBar.tsx:159` | 0 | — | OriginIcon, Pressable |
+| `cmp:SearchInput` | `src/components/SearchBar/SearchBar.tsx:171` | 0 | — | OriginIcon, Pressable |
 | `cmp:SectionCard` | `src/components/SectionCard/SectionCard.tsx:5` | 0 | — | — |
 | `cmp:Segmented` | `src/components/Segmented/Segmented.tsx:29` | 0 | — | — |
 | `cmp:SheetBody` | `src/components/BottomSheet/BottomSheet.tsx:66` | 0 | — | ActionBar, Button, OriginIcon, Pressable |
 | `cmp:SheetFooter` | `src/components/BottomSheet/BottomSheet.tsx:82` | 0 | — | ActionBar, Button, OriginIcon, Pressable |
 | `cmp:SheetHeader` | `src/components/BottomSheet/BottomSheet.tsx:22` | 0 | — | ActionBar, Button, OriginIcon, Pressable |
-| `cmp:Skeleton` | `src/components/Skeleton/Skeleton.tsx:8` | 0 | — | — |
-| `cmp:SkuCard` | `src/components/SkuCard/SkuCard.tsx:50` | 0 | — | CatalogTag, LikeHeart, ProductImage |
+| `cmp:Skeleton` | `src/components/Skeleton/Skeleton.tsx:12` | 0 | — | — |
+| `cmp:SkuCard` | `src/components/SkuCard/SkuCard.tsx:50` | 0 | — | CatalogTag, LikeHeart, ProductImage, QuickAdd |
 | `cmp:Snackbar` | `src/components/Snackbar/Snackbar.tsx:36` | 0 | — | OriginIcon, Pressable |
 | `cmp:SnackbarStack` | `src/components/Snackbar/Snackbar.tsx:79` | 1 | home | OriginIcon, Pressable |
 | `cmp:Spinner` | `src/components/Spinner/Spinner.tsx:44` | 0 | — | — |
@@ -67,7 +68,7 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:Text` | `src/components/Text/Text.tsx:23` | 1 | home | — |
 | `cmp:TextArea` | `src/components/TextArea/TextArea.tsx:62` | 0 | — | — |
 | `cmp:TextField` | `src/components/TextField/TextField.tsx:70` | 0 | — | — |
-| `cmp:Toast` | `src/components/Toast/Toast.tsx:26` | 0 | — | — |
+| `cmp:Toast` | `src/components/Toast/Toast.tsx:28` | 0 | — | — |
 | `cmp:WishlistHeart` | `src/components/WishlistHeart/WishlistHeart.tsx:12` | 1 | home | Icon, LikeHeart |
 
 ## Flow-local (`src/flows/<flow>/components`)
@@ -88,5 +89,5 @@ One line per flow: components and how many screens reach each. Used outside its 
 - **plp** (6): BrandWidget 0, CatalogListHeader 0, CatalogNavPill 0, MarketplaceStrip 0, RevealChip 0, SkeletonCard 0
 - **returns** (34): AFSBackHeader 0, AFSButton 0, AnimatedSection 0, CommentInput 0, ConfirmOverlay 0, Dashed 0, DepthCarousel 0, EstimatedRefundButton 0, EvidenceSection 0, EvidenceSkipOverlay 0, Fade 0, FeedbackOverlay 0, FeedbackWidget 0, ImageGuidelineOverlay 0, Photo 0, PhotoGuideCarousel 0, PickupAddressOverlay 0, PickupSection 0, PolicyOverlay 0, ProductDetails 0, ReasonArt 0, ReasonSection 0, RefundDetailsOverlay 0, RefundSection 0, RefundSummaryOverlay 0, ResolutionSection 0, ReturnsOverlay 0, StepGlyph 0, SummaryButton 0, Svg 0, Tap 0, TrackingSteps 0, TrackingTimelineOverlay 0, UploadImageOverlay 0
 - **reviews** (35): AddPhotos 0, AiToggle 0, AttributeChip 0, AttributeChips 0, CraftingShimmer 0, DraftAction 0, DraftCard 0, DraftProductTop 0, EditReviewSheet 0, ExclamationIcon 0, EyeIcon 0, GrowEditor 0, KeyboardDock 0, MockKeyboard 0, NameToggle 0, NewReviewManual 0, NewReviewMorphHeader 0, NewReviewPicks 0, PastOrderCard 0, PastOrdersTitle 0, PhotoThumbs 0, PinnedEditor 0, ProgressRing 0, RateCheckRow 0, RateFeedbackCard 0, RateQuestionsSkeleton 0, ReviewFooter 0, ReviewHeader 0, ReviewProductHeader 0, ReviewSheet 0, ReviewTextField 0, RewriteSheet 0, SheetEditor 0, SparkleIcon 0, StarRatingInput 0
-- **search** (2): RecentSearches 0, SuggestionRow 0
+- **search** (3): GroupReveal 0, RecentSearches 0, SuggestionRow 0
 - **wishlist** (8): CollectionTile 0, EmptyState 0, EmptyWishlist 0, NoCollectionWidget 0, ViewCartPill 0, WishlistAtc 0, WishlistHeader 0, WishlistProductBox 0

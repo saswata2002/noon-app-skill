@@ -1,4 +1,5 @@
 import { registerTransition } from '../../motion/transitions';
+import { duration, easing, handoff } from '../../motion/presets';
 
 /**
  * noon One overlays are `navigator.showOverlay` screens on master: the screen below stays visible and the overlay
@@ -14,7 +15,7 @@ registerTransition('mb-overlay', {
   animate: { ...layer, opacity: 1 },
   // <VipOverlay> has already animated out when it calls nav.back(); this only covers a direct back()
   exit: { ...layer, opacity: 0 },
-  transition: { duration: 0.2 },
+  transition: { duration: duration.base, ease: easing.standard }, // Test01 S-curve fade
 });
 
 /** VIPManageMembership is `showModal` (fullScreen) on master — iOS modal slide up, nothing underneath moves. */
@@ -22,7 +23,7 @@ registerTransition('mb-modal', {
   initial: { y: '100%' },
   animate: { y: 0 },
   exit: { y: '100%' },
-  transition: { duration: 0.42, ease: [0.32, 0.72, 0, 1] },
+  transition: handoff.spring, // Test01 movement spring
 });
 
 /** Spread into an overlay ScreenDef: `{ id, title, component, ...overlayScreen }` (master: navigator.showOverlay). */

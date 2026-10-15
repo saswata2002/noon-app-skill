@@ -33,7 +33,7 @@ System icon from a noon / Figma design → `OriginIcon` (catalogue in `icons.md`
 | Wishlist grid card (bappzaar `isWishlist` compact view) | `ProductBoxVertical` with `wishlist` |
 | Carousel / other product tile | `ProductCard` |
 | Figma "SKU" rail card (134 wide, 134×174 image box, 1.2px blue "+", 15/20 price; Homepage 2025, Cart 2.0) | `SkuCard` (shared; `look="cart"` in cart carousels); don't use `ProductCard` for these rails |
-| Quick add-to-cart "+" that expands into a stepper | `QuickAdd` |
+| Quick add-to-cart "+" (the one look, every card) | `QuickAdd` (catalog product) / `QuickAddButton` (own `onPress`) |
 | Wishlist heart toggle | `WishlistHeart` (own heart button: `LikeHeart`) |
 | Quantity −/+ control | `QuantityStepper` |
 | "Best Seller" corner tag | `CatalogTag` |
@@ -514,7 +514,7 @@ Gotcha: always give it a width plus `height` or `aspect`, otherwise it has no he
 | `width` | `number \| string` (fixed width, `flexShrink: 0`, for carousels) | — |
 | `carousel` | `boolean` — bappzaar home `productCarousel` box (NoonProductCard): r8, no hairline, image `width × round((width − 14) · 1.361)` (138 × 169) with an r8 overlay, 24 heart circle, "+" at bottom 6, info inset 4 (+2 bottom), price 6 below the rating with a 16/700 dirham sign, express flag only (18h), discount "n%"; needs a numeric `width` | — |
 
-`QuickAdd`: 36×36 "+" that adds 1 to the DemoStore cart (no snackbar, as in bappzaar `useCartActions`; products with sizes open `pdp/variants`, whose success shows "Added to cart"), expands into a filled `QuantityStepper`, and collapses to a count badge after 2.5s. Props: `productId: string` (required).
+`QuickAdd`: the kit's one add-to-cart "+" (36×36 white, r8, hairline border, thumb shadow, 22px ink plus) with the NoonProductBoxAddToCart flow as a **shared-element morph** (2026-10-15): one shell whose width springs 36 ⇄ 76 (Apple snappy, `appleSpring(0.3, 0.8)`, ~1% settle, growing towards the card's inner edge) while white crossfades into blue (160ms); inside, every piece is ONE element positioned from the growing edge, so nothing overlaps: the "+" never moves (18px from the edge in both looks) and only shrinks 22 → 16 and turns ink → white; the trash/minus is parked where the stepper puts it (46–70px) so the shell's clip reveals/hides it; the count rises in, slides between the stepper centre and the badge and scales to the badge size. Count changes roll like an odometer (`RollingCount`: old digit up and out, new one up from below; down when decreasing; digits chained right → left 35ms apart, then the trash ⇄ minus glyph). After 2.5s idle it narrows to the blue count badge (tap to reopen); trash at 1 morphs back to the white "+". The count shows optimistically and the cart store update is committed 360ms later as a transition (it re-renders every card), flushed on unmount. No snackbar (bappzaar `useCartActions`); products with sizes open `pdp/variants`. Props: `productId` (required). `QuickAddButton`: the same "+" look with your own `onPress` and a press bounce (non-catalog tiles; `asDiv` inside another button). Used by ProductCard, ProductBoxVertical, MegaDeals, RecoCard, SkuCard (home rails + cart carousels, anchored bottom-right) and the Storefront PDP recommendations; the cart's offers row fades a leaving card out and slides the row closed (`CartCarousel`). LTR geometry (offsets from the right edge).
 
 ```tsx
 // src/flows/home/HomeScreen.tsx (carousel)
@@ -811,13 +811,14 @@ Gotchas:
 
 ## Skeleton
 
-`src/components/Skeleton/Skeleton.tsx`. Shimmer block (`nk-shimmer` keyframes in `global.css`).
+`src/components/Skeleton/Skeleton.tsx`. Shimmer block (`nk-shimmer` keyframes in `global.css`). `look="band"` is the Brand Widget PLP skeleton 1:1 (`Skeleton.module.css`): #F6F5FA (`skeletonBase`) with one 195px white band leaning 17°, sweeping −200 → 640px every 1.867s, first pass at `--nk-skeleton-at` (default 0.12s); the search page's intro, the PLP's card (`SkeletonCard`) and chip (`RevealChip`) skeletons and the address flow's loading states (Address Book listing, search results, map locate rows: `src/flows/address/components/select.tsx`, `map.tsx`) use it. Pair it with `SkeletonReveal` (skeleton = `<Skeleton look="band" height="100%" radius=… />` over each element's own box).
 
 | Prop | Type | Default |
 |---|---|---|
 | `width` | `number \| string` | `'100%'` |
 | `height` | `number \| string` | `14` |
-| `radius` | `number` | `r.r6` |
+| `radius` | `number \| string` | `r.r6` |
+| `look` | `'default' \| 'band'` | `'default'` |
 | `style` | `CSSProperties` | — |
 
 ```tsx

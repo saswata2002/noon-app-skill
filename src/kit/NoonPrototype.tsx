@@ -30,6 +30,13 @@ export interface NoonPrototypeProps {
    * global.css, Lottie / Spinner / Skeleton and every flow's autoplay (`useReduceMotion`, src/motion/reducedMotion.ts).
    */
   reducedMotion?: 'never' | 'always' | 'user';
+  /**
+   * Tab switches go page → looping loader Lottie (0.8s hold) → page, 1:1 with the "Page Loader" project
+   * (kit/pageLoader.tsx, `pageLoader` in motion/presets.ts). Every other navigation keeps its own transition. Default false.
+   */
+  pageLoader?: boolean;
+  /** false: no toasts or snackbars anywhere (`nav.toast()` is a no-op, `Toast` hosts draw nothing). Default true. */
+  toasts?: boolean;
   onRouteChange?: (route: Route, stack: StackEntry[]) => void;
   /** imperatively reset from outside (playground) */
   resetSignal?: { route: Route; params?: Record<string, unknown>; nonce: number };
@@ -42,7 +49,7 @@ export interface NoonPrototypeProps {
  *   import '@noon/flow-kit/style.css';
  *   <NoonPrototype flows={[homeFlow, plpFlow, pdpFlow, cartFlow]} initialRoute="home/home" />
  */
-export function NoonPrototype({ flows, initialRoute, initialParams, frame = true, scale = 1, rtl, tokens, emptyCart, reducedMotion = 'user', onRouteChange, resetSignal }: NoonPrototypeProps) {
+export function NoonPrototype({ flows, initialRoute, initialParams, frame = true, scale = 1, rtl, tokens, emptyCart, reducedMotion = 'user', pageLoader, toasts, onRouteChange, resetSignal }: NoonPrototypeProps) {
   const registry = useMemo(() => createRegistry(flows), [flows]);
   const start = initialRoute ?? `${flows[0].id}/${flows[0].initial}`;
   const [screenTone, setScreenTone] = useState<StatusBarTone>('dark');
@@ -81,7 +88,7 @@ export function NoonPrototype({ flows, initialRoute, initialParams, frame = true
           <DemoStoreProvider emptyCart={emptyCart}>
             <PhoneFrame frameless={!frame} scale={scale} statusBar={statusBar}>
               <StatusBarCtx.Provider value={setOverride}>
-                <Navigator registry={registry} initialRoute={start} initialParams={initialParams} onChange={onChange} resetSignal={resetSignal} />
+                <Navigator registry={registry} initialRoute={start} initialParams={initialParams} onChange={onChange} resetSignal={resetSignal} pageLoader={pageLoader} toasts={toasts} />
               </StatusBarCtx.Provider>
             </PhoneFrame>
           </DemoStoreProvider>

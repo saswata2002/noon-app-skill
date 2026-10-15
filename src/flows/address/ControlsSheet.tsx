@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { duration, easing, handoff } from '../../motion/presets';
 import { Fragment, useState } from 'react';
 import { useNav } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
@@ -13,7 +14,8 @@ export interface ControlsParams {
   id?: number;
 }
 
-const deleteSpring = { type: 'spring' as const, mass: 1, damping: 18, stiffness: 190 };
+/** timing: the Test01 motion reference */
+const deleteSpring = handoff.spring;
 
 /**
  * AddressV2AddressControlsScreen — Edit / Share / Verify / Delete. Delete cross-fades (250ms) to the
@@ -62,7 +64,7 @@ export function ControlsSheet({ params }: ScreenProps<ControlsParams>) {
   return (
     <AnimatePresence mode="wait" initial={false}>
       {mode === 'controls' ? (
-        <motion.div key="controls" className={styles.controls} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+        <motion.div key="controls" className={styles.controls} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.base, ease: easing.inOut }}>
           {actions.map((a, i) => (
             <Fragment key={a.key}>
               {i > 0 && (
@@ -80,15 +82,15 @@ export function ControlsSheet({ params }: ScreenProps<ControlsParams>) {
           ))}
         </motion.div>
       ) : (
-        <motion.div key="delete" className={styles.deleteModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}>
-          <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100, transition: { duration: 0.2 } }} transition={deleteSpring}>
+        <motion.div key="delete" className={styles.deleteModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.medium, ease: easing.inOut }}>
+          <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100, transition: { duration: duration.base, ease: easing.in } }} transition={deleteSpring}>
             <div className={styles.deleteTitle}>{t.address_v2_delete_modal_title}</div>
             <div className={styles.deleteBox}>
               {address.area && <span className={styles.deleteArea}>{address.area}</span>}
               <span className={styles.deleteLine}>{singleLineAddress(address)}</span>
             </div>
           </motion.div>
-          <motion.div className={styles.deleteButtons} initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100, transition: { duration: 0.2 } }} transition={deleteSpring}>
+          <motion.div className={styles.deleteButtons} initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100, transition: { duration: duration.base, ease: easing.in } }} transition={deleteSpring}>
             <button type="button" className={`${styles.deleteButton} ${styles.cancelButton}`} onClick={() => setMode('controls')}>
               {t.common_cancel}
             </button>

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Lottie, Screen } from '../../components';
 import { useIsTop, useNav } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
-import { easing } from '../../motion/presets';
+import { duration, easing, handoff } from '../../motion/presets';
 import { lotties } from './assets';
 import { AddressDetailsForm, type AddressFormValues } from './components/form';
 import { CurrentLocationButton, FloatingOverlay, LocationLoading, LocationSummary, MapPin, MapSearchButton, UnserviceableView } from './components/map';
@@ -135,7 +135,7 @@ export function MapScreen({ params }: ScreenProps<MapParams>) {
   const movePin = useCallback(
     (p: MapPoint, skipDetailsFetch: boolean) => {
       skipFetch.current = skipDetailsFetch;
-      const opts = { duration: 0.45, ease: easing.inOut };
+      const opts = handoff.spring; // Test01 movement spring
       animate(x, VW / 2 - p.x, opts);
       animate(y, VH / 2 - p.y, opts);
     },
@@ -197,7 +197,7 @@ export function MapScreen({ params }: ScreenProps<MapParams>) {
   const confirmTitle = flow === 'update' ? t.address_v2_edit_address_details : t.address_v2_add_address_details;
 
   const mapScale = overlayOpen || hideMapComponents ? addressMetrics.mapZoomOverlay : zoomSearch ? addressMetrics.mapZoomSearch : 1;
-  const mapScaleTransition = zoomSearch && !overlayOpen ? { duration: 0.15, ease: easing.in } : { duration: 0.23, ease: easing.inOut, delay: overlayOpen ? 0.05 : 0 };
+  const mapScaleTransition = zoomSearch && !overlayOpen ? { duration: duration.fast, ease: easing.in } : { duration: duration.base, ease: easing.inOut, delay: overlayOpen ? 0.05 : 0 };
 
   const formInitialValues: AddressFormValues = editing
     ? {

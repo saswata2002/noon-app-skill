@@ -34,7 +34,8 @@
 .heart { composes: btnReset; position: absolute; top: var(--nk-space-s6); right: var(--nk-space-s6); display: flex; align-items: center; justify-content: center; padding: var(--nk-space-s4); border-radius: var(--nk-radius-full); background: var(--nk-palette-white-alpha20); }
 
 /* quick add: 24 plus, white, 1.2px Blue-Gray/200, r8, p4, bottom 6 / right 6 */
-.add { composes: btnReset; position: absolute; right: var(--nk-space-s6); bottom: var(--nk-space-s6); display: flex; align-items: center; padding: var(--nk-space-s4); background: var(--nk-color-bg-surface); border: 1.2px solid var(--nk-color-border-subtle); border-radius: var(--nk-radius-r8); }
+/* QuickAdd (the kit's one add-to-cart look) at the same bottom-right anchor */
+.add { position: absolute; right: var(--nk-space-s6); bottom: var(--nk-space-s6); display: flex; }
 
 /* info: pt6 px6 pb8, gap 8 */
 .info { display: flex; flex-direction: column; align-items: flex-start; gap: var(--nk-space-s8); padding: var(--nk-space-s6) var(--nk-space-s6) var(--nk-space-s8); }

@@ -24,6 +24,26 @@
   flex: 1;
   min-height: 0;
 }
+/* the skeleton and the content share one cell while one dissolves into the other (SelectScreen `stack`) */
+.loadStack {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+.loadStack > * {
+  grid-area: 1 / 1;
+  min-height: 0;
+}
+.loadContent {
+  display: flex;
+  flex-direction: column;
+}
+.loadLayer {
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
 .paneInner {
   padding-bottom: calc(var(--nk-inset-bottom) + 12px);
 }

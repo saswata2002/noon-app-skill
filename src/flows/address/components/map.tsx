@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Lottie, MaskIcon, Pressable, Skeleton } from '../../../components';
 import { icons, images, lotties } from '../assets';
@@ -24,11 +25,11 @@ export function MapPin({ title, isError, isWarning, isMapDragging, pinScale }: {
       className={styles.pinAnchor}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: [0.8, 1.05, 1] }}
-      transition={{ duration: 0.3, times: [0, 0.6, 1] }}
+      transition={{ duration: duration.medium, times: [0, 0.6, 1], ease: easing.out }}
     >
-      <motion.div className={styles.pinColumn} animate={{ scale: pinScale }} transition={{ duration: 0.15, ease: 'linear' }} style={{ transformOrigin: '50% 100%' }}>
+      <motion.div className={styles.pinColumn} animate={{ scale: pinScale }} transition={handoff.spring} style={{ transformOrigin: '50% 100%' }}>
         {title ? (
-          <motion.div key={title} className={styles.tooltipWrap} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
+          <motion.div key={title} className={styles.tooltipWrap} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ y: handoff.spring, opacity: { duration: handoff.fade.out, ease: handoff.easeOut } }}>
             <div className={styles.tooltip} data-error={!!isError} data-warning={!!isWarning}>
               <span className={styles.tooltipText}>{title}</span>
             </div>
@@ -44,7 +45,7 @@ export function MapPin({ title, isError, isWarning, isMapDragging, pinScale }: {
           className={styles.pin}
           style={{ width: addressMetrics.pinWidth, height: addressMetrics.pinHeight }}
           animate={{ y: isMapDragging ? addressMetrics.pinLift : 0 }}
-          transition={{ duration: 0.15, ease: 'linear' }}
+          transition={handoff.spring}
         />
       </motion.div>
     </motion.div>
@@ -120,9 +121,9 @@ export function SearchCurrentLocationButton({ description, onPress, loading }: {
         <MaskIcon src={icons.crosshair} size={15} color="var(--nk-color-cta)" />
       </span>
       <span className={styles.searchLocateTexts}>
-        {loading ? <Skeleton height={16} width="90%" /> : <span className={styles.searchLocateTitle}>{t.address_v2_use_search_current_location}</span>}
+        {loading ? <Skeleton look="band" height={16} width="90%" /> : <span className={styles.searchLocateTitle}>{t.address_v2_use_search_current_location}</span>}
         {description && <span className={styles.searchLocateSub}>{description}</span>}
-        {loading && <Skeleton height={16} width="90%" />}
+        {loading && <Skeleton look="band" height={16} width="90%" />}
       </span>
       <MaskIcon src={icons.chevronRightBlue} size={16} color="var(--nk-color-cta)" />
     </button>
@@ -181,8 +182,8 @@ export function LocationLoading() {
         <Img src={icons.pin} width={25} height={30} />
       </div>
       <div className={styles.loadingLines}>
-        <Skeleton height={32} radius={8} />
-        <Skeleton height={32} radius={8} />
+        <Skeleton look="band" height={32} radius={8} />
+        <Skeleton look="band" height={32} radius={8} />
       </div>
     </div>
   );
@@ -207,10 +208,11 @@ export function UnserviceableView({ style }: { style?: CSSProperties }) {
 
 /* ───────────────────────────── AddressV2FloatingOverlay ───────────────────────────── */
 
-const OPACITY_EASE: [number, number, number, number] = [0.65, 0, 0.35, 1];
+/** timing: the Test01 motion reference — fades on its S-curve, every movement on its spring */
+const OPACITY_EASE = easing.inOut;
 /** ThemeManager.metrics.screenHeight() on the 390 × 844 demo phone (slide-in start) */
 const SCREEN_HEIGHT = 844;
-const fade = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.2, ease: OPACITY_EASE } };
+const fade = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: duration.base, ease: OPACITY_EASE } };
 
 /**
  * Floating card 12px from the edges, radius 16, sitting on the home-indicator inset. Collapsed it shows the
@@ -274,7 +276,7 @@ export function FloatingOverlay({
     <motion.div
       className={styles.overlay}
       animate={closing ? { opacity: 0 } : { opacity: 1 }}
-      transition={{ duration: 0.35 }}
+      transition={{ duration: duration.slow, ease: OPACITY_EASE }}
     >
       <motion.div
         className={styles.scrim}
@@ -282,7 +284,7 @@ export function FloatingOverlay({
         initial={slideIn ? { backgroundColor: palette.blackAlpha0 } : false}
         animate={{ backgroundColor: expanded ? palette.blackAlpha80 : palette.blackAlpha0 }}
         exit={slideIn ? { backgroundColor: palette.blackAlpha0 } : undefined}
-        transition={{ duration: 0.3, ease: OPACITY_EASE }}
+        transition={{ duration: duration.medium, ease: OPACITY_EASE }}
         onClick={expanded ? onOverlayClose : undefined}
       />
       <AnimatePresence>
@@ -305,12 +307,12 @@ export function FloatingOverlay({
         exit={slideIn ? { y: SCREEN_HEIGHT } : undefined}
         style={{ transformOrigin: 'bottom' }}
         transition={{
-          height: { type: 'spring', mass: 1, stiffness: 300, damping: 28 },
-          y: { type: 'spring', mass: 0.75, stiffness: 420, damping: 30 },
-          backgroundColor: { duration: 0.3, ease: OPACITY_EASE },
-          scaleY: { duration: 0.35 },
-          marginLeft: { duration: 0.35 },
-          marginRight: { duration: 0.35 },
+          height: handoff.spring,
+          y: handoff.spring,
+          backgroundColor: { duration: duration.medium, ease: OPACITY_EASE },
+          scaleY: { duration: duration.slow, ease: OPACITY_EASE },
+          marginLeft: { duration: duration.slow, ease: OPACITY_EASE },
+          marginRight: { duration: duration.slow, ease: OPACITY_EASE },
         }}
       >
         <div ref={innerRef} className={styles.inner}>

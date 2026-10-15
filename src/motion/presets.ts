@@ -3,43 +3,54 @@ import type { Transition } from 'motion/react';
 type Bezier = [number, number, number, number];
 
 /**
- * Central motion tokens. Every animation in the kit reads from here,
- * so tuning a curve or a spring changes the feel of all flows at once.
- * Values mirror what bappzaar uses with reanimated (withTiming / withSpring).
+ * Central motion tokens. Every animation in the kit reads from here, so tuning a curve or a spring changes the feel of
+ * all flows at once.
+ *
+ * THE MOTION REFERENCE (2026-10-15): ProtoPie "noon X supermall" · recording "Test01"
+ * (cloud.protopie.io/p/041e0f998b5182ed0ca8ce6d/r/8e30fe8e), read from its recorded property tracks:
+ *   · every movement — the page push (382 → 0 while the page under it goes 0 → −200), rows and blocks (20px) — rides one
+ *     spring: stiffness 280.6, damping 27.14 (ω 16.75 rad/s, ζ 0.81, 1.3% overshoot, settled ≈ 0.547s)
+ *   · fades in: a fast-start ease-out, 183ms (276ms long); fades out / chips / skeletons: an S-curve, 189ms (388ms long)
+ *   · stagger 60ms in (top → bottom), 40ms out (bottom → top)
+ * The bezier curves below are fits of those recorded curves (ease-out ≤1.3%, S-curve ≤0.2%, spring shape ≤3.7%) so
+ * they also work in CSS; `handoff` (further down) keeps the exact sampled curves. Press feedback (`spring.press`),
+ * playful pops (`spring.bouncy`, `easing.backOut`) and `duration.instant` have no counterpart in Test01 and are kept.
  */
+const TEST01_SPRING = { type: 'spring', stiffness: 280.6, damping: 27.14, mass: 1 } as const;
 export const easing = {
-  /** Easing.out(Easing.cubic) — default for UI entering */
-  out: [0.215, 0.61, 0.355, 1] as Bezier,
-  /** Easing.inOut(Easing.cubic) */
-  inOut: [0.645, 0.045, 0.355, 1] as Bezier,
-  /** Easing.in(Easing.cubic) — elements leaving */
-  in: [0.55, 0.055, 0.675, 0.19] as Bezier,
-  /** Easing.bezier(0.25, 0.1, 0.25, 1) — RN default ease */
-  standard: [0.25, 0.1, 0.25, 1] as Bezier,
-  /** iOS-like navigation curve */
-  ios: [0.32, 0.72, 0, 1] as Bezier,
-  /** Easing.out(Easing.back(1.5)) — playful overshoot */
+  /** Test01 fade-in: fast-start ease-out (was Easing.out(Easing.cubic)) */
+  out: [0, 0.204, 0.316, 1.066] as Bezier,
+  /** Test01 S-curve (fades out, chips, skeletons) */
+  inOut: [0.615, 0.06, 0.34, 0.993] as Bezier,
+  /** elements leaving: Test01 fades out on its S-curve */
+  in: [0.615, 0.06, 0.34, 0.993] as Bezier,
+  /** Test01 S-curve (was the RN default ease) */
+  standard: [0.615, 0.06, 0.34, 0.993] as Bezier,
+  /** movement as a tween: the shape of the Test01 spring (~1% settle), for places that need a bezier */
+  ios: [0.338, 0.75, 0.061, 1.109] as Bezier,
+  /** Easing.out(Easing.back(1.5)) — playful overshoot (no Test01 counterpart, kept) */
   backOut: [0.34, 1.56, 0.64, 1] as Bezier,
 };
 
+/** seconds — Test01: fade-in 183 / S-curve 189 / long fade-in 276 / long S-curve 388 / spring settle 547 */
 export const duration = {
   instant: 0.1,
-  fast: 0.15,
-  base: 0.25,
-  medium: 0.3,
-  slow: 0.45,
-  slower: 0.6,
+  fast: 0.183,
+  base: 0.189,
+  medium: 0.276,
+  slow: 0.388,
+  slower: 0.547,
 };
 
 export const spring = {
-  /** buttons / press feedback */
+  /** buttons / press feedback (no Test01 counterpart, kept) */
   press: { type: 'spring', stiffness: 500, damping: 30, mass: 0.6 },
-  /** sheets, drawers — reanimated withSpring({ damping: 20, stiffness: 200 }) */
-  sheet: { type: 'spring', stiffness: 260, damping: 30, mass: 1 },
-  /** badges, counters, hearts */
+  /** sheets, drawers: the Test01 spring */
+  sheet: TEST01_SPRING,
+  /** badges, counters, hearts (playful, no Test01 counterpart, kept) */
   bouncy: { type: 'spring', stiffness: 400, damping: 14 },
-  /** default layout animations */
-  gentle: { type: 'spring', stiffness: 170, damping: 26 },
+  /** default layout / movement animations: the Test01 spring */
+  gentle: TEST01_SPRING,
 } satisfies Record<string, Transition>;
 
 export const tween = (d: keyof typeof duration = 'base', e: keyof typeof easing = 'out'): Transition => ({
@@ -103,7 +114,7 @@ export const sampledEase = (samples: readonly number[]) => (t: number) => {
  */
 export const handoff = {
   /** every movement: stiffness 280.6, damping 27.14 (ω 16.75 rad/s, ζ 0.81, 1.3% overshoot, settled ≈0.5s) */
-  spring: { type: 'spring', stiffness: 280.6, damping: 27.14, mass: 1 } as const,
+  spring: TEST01_SPRING,
   /** fades in (rows, trending, cards): fast-start ease-out */
   easeOut: sampledEase([0, 0.2363, 0.3453, 0.4424, 0.5291, 0.607, 0.6754, 0.7351, 0.7873, 0.8322, 0.8702, 0.9019, 0.9278, 0.9489, 0.9654, 0.9779, 0.9871, 0.9933, 0.9971, 0.9991, 1]),
   /** fades out, chips in, skeleton: S-curve */
@@ -221,4 +232,34 @@ export const supermall = {
   nudge: { textAt: 0.7, text: 0.2, settle: 1.45, x: [0, -1.5, 1.3, -0.8, 0.4, 0], times: [0, 0.14, 0.34, 0.54, 0.74, 1], duration: 0.56 },
   /** auto-rotating stacks: a ticker steps every 2.4s (0.5s, `ease.sheet`); marquee subtitles loop 7.2s, 140ms apart */
   ticker: { every: 2.4, step: 0.5, rowHeight: 34, marquee: 7.2, marqueeStagger: 0.14 },
+} as const;
+
+/**
+ * Page loader (the "Page Loader" project, `noon-homepage/app.js`, 1:1): every tab switch goes page → loader → page.
+ * Whatever leaves zooms out, whatever arrives scales in, all about the screen centre; opacity + transform only.
+ *   0              the old page zooms out 100% → 96% (SOFT 420) as it fades (300); the #F2F3F7 loader layer fades up (240)
+ *   artIn          the looping Lottie scales in from 96% (RISE 520) and fades in (300)
+ *   artIn + hold   the art eases out to 96% (SOFT 420, fade 280); the loader layer lifts `land` later (fade 300)
+ *                  while the new page scales in from 97% (RISE 520, fade 320)
+ * Another tab while loading retargets and holds `hold` more. `hold` is 0.8s here (the reference iterations used 0.5–1.8s).
+ * SOFT = critically damped (response .36s), RISE = ζ .86 (response .34s, 0.5% overshoot), both sampled as CSS `linear()`.
+ */
+export const pageLoader = {
+  hold: 800,
+  artIn: 60,
+  land: 60,
+  soft: 'linear(0, .0226, .0778, .1514, .2335, .3175, .3993, .4762, .5468, .6104, .667, .7167, .7601, .7975, .8297, .8572, .8806, .9004, .9171, .9311, .9428, .9527, .9609, .9677, .9734, .9781, .982, .9852, .9879, .99, .9918, .9933, 1)',
+  rise: 'linear(0, .0353, .1198, .2286, .3452, .4589, .5634, .6554, .734, .7991, .8519, .8937, .926, .9505, .9687, .9818, .9909, .9971, 1.001, 1.0034, 1.0046, 1.005, 1.0049, 1.0046, 1.0041, 1.0035, 1.0029, 1.0024, 1.0019, 1.0015, 1.0011, 1.0008, 1)',
+  fadeIn: 'cubic-bezier(.25,.1,.25,1)',
+  fadeOut: 'cubic-bezier(.4,0,.6,1)',
+  /** the leaving page: fade 300, zoom to 96% over 420 (SOFT) */
+  leave: { fade: 300, scale: 0.96, zoom: 420 },
+  /** the loader layer: up 240, lifts 300 */
+  layer: { in: 240, out: 300 },
+  /** the Lottie: in fade 300 + from 96% over 520 (RISE); out fade 280 + to 96% over 420 (SOFT) */
+  art: { inFade: 300, from: 0.96, rise: 520, outFade: 280, to: 0.96, zoom: 420 },
+  /** the arriving page: fade 320, from 97% over 520 (RISE) */
+  enter: { fade: 320, from: 0.97, rise: 520 },
+  /** reduced motion: transforms stay put, fades ≤ 200ms, no delays */
+  reducedMax: 200,
 } as const;

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState, type CSSProperties } from 'react';
-import { Icon, Pressable } from '../../../components';
+import { Pressable, QuickAddButton } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
 import { currency } from '../../../data';
 import { cmsWidgets, groceryTiles, homeTabs, sponsored, tabRails, tabStars, type Crop, type HomeTabId, type PromoItem, type TabTile } from '../data.tabs';
@@ -293,17 +293,10 @@ function Sponsored() {
                 <span className={styles.spotHeart}>
                   <img src={sponsored.heart} alt="" width={16} height={16} />
                 </span>
-                <Pressable
-                  asDiv
-                  className={styles.spotAtc}
-                  aria-label="Add to cart"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nav.toast('Added to cart');
-                  }}
-                >
-                  <Icon name="plus" size={15} />
-                </Pressable>
+                {/* the kit's one add-to-cart "+" (QuickAddButton; a div, it sits inside the tile's button) */}
+                <span className={styles.spotAtc}>
+                  <QuickAddButton asDiv onPress={() => nav.toast('Added to cart')} />
+                </span>
                 <span className={styles.spotAd}>Ad</span>
               </span>
               <span className={styles.spotBody}>

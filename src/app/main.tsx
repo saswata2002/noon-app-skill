@@ -51,7 +51,7 @@ function Preview() {
 
   return (
     <div className="pg-stage">
-      <NoonPrototype key={page.nonce} flows={allFlows} initialRoute={page.route} initialParams={page.params} onRouteChange={onRouteChange} />
+      <NoonPrototype key={page.nonce} flows={allFlows} pageLoader toasts={false} initialRoute={page.route} initialParams={page.params} onRouteChange={onRouteChange} />
     </div>
   );
 }

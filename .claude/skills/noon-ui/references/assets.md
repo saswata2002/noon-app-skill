@@ -117,6 +117,8 @@ Registered names (`lotties` in `src/components/Lottie/Lottie.tsx`, all in `src/a
 | `sliderArrow` | `slider-arrow-animation-en.lottie` | unused, available (slide-to-pay arrow) |
 | `starLoading` | `star-loading.lottie` | unused, available (star loader) |
 
+Page loader: `page-loader.json` (the "Page Loader" project's page transition Lottie, 57-frame loop, 5 images inlined), imported by URL in `src/kit/pageLoader.tsx`; not in `lotties`.
+
 Flow lotties (pass via `src`):
 
 | File | Used in |

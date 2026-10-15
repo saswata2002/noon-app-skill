@@ -1,10 +1,11 @@
 import { motion, type Variants } from 'motion/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Pill, Screen, SearchInput, Text } from '../../components';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Pill, Screen, SEARCH_FILL_FADE, SearchInput, Text } from '../../components';
 import { preloadRoutes } from '../../kit/lazyScreen';
 import { useIsTop, useNav, useParams } from '../../kit/Navigator';
 import { handoff } from '../../motion/presets';
 import { BlurSwap } from '../../motion/recipes';
+import { GroupReveal, type GroupIntro } from './components/GroupReveal';
 import { RecentSearches } from './components/RecentSearches';
 import { SuggestionRow } from './components/SuggestionRow';
 import { recentSearches, suggest, trending, type Suggestion } from './data';
@@ -32,20 +33,35 @@ const keyOf = (l: Suggestion[]) => l.map((s) => s.text).join('|');
 /** One suggestion slot: in (falls 20px on the handoff spring), out (lifts 20px), gone (spare row), fast (exit into results). */
 const slot: Variants = {
   in: (d: number) => ({ opacity: 1, y: 0, transition: { y: { ...handoff.spring, delay: d }, opacity: { duration: handoff.fade.out, ease: handoff.easeOut, delay: d } } }),
-  out: (d: number) => ({ opacity: 0, y: -handoff.travel, transition: { y: { ...handoff.spring, delay: d }, opacity: { duration: handoff.fade.io, ease: handoff.easeInOut, delay: d } }, transitionEnd: { y: -handoff.travel } }),
+  out: (d: number) => ({
+    opacity: 0,
+    y: -handoff.travel,
+    transition: { y: { ...handoff.spring, delay: d }, opacity: { duration: handoff.fade.io, ease: handoff.easeInOut, delay: d } },
+    transitionEnd: { y: -handoff.travel },
+  }),
   gone: (d: number) => ({ opacity: 0, y: -st.goneTravel, transition: { duration: st.goneFade, ease: handoff.easeInOut, delay: d }, transitionEnd: { y: -handoff.travel } }),
-  fast: (d: number) => ({ opacity: 0, y: -st.fastExit.travel, transition: { y: { duration: st.fastExit.move, ease: handoff.easeInOut, delay: d }, opacity: { duration: st.fastExit.fade, ease: handoff.easeInOut, delay: d } }, transitionEnd: { y: -handoff.travel } }),
+  fast: (d: number) => ({
+    opacity: 0,
+    y: -st.fastExit.travel,
+    transition: { y: { duration: st.fastExit.move, ease: handoff.easeInOut, delay: d }, opacity: { duration: st.fastExit.fade, ease: handoff.easeInOut, delay: d } },
+    transitionEnd: { y: -handoff.travel },
+  }),
 };
 
 /** Presearch (recent + trending): rises 20px on push / when the field is cleared, sinks 20px on the first keystroke. */
 const presearch: Variants = {
+  /** first open: the skeleton layer fades in place on the S-curve (Brand Widget PLP), the elements then rise out of it */
+  intro: { opacity: 1, y: 0, transition: { duration: st.skeleton.layer, ease: handoff.easeInOut } },
   in: (d: number) => ({ opacity: 1, y: 0, transition: { y: { ...handoff.spring, delay: d }, opacity: { duration: handoff.fade.out, ease: handoff.easeOut, delay: d } } }),
   out: { opacity: 0, y: handoff.travel, transition: { y: handoff.spring, opacity: { duration: handoff.fade.io, ease: handoff.easeInOut } } },
 };
 
 /**
  * NoonSearchScreen with the Brand Widget PLP handoff choreography:
- * · push → presearch rises 20px while fading in, 124ms after touch-up
+ * · push → every element below the search bar starts as a skeleton (Brand Widget PLP band shimmer): the layer fades in,
+ *   then the page resolves component by component, top → bottom (Recent Searches, then Trending searches), each
+ *   component crossfading out of its skeletons as one unit
+ * · presearch coming back later (field cleared) rises 20px while fading in
  * · first keystroke → presearch drops 20px and fades (S-curve); 110ms later the rows fall in TOP→BOTTOM,
  *   60ms apart, on the handoff spring with the ease-out fade
  * · still typing → rows update in place: a changed suggestion crossfades (BlurSwap, 28ms cascade), spare
@@ -64,10 +80,23 @@ export function SearchScreen() {
   const [phase, setPhaseState] = useState<Phase>('idle');
   const [rows, setRows] = useState<Rows>(empty);
   const [presearchDelay, setPresearchDelay] = useState(params.q ? 0 : st.presearchPushDelay);
+  // first open (no query): the skeleton intro. At revealAt the page resolves component by component:
+  // group 0 Recent Searches (header, Edit, tiles) · group 1 Trending searches (heading + every pill)
+  const [intro] = useState(!params.q);
+  const [introIn, setIntroIn] = useState(intro);
+  const [introShown, setIntroShown] = useState(false);
+  useEffect(() => {
+    if (!intro) return;
+    const t = setTimeout(() => setIntroShown(true), st.skeleton.revealAt * 1000);
+    return () => clearTimeout(t);
+  }, [intro]);
+  const groupIntro: GroupIntro | undefined = intro ? { shown: introShown, at: (group) => group * st.skeleton.groupStagger } : undefined;
   const phaseRef = useRef<Phase>('idle');
   const rowsRef = useRef(rows);
   const hideEnd = useRef(0);
   const headerRef = useRef<HTMLDivElement>(null);
+  /** what was typed when a suggestion was picked: the leaving rows keep highlighting it (not the picked text) */
+  const typed = useRef(q);
   /** what each slot last showed, so a leaving row keeps its content while it animates out */
   const lastShown = useRef<(Suggestion | undefined)[]>([]);
   rowsRef.current = rows;
@@ -116,7 +145,14 @@ export function SearchScreen() {
   );
   useEffect(() => update(q), [q, update]);
   // the results page and the PDP are lazy chunks: fetch them now so the in-place hand-off never shows an empty frame
-  useEffect(() => preloadRoutes(() => import('../plp/ListingScreen'), () => import('../pdp/DetailScreen')), []);
+  useEffect(
+    () =>
+      preloadRoutes(
+        () => import('../plp/ListingScreen'),
+        () => import('../pdp/DetailScreen'),
+      ),
+    [],
+  );
 
   // back from results: the rows spring back in and the field is editable again
   const isTop = useIsTop();
@@ -132,13 +168,16 @@ export function SearchScreen() {
   const go = (text: string) => {
     const query = text.trim();
     if (!query || phaseRef.current === 'leaving') return;
+    typed.current = q;
     setFill({ from: fillFrom(query), key: Date.now() });
     setQ(query);
     const up = phaseRef.current === 'showing' ? rowsRef.current.list.length : 0;
     setPhase('leaving');
     (document.activeElement as HTMLElement | null)?.blur(); // the keyboard drops as the rows leave
     // the rows finish leaving first (nothing overlaps), then the PLP layer fades in
-    const ms = up ? (up - 1) * st.fastExit.stagger + st.fastExit.move : !q.trim() ? handoff.fade.io : 0;
+    const rowsOut = up ? (up - 1) * st.fastExit.stagger + st.fastExit.move : !q.trim() ? handoff.fade.io : 0;
+    // hand over once the rows have faded AND the picked text has fully faded in (the PLP's bar shows it at full ink)
+    const ms = Math.max(rowsOut, fillFrom(query) < query.length ? SEARCH_FILL_FADE : 0);
     setTimeout(() => nav.push('plp/listing', { query }, { transition: 'results-fade' }), ms * 1000 + 10);
   };
 
@@ -156,10 +195,15 @@ export function SearchScreen() {
     return 0;
   };
   const showPresearch = !q.trim() && phase !== 'leaving';
+  // once presearch has left (first keystroke), it comes back with the normal rise
+  useEffect(() => {
+    if (!showPresearch) setIntroIn(false);
+  }, [showPresearch]);
+  const trendingGroup = recents.length ? 1 : 0; // the component after Recent Searches
 
   const header = (
     <div ref={headerRef} style={{ background: ref.color('bgSurface'), padding: 'calc(var(--nk-inset-top) + 4px) 16px 12px' }}>
-      <SearchInput value={q} onChange={setQ} onBack={nav.back} autoFocus onSubmit={go} fill={fill} />
+      <SearchInput value={q} onChange={setQ} onBack={nav.back} autoFocus onSubmit={go} fill={fill} committed={phase === 'leaving'} />
     </div>
   );
 
@@ -167,22 +211,35 @@ export function SearchScreen() {
     <Screen header={header} background="bgSurface">
       <div style={{ position: 'relative' }}>
         <motion.div
-          initial={{ opacity: 0, y: handoff.travel }}
-          animate={showPresearch ? 'in' : 'out'}
+          initial={{ opacity: 0, y: intro ? 0 : handoff.travel }}
+          animate={showPresearch ? (introIn ? 'intro' : 'in') : 'out'}
           custom={presearchDelay}
           variants={presearch}
-          style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 8, pointerEvents: showPresearch ? 'auto' : 'none' }}
+          // the first shimmer pass once the skeleton layer is showing (reference: 120ms after it appears)
+          style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingTop: 8, pointerEvents: showPresearch ? 'auto' : 'none', '--nk-skeleton-at': '0.12s' } as CSSProperties}
         >
-          <RecentSearches items={recents} editing={editing} onToggleEdit={() => setEditing((e) => !e)} onRemove={(id) => setRecents((r) => r.filter((x) => x.id !== id))} onPress={go} />
+          <RecentSearches
+            items={recents}
+            editing={editing}
+            onToggleEdit={() => setEditing((e) => !e)}
+            onRemove={(id) => setRecents((r) => r.filter((x) => x.id !== id))}
+            onPress={go}
+            intro={groupIntro}
+          />
           <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <Text variant="section" color="textStrong" style={{ padding: '0 16px' }}>
-              Trending searches
-            </Text>
+            <GroupReveal intro={groupIntro} group={trendingGroup} radius="var(--nk-radius-r4)" style={{ alignSelf: 'flex-start', margin: '0 16px' }}>
+              <Text variant="section" color="textStrong" style={groupIntro ? undefined : { padding: '0 16px' }}>
+                Trending searches
+              </Text>
+            </GroupReveal>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '0 16px' }}>
-              {trending.map((t) => (
-                <Pill key={t} variant="tag" icon="trendingUp" onPress={() => go(t)}>
-                  {t}
-                </Pill>
+              {trending.map((t, j) => (
+                // every pill resolves with its component (Trending searches)
+                <GroupReveal key={t} intro={groupIntro} group={trendingGroup} index={1 + j} radius="var(--nk-radius-full)">
+                  <Pill variant="tag" icon="trendingUp" onPress={() => go(t)}>
+                    {t}
+                  </Pill>
+                </GroupReveal>
               ))}
             </div>
           </section>
@@ -193,12 +250,20 @@ export function SearchScreen() {
             if (rows.list[i]) lastShown.current[i] = rows.list[i];
             const s = rows.list[i] ?? lastShown.current[i];
             return (
-              <motion.div key={i} role="option" initial={{ opacity: 0, y: -handoff.travel }} animate={stateOf(i)} custom={delayOf(i)} variants={slot} style={{ marginBottom: 8, visibility: s ? 'visible' : 'hidden' }}>
+              <motion.div
+                key={i}
+                role="option"
+                initial={{ opacity: 0, y: -handoff.travel }}
+                animate={stateOf(i)}
+                custom={delayOf(i)}
+                variants={slot}
+                style={{ marginBottom: 8, visibility: s ? 'visible' : 'hidden' }}
+              >
                 {s && (
                   <BlurSwap key={rows.epoch[i]} swapKey={s.text} delay={rows.delay[i] ?? 0}>
                     <SuggestionRow
                       text={s.text}
-                      query={s.text.startsWith('Search for "') ? '' : q}
+                      query={s.text.startsWith('Search for "') ? '' : phase === 'leaving' ? typed.current : q}
                       product={s.product}
                       category={s.category}
                       onPress={() => go(s.text.startsWith('Search for "') ? q : s.text)}

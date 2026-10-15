@@ -2,7 +2,7 @@ import { motion, useMotionValue } from 'motion/react';
 import { useCallback, useEffect, useState } from 'react';
 import { Screen, Spinner } from '../../components';
 import { cartGroupOf, useDemoStore, type CartGroupType, type CartLine } from '../../kit/DemoStore';
-import { useNav } from '../../kit/Navigator';
+import { useNav, usePageLoader } from '../../kit/Navigator';
 import { useIsNoonOneMember } from '../../kit/membership';
 import { takeCartVipPush } from '../noonone/components/entry/cartVipPush';
 import type { ScreenProps } from '../../kit/types';
@@ -40,7 +40,9 @@ export function CartScreen({ params }: ScreenProps<{ state?: 'empty' | 'loading'
   const nav = useNav();
   const store = useDemoStore();
   const { cart, cartTotals, cartUpdatesDismissed, dismissCartUpdates } = store;
-  const [loading, setLoading] = useState(true);
+  // the page loader already covered the wait: no ProgressLoader sweep line after it
+  const pageLoader = usePageLoader();
+  const [loading, setLoading] = useState(!pageLoader);
   const [snack, setSnack] = useState<Product | null>(null);
   // CART_APPLY_COUPON / CART_REMOVE_COUPON → screenState RELOADING: FeedbackView overlayLoader over the cart
   const [reloading, setReloading] = useState(false);
@@ -65,9 +67,10 @@ export function CartScreen({ params }: ScreenProps<{ state?: 'empty' | 'loading'
 
   // FeedbackView shows ScreenState.LOADING on every appear while getCartData runs
   useEffect(() => {
+    if (pageLoader) return;
     const id = window.setTimeout(() => setLoading(false), 450);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [pageLoader]);
 
   const onMovedToWishlist = useCallback((line: CartLine) => setSnack(line.product), []);
   const hideSnack = useCallback(() => setSnack(null), []);

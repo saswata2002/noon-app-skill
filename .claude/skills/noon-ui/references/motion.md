@@ -49,36 +49,38 @@ Animate only `transform` and `opacity` (and `clip-path` / colour cross-fades); l
 
 ## 2. Presets (`src/motion/presets.ts`)
 
-### easing (cubic-bezier arrays, `as Bezier`)
+**The motion reference (2026-10-15): ProtoPie "noon X supermall" · recording "Test01"** (cloud.protopie.io/p/041e0f998b5182ed0ca8ce6d/r/8e30fe8e), read from its recorded tracks. Every flow takes its timing from these tokens; screens keep their own choreography (what moves, how far, stagger order). Recorded: page push 382 → 0 while the page under it goes 0 → −200, ≈ 547ms, one spring; rows / blocks travel 20px on it; fades in ≈ 183ms fast-start (≈ 276 long); fades out ≈ 189ms S-curve (≈ 388 long); stagger 60ms in, 40ms out. Kept (no Test01 counterpart): `spring.press`, `spring.bouncy`, `easing.backOut`, `duration.instant`, and the tab-switch page loader (its own 1:1 reference, `pageLoader`).
+
+### easing (cubic-bezier arrays, `as Bezier`; fits of the recorded curves so they also work in CSS — `handoff` keeps the exact sampled ones)
 
 | Key | Value | Source / use |
 |---|---|---|
-| `easing.out` | `[0.215, 0.61, 0.355, 1]` | `Easing.out(Easing.cubic)`; default for UI entering |
-| `easing.inOut` | `[0.645, 0.045, 0.355, 1]` | `Easing.inOut(Easing.cubic)`; cross-fades, card flip |
-| `easing.in` | `[0.55, 0.055, 0.675, 0.19]` | `Easing.in(Easing.cubic)`; elements leaving |
-| `easing.standard` | `[0.25, 0.1, 0.25, 1]` | RN default ease; `fade` transition, alpha pushes |
-| `easing.ios` | `[0.32, 0.72, 0, 1]` | iOS navigation curve; `push` / `modal` |
-| `easing.backOut` | `[0.34, 1.56, 0.64, 1]` | `Easing.out(Easing.back(1.5))`; playful overshoot |
+| `easing.out` | `[0, 0.204, 0.316, 1.066]` | Test01 fade-in, fast start (fit ≤ 1.3%); default for UI entering |
+| `easing.inOut` | `[0.615, 0.06, 0.34, 0.993]` | Test01 S-curve (fit ≤ 0.2%); cross-fades, card flip |
+| `easing.in` | `[0.615, 0.06, 0.34, 0.993]` | elements leaving: Test01 fades out on its S-curve |
+| `easing.standard` | `[0.615, 0.06, 0.34, 0.993]` | Test01 S-curve; `fade` transition, alpha pushes |
+| `easing.ios` | `[0.338, 0.75, 0.061, 1.109]` | the shape of the Test01 spring (~1% settle, fit ≤ 3.7%) for tweens that move things |
+| `easing.backOut` | `[0.34, 1.56, 0.64, 1]` | `Easing.out(Easing.back(1.5))`; playful overshoot (kept) |
 
 ### duration (seconds)
 
-| Key | Value | Typical use |
+| Key | Value | Test01 |
 |---|---|---|
-| `instant` | `0.1` | micro state flips |
-| `fast` | `0.15` | small fades, exits |
-| `base` | `0.25` | `fade` transition, `Segmented` thumb, scrims |
-| `medium` | `0.3` | `fade-up`, `FadeIn`, collapses |
-| `slow` | `0.45` | `Reveal` on scroll |
-| `slower` | `0.6` | long reveals |
+| `instant` | `0.1` | (kept) micro state flips |
+| `fast` | `0.183` | fade-in |
+| `base` | `0.189` | S-curve fade (`fade` transition, scrims, `Segmented` thumb) |
+| `medium` | `0.276` | long fade-in (`FadeIn`, collapses) |
+| `slow` | `0.388` | long S-curve (`Reveal` on scroll) |
+| `slower` | `0.547` | the spring's settle (long reveals, `card-flip`) |
 
 ### spring (`satisfies Record<string, Transition>`)
 
 | Key | Value | Use |
 |---|---|---|
-| `spring.press` | `{ type: 'spring', stiffness: 500, damping: 30, mass: 0.6 }` | `<Pressable>` whileTap |
-| `spring.sheet` | `{ type: 'spring', stiffness: 260, damping: 30, mass: 1 }` | bottom sheets, `sheet` transition, nav toasts |
-| `spring.bouncy` | `{ type: 'spring', stiffness: 400, damping: 14 }` | badges, counters, hearts, `Pop`, ProductCard quick-add |
-| `spring.gentle` | `{ type: 'spring', stiffness: 170, damping: 26 }` | default layout animation, `zoom`, `scale-up` |
+| `spring.press` | `{ type: 'spring', stiffness: 500, damping: 30, mass: 0.6 }` | `<Pressable>` whileTap (kept) |
+| `spring.sheet` | Test01: `{ stiffness: 280.6, damping: 27.14, mass: 1 }` | bottom sheets, `sheet` transition, nav toasts |
+| `spring.bouncy` | `{ type: 'spring', stiffness: 400, damping: 14 }` | badges, counters, hearts, `Pop` (kept) |
+| `spring.gentle` | Test01: `{ stiffness: 280.6, damping: 27.14, mass: 1 }` | default layout / movement, `zoom`, `scale-up` |
 
 ### helpers
 
@@ -180,31 +182,33 @@ A `ScreenTransition` is `{ initial, animate, exit, under?, transition }`. `under
 
 | Name | Where | Looks like | Timing |
 |---|---|---|---|
-| `push` | built-in | slides in from `x: '100%'`; below moves to `x: '-28%'`, `brightness(0.92)` | `{ duration: 0.42, ease: easing.ios }` |
+| `push` | built-in | slides in from `x: '100%'`; below moves to `x: '-52.36%'` (Test01: 200 of 382), `brightness(0.92)` | Test01 spring (`handoff.spring`, ~1.3% settle, ≈ 0.55s) |
 | `fade` | built-in | opacity 0 to 1 | `duration.base`, `easing.standard` |
-| `fade-up` | built-in | opacity 0, `y: 24` to 0 | `duration.medium`, `easing.out` |
-| `modal` | built-in | slides up from `y: '100%'`; below `scale: 0.94, borderRadius: 24, brightness(0.85)` | 0.42s `easing.ios` |
+| `fade-up` | built-in | opacity 0, `y: 20` to 0 | y on the Test01 spring, opacity 183ms `handoff.easeOut` |
+| `modal` | built-in | slides up from `y: '100%'`; below `scale: 0.94, borderRadius: 24, brightness(0.85)` | Test01 spring |
 | `zoom` | built-in | opacity 0 + `scale: 0.9` to 1 | `spring.gentle` |
 | `sheet` | built-in | slides up from `y: '100%'`, nothing under | `spring.sheet` |
 | `none` | built-in | no animation | `{ duration: 0 }` |
-| `card-flip` | `src/motion/custom/index.ts` | `rotateY: 90` to 0, `transformPerspective: 1200`, exit `rotateY: -90`; under opacity 0.6 | 0.5s `easing.inOut` |
+| `card-flip` | `src/motion/custom/index.ts` | `rotateY: 90` to 0, `transformPerspective: 1200`, exit `rotateY: -90`; under opacity 0.6 | `duration.slower` (0.547) `easing.inOut` |
 | `scale-up` | `src/motion/custom/index.ts` | `scale: 0.85, borderRadius: 40` to 1/0; under `scale 0.96, brightness(0.9)` | `spring.gentle` |
-| `slide-left` | `src/motion/custom/index.ts` | like `push`, under `x: '-52%'` ("the noon search push"); `search/search` and `search/suggestions` use it | `handoff.spring` (280.6 / 27.14 / mass 1) |
+| `slide-left` | `src/motion/custom/index.ts` | like `push`, under `x: '-52.36%'` ("the noon search push"); `search/search` and `search/suggestions` use it | `handoff.spring` (280.6 / 27.14 / mass 1) |
 | `results-fade` | `src/motion/custom/index.ts` | search → `plp/listing` "in place": the layer appears at once (no layer fade, so the search bar drawn at the same spot on both screens never cross-fades); the PLP fades in only what sits under its bar (`belowBar` in `ListingScreen.tsx`). Preload the target's lazy chunk first (`nav.preload` / `preloadRoutes`, `src/kit/lazyScreen.ts`) or the hand-off shows an empty Suspense frame | enter instant + 0.3s `handoff.easeInOut` content fade; exit fades the layer 0.3s |
-| `checkout-alpha` | `src/flows/checkout/transitions.ts` | opacity only (NoonPostOrderLoader to OrderConfirmationV3) | 0.25s `easing.standard` |
-| `noonone-overlay` | `src/flows/noonone/transitions.ts` | transparent, static layer; exit fades | 0.2s |
+| `checkout-alpha` | `src/flows/checkout/transitions.ts` | opacity only (NoonPostOrderLoader to OrderConfirmationV3) | `duration.base` (0.189) S-curve |
+| `noonone-overlay` | `src/flows/noonone/transitions.ts` | transparent, static layer; exit fades | 0.189 S-curve |
 | `noonone-instant` | `src/flows/noonone/transitions.ts` | no entry animation; exit fades (`animations.push.enabled: false`) | 0 |
-| `address-map` | `src/flows/address/transitions.ts` | opacity 0 + `y: -15` to 0 | 0.33s `easing.inOut` |
-| `address-search` | `src/flows/address/transitions.ts` | opacity (FadeIn 150) | 0.15s `easing.standard` |
-| `address-success` | `src/flows/address/transitions.ts` | fades in; exits opacity 0 + `y: '-100%'` | 0.35s `easing.standard` |
-| `mb-overlay` | `src/flows/membership/transitions.ts` | transparent static layer; `<VipOverlay>` animates scrim + sheet itself | 0.2s |
-| `mb-modal` | `src/flows/membership/transitions.ts` | iOS modal slide up, nothing underneath moves | 0.42s `[0.32, 0.72, 0, 1]` |
+| `address-map` | `src/flows/address/transitions.ts` | opacity 0 + `y: -15` to 0 | y Test01 spring, opacity 183ms ease-out |
+| `address-search` | `src/flows/address/transitions.ts` | opacity (FadeIn 150) | 0.189 S-curve |
+| `address-success` | `src/flows/address/transitions.ts` | fades in; exits opacity 0 + `y: '-100%'` | y Test01 spring, opacity 0.189 S-curve |
+| `mb-overlay` | `src/flows/membership/transitions.ts` | transparent static layer; `<VipOverlay>` animates scrim + sheet itself | 0.189 S-curve |
+| `mb-modal` | `src/flows/membership/transitions.ts` | iOS modal slide up, nothing underneath moves | Test01 spring |
 
 `getTransition(name)` silently falls back to `push` for unknown names; `listTransitions()` lists all keys.
 
-**Reduced motion.** While motion is reduced the Navigator plays `reducedTransition(t)` (`src/motion/transitions.ts`) instead: every movement key (`x`, `y`, `scale`, `rotate*`, `transformPerspective`, …) is dropped from `initial` / `animate` / `exit` / `under`; opacity, `filter` and colours keep their timing. A transition that only moved (`push`, `modal`, `sheet`, `slide-left`, `mb-modal`, `card-flip` keeps its own fade) becomes a `duration.base` (0.25s) `easing.standard` cross-fade; `none` / `noonone-instant` stay instant. Sheets (`SheetLayer`) fade in place with their scrim (0.25s) instead of rising; grabber drag still works.
+**Reduced motion.** While motion is reduced the Navigator plays `reducedTransition(t)` (`src/motion/transitions.ts`) instead: every movement key (`x`, `y`, `scale`, `rotate*`, `transformPerspective`, …) is dropped from `initial` / `animate` / `exit` / `under`; opacity, `filter` and colours keep their timing. A transition that only moved (`push`, `modal`, `sheet`, `slide-left`, `mb-modal`, `card-flip` keeps its own fade) becomes a `duration.base` (0.189s) `easing.standard` cross-fade; `none` / `noonone-instant` stay instant. Sheets (`SheetLayer`) fade in place with their scrim (0.189s) instead of rising; grabber drag still works.
 
 ### How the Navigator picks one (`makeEntry` in `src/kit/Navigator.tsx`)
+
+**Arming (2026-10-15):** a newly opened screen holds its transition's `initial` pose until it has painted twice (`armed` in the Navigator); then its animation and the covered screen's `under` parallax start together. Heavy screens spend their first frames on layout/paint/decode, and a clock started at mount made the first visible frame jump ~30% into the slide. Keep heavy screens' first render small too: the Storefront PDP defers everything below the fold (`BELOW_FOLD_AFTER_MS` in `src/flows/pdp/DetailScreen.tsx`), the PLP grows its grid in idle batches. Never read layout (`clientWidth`, `getBoundingClientRect`) in a mount `useLayoutEffect` of a pushed screen: it forces a synchronous layout of the whole page in the push frame (use a ResizeObserver).
 
 ```
 presentation = opts.presentation ?? screen.presentation ?? 'screen'
@@ -256,6 +260,19 @@ registerTransition('<flow>-alpha', {
 });
 ```
 
+### Page loader (`pageLoader` prop, on in the dev preview)
+
+`<NoonPrototype pageLoader>` (→ `<Navigator pageLoader>`) runs every **tab switch** (`nav.switchTab`, i.e. the tab bar) as the "Page Loader" project's flow, 1:1 (`noon-homepage/app.js`): **page → looping loader Lottie → page**. Push, back, replace, reset and sheets keep their own transitions. Code: `src/kit/pageLoader.tsx` (WAAPI helpers + the overlay), timings and curves in `pageLoader` (`src/motion/presets.ts`); the Lottie is `src/assets/lotties/page-loader.json` (750 × 1624 @ 60fps, 57-frame loop, fitted to the screen).
+
+| t (ms) | What moves |
+|---|---|
+| 0 | leaving page body: fade 300 → 0, scale 1 → 0.96 over 420 (SOFT); the #F2F3F7 loader layer fades up over 240; the Lottie restarts at frame 0 and loops |
+| 60 | Lottie art: fade 300 → 1, scale 0.96 → 1 over 520 (RISE) |
+| 60 + 800 (hold) | the stack changes under the loader (instant); art: fade 280 → 0, scale → 0.96 over 420 (SOFT) |
+| + 60 | loader layer lifts (fade 300); arriving page body: fade 320 from 0, scale 0.97 → 1 over 520 (RISE) |
+
+SOFT = critically damped (response .36s), RISE = ζ .86 (response .34s, 0.5% overshoot), both CSS `linear()` samples; fades `cubic-bezier(.25,.1,.25,1)` in / `(.4,0,.6,1)` out, each starting from the element's current opacity. Tab root → tab root: a copy of the tab bar sits above the loader (its lens moves to the new tab), as in the reference where the bar never leaves. Another tab tapped on that bar while loading retargets: the latest wins and the loader holds 0.8s more. Only the screen body zooms; the tab bar stays put. Reduced motion: no transforms, fades ≤ 200ms, no delays, same hold. Haptic `soft` when a page lands. With the loader on, `usePageLoader()` is true and Cart / Categories skip their own first-load ProgressLoader (the blue sweep line above the tab bar), since the page loader already covered the wait; their pinned previews (`cart/loading`, `categories?state=loading`) still show it.
+
 Overlay pattern (screen below stays visible, component draws its own scrim/sheet): `presentation: 'modal'` + a transparent static transition (`mb-overlay`, `noonone-overlay`); spread `overlayScreen` from `src/flows/membership/transitions.ts`.
 
 ## 4. Recipes (`src/motion/recipes.tsx`)
@@ -298,7 +315,13 @@ const [k, setK] = useState(0); <Confetti fireKey={k} />  // setK((n) => n + 1) t
 - Swap sheet content: `nav.replace('pdp/added', params, { presentation: 'sheet' })` (`src/flows/pdp/VariantsSheet.tsx`).
 - Close after a selection animates: `setTimeout(nav.back, 180)` (`src/flows/plp/SortSheet.tsx`).
 
+### Address flow: settle → shimmer → reveal
+
+`src/flows/address/SelectScreen.tsx` (`address/select` page and `address/selectSheet` bottom sheet), timing from Test01: the sheet / page rises and settles on the Test01 spring (`LOAD.settle` 0.5s), then the `ListingLoading` skeleton (`Skeleton look="band"`) fades in on the S-curve (`shimmerIn` 0.3s) and shimmers for `hold` (0.65s), then the content resolves component by component out of it — search field, header, each address card, 60ms apart (`handoff.stagger.in`) — fading in (183ms fast-start) while rising 16px on the spring, as the skeleton dissolves (189ms S-curve, 60ms behind). Skeleton and content share one grid cell (`.loadStack`), so nothing jumps. Gotcha: the floating sheet's `AnimatePresence initial={false}` suppresses the first-mount animation of everything inside it, so the revealed content sits in its own `AnimatePresence initial={revealing}`. The rest of the flow (floating sheet rise/height, scrim, tab slider and indicator, list items, nudge, delete modal, search screen, map pin/tooltip/pan, form header) runs on the Test01 spring and fades.
+
 ### Toasts
+
+**Switched off in the dev preview** (`<NoonPrototype toasts={false}>` in `src/app/main.tsx`): `nav.toast()` is a no-op and the `Toast` host renders nothing while keeping its timer. A new hand-rolled toast must check `useToastsEnabled()` (from `src/kit/Navigator.tsx`) too.
 - Plain message: `nav.toast(msg, { tone: 'success' | 'error', icon, action: { label, onPress }, duration })`. Default 2600ms, max 2 visible, enters `y: 40, scale: 0.96` with `spring.sheet`, `layout`; sits above the tab bar. Examples: `src/flows/checkout/ConfirmationScreen.tsx` (`tone: 'success'`), `src/flows/noonone/screens/OffersOverlayScreen.tsx` (`tone: 'error'`), `src/components/WishlistHeart/WishlistHeart.tsx` (icon).
 - Custom-styled self-dismissing toast: `<Toast item duration onHide ...motionProps>`.
 
@@ -322,12 +345,15 @@ const [k, setK] = useState(0); <Confetti fireKey={k} />  // setK((n) => n + 1) t
   <SkeletonReveal skeleton={<SkeletonCard />} animateIn={i < T.animateFirst} delay={T.cardsAt + i * handoff.stagger.in}><ProductCard product={p} /></SkeletonReveal>
 </motion.div>
 ```
+- Search page skeleton intro (first open, no query): the presearch layer fades in on the S-curve (300ms) as `Skeleton look="band"` blocks over every element below the search bar; at 0.48s the page resolves **component by component**, top → bottom, 120ms apart (`GroupReveal`, `src/flows/search/components/GroupReveal.tsx`): Recent Searches (header, Edit, every tile) · Trending searches (heading + every pill). Inside a component the elements follow each other by a minimal 25ms in reading order (`index`; a recent tile's image + label move as one), so Trending starts while the last recent tiles land. Each element is a soft, bounce-free crossfade: content fades in and comes into focus (480ms on `easing.ios`, blur 4px → 0, filter dropped afterwards) while it settles 6px on a critically damped spring (`appleSpring(0.55, 1)`), and its skeletons dissolve (440ms `easing.inOut`) from 40ms later, so the two overlap the whole way. The search bar stays live. Timings: `searchTokens.skeleton`. Gotcha: `<AnimatePresence initial={false}>` also suppresses the initial animation of every motion element inside it, so RecentSearches turns it on for the intro pass.
 - Search suggestions: fixed slots driven by variants (`in` / `out` / `gone` / `fast`), see "Search → results handoff" below (`src/flows/search/SearchScreen.tsx`).
 - PLP chips drop from `y: -20` over their own skeleton pill, delay `0.48 + i * 0.06`, `handoff.spring` + S-curve fade (`src/flows/plp/components/NavPills.tsx` `RevealChip`).
 - Edit-mode wobble with `repeat: Infinity` (`src/flows/search/components/RecentSearches.tsx`).
 - Generic stagger with no source timing: `Stagger` (35ms, spring 380 / 39, first 8).
 
 ### Search → results handoff (Brand Widget PLP)
+
+Hand-off details (2026-10-15): the picked text fades in where it stays (`FillCopy`: opacity only, `SEARCH_FILL_FADE` 300ms `easing.out`; the input's padding is pinned to 1px 2px so the copy lands on its text in every engine); on a pick the rows fade out in place (`searchTokens.fastExit`: no travel, no stagger, 180ms) and the PLP push waits for max(rows out, fill fade). Flicker trap: `useFill` derives `filling` in render (a `useEffect` turned the copy on one frame late, so the full text flashed, vanished and faded in), and the leaving rows highlight the typed query (`typed` ref), not the picked one; `SearchInput committed` crossfades the clear (x) into the camera (one end-aligned grid slot, 200ms) so the PLP bar takes over pixel-identical; the PLP grid mounts `animateFirst` cards and adds `renderBatch` per idle slot from `cardsAt + 8 × stagger + settle` (rendering all results at once stalled the hand-off frame).
 
 Source: github.com/saswata2002/Brand-Widget-PLP (`app.js`, sections "Home ⇄ Search", "Search suggestions", "Results", "Brand widget"). Built in `src/flows/search/SearchScreen.tsx` (+ `searchTokens`), `src/flows/plp/ListingScreen.tsx`, `src/flows/plp/components/BrandWidget.tsx`, `NavPills.tsx`, `MarketplaceStrip.tsx` (+ `plpTokens.timeline`, `swap`, `brandWidget`, `ticker`). Every animation starts from the element's current value, so any step can be interrupted.
 

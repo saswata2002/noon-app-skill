@@ -9,10 +9,22 @@
 [dir='rtl'] .quick { right: auto; left: var(--nk-space-s4); }
 .info { display: flex; flex-direction: column; gap: var(--nk-space-s4); padding: var(--nk-space-s6) var(--nk-space-s8) 0; }
 .delivery { display: flex; align-items: center; gap: var(--nk-space-s4); padding: 0 var(--nk-space-s8); margin-top: var(--nk-space-s6); min-height: 20px; min-width: 0; }
-.quickBtn, .quickFilled { width: var(--nk-quick-add-size); height: var(--nk-quick-add-size); border-radius: var(--nk-quick-add-radius); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.quickBtn { width: var(--nk-quick-add-size); height: var(--nk-quick-add-size); border-radius: var(--nk-quick-add-radius); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
 .quickBtn { background: var(--nk-quick-add-bg); border: 1px solid var(--nk-quick-add-border); box-shadow: var(--nk-quick-add-shadow); }
-.quickFilled { background: var(--nk-quick-add-filled-bg); border: 0; }
+/* QuickAdd's morphing shell: width springs 36 ⇄ 76; the white surface and the blue fill crossfade; content is clipped */
+.quickShell { position: relative; height: var(--nk-quick-add-size); border-radius: var(--nk-quick-add-radius); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.quickSurface, .quickFill, .quickClip { position: absolute; inset: 0; border-radius: var(--nk-quick-add-radius); }
+.quickSurface { background: var(--nk-quick-add-bg); border: 1px solid var(--nk-quick-add-border); box-shadow: var(--nk-quick-add-shadow); }
+.quickFill { background: var(--nk-quick-add-filled-bg); }
+.quickClip { overflow: hidden; }
+/* one morph piece (24×36 box) positioned from the shell's growing edge; `x` moves it (negative = towards the inside) */
+.quickPiece { position: absolute; top: 0; right: 0; width: 24px; height: var(--nk-quick-add-size); overflow: hidden; /* a rolling glyph stays inside its slot */ display: flex; align-items: center; justify-content: center; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.quickGlyph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+/* the odometer count: each digit rolls inside its own clipped slot */
+.roll { position: relative; display: inline-flex; height: 20px; overflow: hidden; font: var(--nk-type-text16-bold-lh20); color: var(--nk-quick-add-count-fg); font-variant-numeric: tabular-nums; }
+.rollDigit { display: inline-block; }
 .qty { color: var(--nk-quick-add-count-fg); font: var(--nk-quick-add-count-font); }
+
 
 /* carousel variant (bappzaar NoonProductCard in the home productCarousel): r8, no border, info inset 4 */
 .card[data-carousel] { border: 0; border-radius: var(--nk-radius-r8); }

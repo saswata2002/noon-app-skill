@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { handoff } from '../../motion/presets';
 import { useEffect, useState } from 'react';
 import { Screen } from '../../components';
 import { useNav } from '../../kit/Navigator';
@@ -65,9 +66,9 @@ export function SearchScreen() {
 
   return (
     <Screen background="addrFormHeader" safeTop={false} contentStyle={{ overflow: 'hidden', paddingBottom: 0 }}>
-      <motion.div className={styles.search} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+      <motion.div className={styles.search} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: handoff.fade.out, ease: handoff.easeOut }}>
         <MapSearchButton searchable autoFocus value={text} onChange={setText} onBack={nav.back} />
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.15 }}>
+        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ y: handoff.spring, opacity: { duration: handoff.fade.out, ease: handoff.easeOut } }}>
           <SearchCurrentLocationButton onPress={onLocateMe} description={locationGranted ? `${current.placeName} ${current.area}` : undefined} />
         </motion.div>
         <div className={`nk-scroll ${styles.searchScroll}`}>

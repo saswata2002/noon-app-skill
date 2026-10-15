@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LikeHeart, OriginIcon, Pressable } from '../../../../components';
 import { useDemoStore } from '../../../../kit/DemoStore';
 import { useNav } from '../../../../kit/Navigator';
@@ -54,12 +54,13 @@ export function SfHeader({ product, solid }: { product: Product; solid: boolean 
 function ExpandableSearch({ expanded, onPress }: { expanded: boolean; onPress: () => void }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [full, setFull] = useState(0);
-  useLayoutEffect(() => {
+  // measured by the ResizeObserver only (it reports after layout, incl. a first callback on observe): reading clientWidth
+  // here forced a synchronous layout of the whole PDP in the push frame
+  useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setFull(el.clientWidth));
+    const ro = new ResizeObserver(([e]) => setFull(Math.round(e.contentRect.width)));
     ro.observe(el);
-    setFull(el.clientWidth);
     return () => ro.disconnect();
   }, []);
   return (

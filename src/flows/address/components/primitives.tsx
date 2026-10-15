@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { handoff } from '../../../motion/presets';
 import { Pressable, Spinner, Toast } from '../../../components';
 import { addressStore, useAddressStore } from '../store';
 import styles from './primitives.module.css';
@@ -73,7 +74,7 @@ export function AddressToastHost() {
       initial={{ y: 50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 50, opacity: 0 }}
-      transition={{ type: 'spring', stiffness: 100, damping: 10, mass: 1, restDelta: 0.01 }}
+      transition={{ y: handoff.spring, opacity: { duration: handoff.fade.out, ease: handoff.easeOut } }}
     >
       {(t) => <div className={styles.toast}>{t.message}</div>}
     </Toast>
