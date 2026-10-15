@@ -12,6 +12,7 @@ import { VIPButton } from '../VIPButton';
 import { DashedLine } from './DashedLine';
 import styles from './landing.module.css';
 import { useReduceMotion } from '../../../../motion/reducedMotion';
+import { easing } from '../../../../motion/presets';
 
 /** DotLottie with RN LottieView `resizeMode` (contain | cover). */
 export function LottieBox({ src, fit = 'contain', loop = false, onComplete, style, className }: { src: string; fit?: 'contain' | 'cover'; loop?: boolean; onComplete?: () => void; style?: CSSProperties; className?: string }) {
@@ -509,7 +510,7 @@ export function SavingsOverviewModule({
   useMotionValueEvent(mv, 'change', (x) => setV(Math.round(x)));
   useEffect(() => {
     // VIPAnimatedDigits sourceValue 0 → targetValue, duration 1200, precision 0
-    const a = animate(mv, target, { duration: 1.2, ease: 'easeOut' });
+    const a = animate(mv, target, { duration: 1.2, ease: easing.out });
     return () => a.stop();
   }, [mv, target]);
   if (customerState !== 'new') {

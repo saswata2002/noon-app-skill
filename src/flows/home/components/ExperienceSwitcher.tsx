@@ -3,10 +3,11 @@ import { Pressable } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
 import { experiences, type Experience } from '../data';
 import { switcherMetrics } from '../tokens';
+import { easing } from '../../../motion/presets';
 import styles from '../home.module.css';
 
 const { itemWidth, itemHeight, collapsedItemHeight, itemPadding, collapsedItemPadding, itemRadius, collapsedItemRadius, duration } = switcherMetrics;
-const transition = { duration, ease: [0.5, 1, 0.89, 1] } as const; // Easing.out(Easing.quad)
+const transition = { duration, ease: easing.out } as const; // Easing.out(Easing.quad) → Test01 ease-out
 
 /**
  * ExperienceSwitcher (src/components/ExperienceSwitcher + ExperienceSwitcherItem + useExperienceSwitcher).

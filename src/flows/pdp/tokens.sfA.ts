@@ -1,4 +1,5 @@
 import type { TokenOverrides } from '../../foundations/tokens';
+import { handoff } from '../../motion/presets';
 
 /**
  * Storefront PDP (Figma 2ldJbjmQq4RkhnrNFCfXQB · 3499:75115, in stock) — header 3499:75879, gallery 3499:75117,
@@ -64,6 +65,6 @@ export const pdpSfATokens = {
   galleryRatio: 512 / 375,
   /** Carousel Indicator: 6 dots + 6 gap per slot, active 14 wide; max 5 slots visible */
   dots: { slot: 12, slotActive: 20, visible: 5, ms: 150 },
-  /** gallery pager spring (same values as Gallery.tsx) */
-  pager: { type: 'spring' as const, stiffness: 300, damping: 34 },
+  /** gallery pager spring: the Test01 spring (was stiffness 300, damping 34) */
+  pager: handoff.spring,
 } as const;

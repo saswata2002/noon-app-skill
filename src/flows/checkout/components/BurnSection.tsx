@@ -11,6 +11,7 @@ import { paymentFigmaIcons } from '../data.payment';
 import { loyaltyProviders, voucherProviders, type BurnProvider } from '../data.rewards';
 import { ensureProvidersLoading, useRewards } from '../store.rewards';
 import { ProviderLogo } from './RewardsPrimitives';
+import { duration, easing } from '../../../motion/presets';
 import styles from './BurnSection.module.css';
 
 /** Opens NoonProviderBurnOverlayScreen for a provider (onProviderCalloutPress). */
@@ -148,7 +149,7 @@ export function BurnSection() {
         </div>
         <div className={styles.dots} aria-hidden>
           {Array.from({ length: pages }, (_, i) => (
-            <motion.span key={i} className={styles.dot} data-active={i === page || undefined} animate={{ width: i === page ? 18 : 5 }} transition={{ duration: 0.2 }} />
+            <motion.span key={i} className={styles.dot} data-active={i === page || undefined} animate={{ width: i === page ? 18 : 5 }} transition={{ duration: duration.base, ease: easing.inOut }} />
           ))}
         </div>
       </div>

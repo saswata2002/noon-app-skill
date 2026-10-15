@@ -1,5 +1,6 @@
 import { Icon, Pressable, ProductCard, Screen, SearchBarButton, Text } from '../../components';
 import { useNav } from '../../kit/Navigator';
+import { openSearch } from '../../kit/searchMorph';
 import { products } from '../../data';
 import { savingsRows, tileRows } from '../home/data';
 import homeStyles from '../home/home.module.css';
@@ -20,7 +21,7 @@ export function DealsScreen() {
 
   const header = (
     <div className={styles.header}>
-      <SearchBarButton height={44} onPress={() => nav.push('search/search')} />
+      <SearchBarButton onPress={(e) => openSearch(nav, e.currentTarget)} />
     </div>
   );
 

@@ -8,6 +8,7 @@ import { cardsImages, t } from './data';
 import { useCards } from './store';
 import { cardsMetrics } from './tokens';
 import { formatIssuerName, formatMasked } from './utils';
+import { duration, easing } from '../../motion/presets';
 import s from './success.module.css';
 
 /* screens/PaymentCardAdditionSuccessScreen/styles.ts → lottieLayout() for the 390 × 844 device */
@@ -48,7 +49,7 @@ export function AddCardSuccessScreen({ params }: ScreenProps<{ cardId?: string }
         <PaymentScreenHeader onBack={finish} />
         <div className={s.content}>
           <div className={s.cardWrap} style={{ width: layout.slotW, height: layout.slotH }}>
-            <motion.div className={s.cardFill} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+            <motion.div className={s.cardFill} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.slower, ease: easing.out }}>
               <img className={s.cardImage} src={showCardArt ? (card?.cardArt?.url ?? cardsImages.defaultCard) : cardsImages.cardSkin} alt="" draggable={false} />
             </motion.div>
             {showCardArt && card && (

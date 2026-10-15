@@ -8,6 +8,7 @@ import { SubscribeButton } from '../components/offers/SubscribeButton';
 import { ChevronLeft } from '../components/offers/Primitives';
 import { partnerCampaigns } from '../data.offers';
 import { completeSubscription, noononeStore, useNoonone } from '../store';
+import { handoff } from '../../../motion/presets';
 import { offersTokens as T } from '../tokens';
 import styles from './OffersV2Screen.module.css';
 
@@ -116,7 +117,7 @@ export function OffersV2Screen({ params }: { params: Params }) {
         className={styles.stickyFooter}
         initial={false}
         animate={{ y: hideSticky ? '110%' : 0 }}
-        transition={{ duration: T.stickyMs / 1000, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={handoff.spring}
       >
         <SubscribeButton
           title={campaign.stickyButtonText}

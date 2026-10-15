@@ -14,6 +14,7 @@ import type { VipPlan } from '../data';
 import { noononeStore } from '../store';
 import { offersTokens as T } from '../tokens';
 import { layout } from '../../../foundations/tokens';
+import { handoff } from '../../../motion/presets';
 import styles from './OffersOverlayScreen.module.css';
 
 type Params = { tab?: 'vouchers' | 'bank'; code?: string; allowSwitching?: boolean; empty?: boolean };
@@ -53,7 +54,7 @@ function Voucher({ voucher, applied, onApply }: { voucher: VipVoucher; applied: 
         </div>
       </div>
       {/* react-native-collapsible: 300ms */}
-      <motion.div initial={false} animate={{ height: collapsed ? 0 : 'auto' }} transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }} style={{ overflow: 'hidden' }}>
+      <motion.div initial={false} animate={{ height: collapsed ? 0 : 'auto' }} transition={handoff.spring} style={{ overflow: 'hidden' }}>
         <div className={styles.voucherDetails}>
           {details?.map((d, i) => (
             <div key={i} className={styles.voucherDetailRow}>
@@ -98,7 +99,6 @@ function Content({ params, layer }: { params: Params; layer: HTMLDivElement | nu
   const maxItems = Math.max(...lengths);
   const showSwitcher = !lengths.some((l) => l === 0) && allowSwitching;
   const contentHeight = T.listHeights[Math.min(maxItems, 3)];
-  const listMs = (maxItems > 1 ? T.listMs.many : T.listMs.one) / 1000;
   const current = tabs[index];
   const labelUp = focused || !!code;
   const showRedeem = focused || !!code || maxItems === 0;
@@ -175,7 +175,7 @@ function Content({ params, layer }: { params: Params; layer: HTMLDivElement | nu
                     setApplied(null);
                   }}
                 >
-                  {i === index && <motion.span layoutId="vip-offers-tab" className={styles.activeTab} transition={{ duration: 0.25 }} />}
+                  {i === index && <motion.span layoutId="vip-offers-tab" className={styles.activeTab} transition={handoff.spring} />}
                   <span className={i === index ? styles.activeTabText : styles.tabText}>{label}</span>
                 </button>
               ))}
@@ -189,7 +189,7 @@ function Content({ params, layer }: { params: Params; layer: HTMLDivElement | nu
               className={styles.inputLabel}
               initial={false}
               animate={labelUp ? { y: -12, x: 2, scale: 0.85 } : { y: 0, x: 12, scale: 1 }}
-              transition={{ duration: T.labelMs / 1000 }}
+              transition={handoff.spring}
             >
               Have a coupon code?
             </motion.span>
@@ -214,7 +214,7 @@ function Content({ params, layer }: { params: Params; layer: HTMLDivElement | nu
             className={styles.redeemBox}
             initial={false}
             animate={{ height: showRedeem ? T.redeemHeight : 0 }}
-            transition={{ duration: listMs, delay: T.listMs.delay / 1000 }}
+            transition={{ ...handoff.spring, delay: T.listMs.delay / 1000 }}
           >
             <VIPButton
               className={[styles.redeem, !code && styles.redeemDisabled].filter(Boolean).join(' ')}
@@ -232,7 +232,7 @@ function Content({ params, layer }: { params: Params; layer: HTMLDivElement | nu
           <motion.div
             initial={false}
             animate={{ height: focused ? 0 : contentHeight + 20 }}
-            transition={{ duration: listMs, delay: T.listMs.delay / 1000 }}
+            transition={{ ...handoff.spring, delay: T.listMs.delay / 1000 }}
             style={{ overflow: 'hidden' }}
           >
             <span className={styles.availableOffers}>Available offers</span>

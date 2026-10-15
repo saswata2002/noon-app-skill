@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { HtmlText, Pressable, Screen } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
 import { useMembershipManage } from '../../../kit/membership';
+import { handoff } from '../../../motion/presets';
 import arrowDown from '@assets/shared/icons/arrow-down.webp';
 import arrowUp from '@assets/membership/arrow-up.webp';
 import back from '@assets/membership/back.webp';
@@ -32,7 +33,7 @@ function PlanBanner({ plan, selected, showSelection, onSelect }: { plan: Availab
         style={{ width: IMAGE_W, overflow: 'hidden' }}
         initial={false}
         animate={{ maxHeight: plan.isSubscribed ? collapsed : selected ? h + (plan.isSubscribed ? 26 : 0) : collapsed }}
-        transition={{ duration: 0.5, ease: [0.7, 0, 0.84, 0] }}
+        transition={handoff.spring}
       >
         <Pressable scale={1} className={styles.bannerPress} disabled={selected} onClick={onSelect}>
           {showSelection && (

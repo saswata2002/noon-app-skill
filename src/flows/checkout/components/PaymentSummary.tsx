@@ -10,10 +10,11 @@ import noonOneC from '@assets/checkout/figma/noonone-logo-c.svg';
 import { cashback, tf } from '../data';
 import type { CheckoutTotals } from '../totals';
 import { formatAmount } from '../utils';
+import { duration, easing, handoff } from '../../../motion/presets';
 import styles from './PaymentSummary.module.css';
 
 const money = (n: number) => `${currency}${formatAmount(n)}`;
-const layout = { duration: 0.3 };
+const layout = { ...handoff.spring, opacity: { duration: duration.medium, ease: easing.out } };
 
 /**
  * Figma "Mini Badge" — a 28.35×19.44 window onto the 56.09×15.68 noon One logo (shifted −28.35 / +0.75 + pt 2.835),
@@ -33,7 +34,7 @@ function NoonOneMiniBadge() {
 
 function Strip({ label, children, underline }: { label: string; children: ReactNode; underline?: boolean }) {
   return (
-    <motion.div layout="position" transition={layout} className={styles.strip} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+    <motion.div layout="position" transition={layout} className={styles.strip} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: duration.medium, ease: easing.inOut } }}>
       <span className={underline ? styles.labelUnderlined : styles.label}>{label}</span>
       <span className={styles.right}>{children}</span>
     </motion.div>

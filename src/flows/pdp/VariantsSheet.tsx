@@ -5,6 +5,7 @@ import { useDemoStore } from '../../kit/DemoStore';
 import { useNav } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
 import { currency, formatPrice, productById } from '../../data';
+import { easing } from '../../motion/presets';
 import { Asset } from './components/Asset';
 import { copy, discountPercent, pdpContent, showDiscount } from './data';
 import styles from './pdp.module.css';
@@ -34,7 +35,7 @@ export function VariantsSheet({ params }: ScreenProps<{ productId: string; sizeM
   const add = () => {
     if (sizes.length > 0 && size < 0) {
       setWarn(true);
-      shake.start({ x: [0, -10, 10, -8, 8, -5, 5, 0], transition: { duration: 0.35, ease: 'easeInOut' } });
+      shake.start({ x: [0, -10, 10, -8, 8, -5, 5, 0], transition: { duration: 0.35, ease: easing.inOut } });
       return;
     }
     addToCart(product.id, qty);

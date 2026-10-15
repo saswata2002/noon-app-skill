@@ -7,6 +7,7 @@ import { handoff } from '../../motion/presets';
 import { BlurSwap } from '../../motion/recipes';
 import { GroupReveal, type GroupIntro } from './components/GroupReveal';
 import { RecentSearches } from './components/RecentSearches';
+import { useSearchMorph } from '../../kit/searchMorph';
 import { SuggestionRow } from './components/SuggestionRow';
 import { recentSearches, suggest, trending, type Suggestion } from './data';
 import { searchTokens as st } from './tokens';
@@ -95,6 +96,10 @@ export function SearchScreen() {
   const rowsRef = useRef(rows);
   const hideEnd = useRef(0);
   const headerRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  // opened from a tapped search bar: that bar flies into this one and the page fades in around it (kit/searchMorph.ts)
+  const morph = useSearchMorph({ bar: barRef, header: headerRef, content: contentRef });
   /** what was typed when a suggestion was picked: the leaving rows keep highlighting it (not the picked text) */
   const typed = useRef(q);
   /** what each slot last showed, so a leaving row keeps its content while it animates out */
@@ -203,15 +208,18 @@ export function SearchScreen() {
 
   const header = (
     <div ref={headerRef} style={{ background: ref.color('bgSurface'), padding: 'calc(var(--nk-inset-top) + 4px) 16px 12px' }}>
-      <SearchInput value={q} onChange={setQ} onBack={nav.back} autoFocus onSubmit={go} fill={fill} committed={phase === 'leaving'} />
+      <div ref={barRef}>
+        <SearchInput value={q} onChange={setQ} onBack={nav.back} autoFocus onSubmit={go} fill={fill} committed={phase === 'leaving'} hint={morph.hint} hintActive={morph.settled && isTop} />
+      </div>
     </div>
   );
 
   return (
-    <Screen header={header} background="bgSurface">
+    <Screen ref={contentRef} header={header} background="bgSurface">
       <div style={{ position: 'relative' }}>
         <motion.div
-          initial={{ opacity: 0, y: intro ? 0 : handoff.travel }}
+          // after the morph the page itself fades in, so the skeleton layer is already up
+          initial={{ opacity: morph.active ? 1 : 0, y: intro ? 0 : handoff.travel }}
           animate={showPresearch ? (introIn ? 'intro' : 'in') : 'out'}
           custom={presearchDelay}
           variants={presearch}

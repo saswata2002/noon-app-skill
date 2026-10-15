@@ -5,6 +5,7 @@ import { currency, formatPrice } from '../../../data';
 import { t } from '../data';
 import { buildDynamicInvoice } from '../invoice';
 import { cartTokens } from '../tokens';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { NoonOneLogo } from './NoonOneLogo';
 import savingsWave from '@assets/cart/footer/savings-wave.svg';
 import { DynamicInvoice } from './DynamicInvoice';
@@ -62,7 +63,7 @@ function ClassicCartFooter({ totals, cart, isTabRoot, disabled, onCheckout, onHe
     <div className={styles.stickyBar} data-tab={isTabRoot || undefined}>
       {/* backdrop (zIndex 2 under the sticky bar) */}
       <AnimatePresence>
-        {open && <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} transition={{ duration: INV.backdropMs / 1000 }} onClick={() => setOpen(false)} />}
+        {open && <motion.div className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0, transition: { duration: duration.base, ease: easing.inOut } }} transition={{ duration: duration.fast, ease: easing.out }} onClick={() => setOpen(false)} />}
       </AnimatePresence>
 
       {/* footer savings — Figma "Color waves 🌊" (All flows 127:40210): 239 × 48 wave, "₫10 saved!" + noon One logo */}
@@ -73,8 +74,8 @@ function ClassicCartFooter({ totals, cart, isTabRoot, disabled, onCheckout, onHe
             className={styles.savings}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: open ? 0 : 1 }}
-            exit={{ y: 20, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            exit={{ y: 20, opacity: 0, transition: { y: handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } } }}
+            transition={{ y: handoff.spring, opacity: { duration: duration.medium, ease: easing.out } }}
           >
             <img src={savingsWave} alt="" width={239} height={48} className={styles.savingsWave} />
             <span className={styles.savingsLabel}>
@@ -97,7 +98,7 @@ function ClassicCartFooter({ totals, cart, isTabRoot, disabled, onCheckout, onHe
           className={styles.invoice}
           initial={false}
           animate={{ y: open ? INV.openTranslateY : INV.closedTranslateY + 200, visibility: open ? 'visible' : 'hidden' }}
-          transition={{ y: { duration: INV.slideMs / 1000, ease: [0.25, 0.1, 0.25, 1] }, visibility: { delay: open ? 0 : 0.4 } }}
+          transition={{ y: handoff.spring, visibility: { delay: open ? 0 : 0.4 } }}
           drag="y"
           dragControls={drag}
           dragListener={false}

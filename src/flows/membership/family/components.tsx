@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { HtmlText, type HtmlStylesheet } from '../../../components';
 import { ref } from '../../../foundations/tokens';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { icons } from '../assets';
 import { cardImage, t } from '../data';
 import { ChevronLeftRounded } from '../components/icons';
@@ -61,7 +62,7 @@ export function ScrollEnter({ children, delay = 0 }: { children: ReactNode; dela
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.48, ease: [0.215, 0.61, 0.355, 1], delay: delay / 1000 }}
+      transition={{ y: { ...handoff.spring, delay: delay / 1000 }, opacity: { duration: duration.slower, ease: easing.out, delay: delay / 1000 } }}
     >
       {children}
     </motion.div>
@@ -137,13 +138,13 @@ export function FaqGroup({ rows }: { rows: { header: string; body: string }[] })
           <motion.button type="button" className={styles.faqRow} whileTap={{ scale: 0.99 }} onClick={() => setOpen((o) => ({ ...o, [i]: !o[i] }))}>
             <span className={styles.faqHeaderRow}>
               <span className={styles.faqHeader}>{r.header}</span>
-              <motion.img src={icons.chevronDownM} alt="" className={styles.faqChevron} animate={{ rotate: open[i] ? -180 : 0 }} transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }} />
+              <motion.img src={icons.chevronDownM} alt="" className={styles.faqChevron} animate={{ rotate: open[i] ? -180 : 0 }} transition={{ duration: duration.medium, ease: easing.out }} />
             </span>
             <motion.span
               className={styles.faqBodyWrap}
               initial={false}
               animate={{ height: open[i] ? 'auto' : 0, opacity: open[i] ? 1 : 0 }}
-              transition={{ duration: 0.3, ease: [0.42, 0, 0.58, 1] }}
+              transition={{ height: handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } }}
             >
               <span className={styles.faqLine} />
               <span className={styles.faqBody}>{r.body}</span>

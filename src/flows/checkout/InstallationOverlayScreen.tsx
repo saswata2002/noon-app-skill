@@ -8,6 +8,7 @@ import { RetryIcon } from './components/RewardsPrimitives';
 import { defaultInstallationSlotId, findInstallationSlot, installationSlots, rt, type InstallationSlot } from './data.rewards';
 import { checkoutStore, useCheckout } from './store';
 import { useCheckoutTotals } from './totals';
+import { duration, easing, handoff } from '../../motion/presets';
 import styles from './installation.module.css';
 
 export interface InstallationParams {
@@ -128,7 +129,7 @@ export function InstallationOverlayScreen({ params }: ScreenProps<InstallationPa
   }
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} nk-content-in`}>
       <span className={styles.title}>{rt.noon_checkout_installation_select_slot}</span>
       {line && (
         <div className={styles.item}>
@@ -176,7 +177,7 @@ export function InstallationOverlayScreen({ params }: ScreenProps<InstallationPa
           </div>
           <DashedDivider color="var(--nk-palette-bright-grey-color)" inset={12} margin="16px 0 0" dash={3} />
           {slots.length > 0 && (
-            <motion.div key={selected.isoDate} className={styles.slots} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+            <motion.div key={selected.isoDate} className={styles.slots} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ y: handoff.spring, opacity: { duration: duration.fast, ease: easing.out } }}>
               {slots.map((slot) => {
                 const isSel = slot.slotId === selected.slotId;
                 return (

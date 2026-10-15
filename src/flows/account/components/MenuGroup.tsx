@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { useNav } from '../../../kit/Navigator';
-import { easing } from '../../../motion/presets';
+import { duration, easing } from '../../../motion/presets';
 import { countryFlags, languages, type LanguageId, type MenuItem } from '../data';
 import { AccountIconImg } from '../icons';
 import { useAccountState } from '../store';
@@ -53,7 +53,7 @@ export function LanguageSwitcher() {
         className={styles.langSlider}
         initial={false}
         animate={{ insetInlineStart: 4 + index * accountTokens.langItem }}
-        transition={{ duration: 0.25, ease: easing.out }}
+        transition={{ duration: duration.medium, ease: easing.out }}
         onAnimationComplete={() => {
           if (selected !== language) nav.push('account/changeLanguage', { language: selected }, { presentation: 'modal', transition: 'fade' });
         }}

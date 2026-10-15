@@ -1,6 +1,6 @@
 import { animate, useMotionValue, useReducedMotion, type MotionValue } from 'motion/react';
 import { useCallback, useEffect, useRef, type RefObject } from 'react';
-import { duration } from '../motion/presets';
+import { duration, easing } from '../motion/presets';
 
 /** ScrollVisibilityProvider constants (src/utils/BottomTabs/ScrollVisibilityProvider.ts) */
 export interface TabBarScrollConfig {
@@ -17,12 +17,12 @@ export interface TabBarScrollConfig {
   flickVelocity: number;
   /** END_REACH_THRESHOLD */
   endReach: number;
-  /** native hide/showTabBar curve (0.15s, UIViewAnimationOptionCurveEaseOut) */
+  /** native hide/showTabBar curve (was 0.15s UIViewAnimationOptionCurveEaseOut [0, 0, 0.58, 1] → Test01 easing.out) */
   ease: [number, number, number, number];
 }
 
 /** bappzaar master values (same for every marketplace screen) */
-export const tabBarScroll: TabBarScrollConfig = { top: 10, activation: 150, deadZone: 4, hideAfter: 64, showAfter: 24, flickVelocity: 2, endReach: 20, ease: [0, 0, 0.58, 1] };
+export const tabBarScroll: TabBarScrollConfig = { top: 10, activation: 150, deadZone: 4, hideAfter: 64, showAfter: 24, flickVelocity: 2, endReach: 20, ease: easing.out };
 
 type Scroll = { y: number; contentHeight: number; layoutHeight: number };
 

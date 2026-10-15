@@ -1,5 +1,6 @@
 import { Icon, MarketplaceTag, Pressable, ProductImage, Screen } from '../../components';
 import { useNav } from '../../kit/Navigator';
+import { duration, easing } from '../../motion/presets';
 import { currency, IPHONE_17_PRO_ID, productById } from '../../data';
 import { icons } from './assets';
 import { AFSBackHeader } from './components/AFSBackHeader';
@@ -31,7 +32,7 @@ export function ReturnableListScreen({ params }: { params: { rootKey?: string } 
           const code = it.button.colorCode;
           return (
             <div key={it.itemNr} className={styles.itemWrap}>
-              <Pressable asDiv className={styles.card} style={{ gap: 0 }} scale={1} whileTap={{ opacity: 0.2 }} transition={{ duration: 0.15 }} onClick={() => nav.push('pdp/detail', { productId: p.id })}>
+              <Pressable asDiv className={styles.card} style={{ gap: 0 }} scale={1} whileTap={{ opacity: 0.2 }} transition={{ duration: duration.base, ease: easing.inOut }} onClick={() => nav.push('pdp/detail', { productId: p.id })}>
                 <span className={styles.statusStrip} style={{ ['--strip' as string]: itemStatusGradient[code] ?? 'var(--nk-color-bg-info)' }}>
                   {/* SD returnItemButtonV2.iconUrl (18) → kit glyph */}
                   <Icon name="clock" size={18} strokeWidth={2.2} color={itemStatusText[code] ?? 'var(--nk-color-text-primary)'} />

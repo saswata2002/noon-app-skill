@@ -12,6 +12,7 @@ import { cardsIcons, manyCards, t, type SavedCard } from './data';
 import { API_DELAY, cardsStore, useCards } from './store';
 import { cardsEasing, cardsMetrics, cardsTimings } from './tokens';
 import { formatMasked } from './utils';
+import { duration, easing, handoff } from '../../motion/presets';
 import s from './cards.module.css';
 
 const ms = (n: number) => n / 1000;
@@ -243,8 +244,8 @@ export function CardsScreen({ params }: ScreenProps<CardsParams>) {
                         style={{ marginBottom: isLast ? cardsMetrics.sectionSpacing : cardsMetrics.cardOffset, zIndex: activeId === card.id ? 8 : 1 }}
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: -30, transition: { duration: 0.28, ease: cardsEasing.inOutQuad } }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        exit={{ opacity: 0, scale: 0.9, y: -30, transition: { duration: duration.medium, ease: easing.inOut } }}
+                        transition={handoff.spring}
                       >
                         <AnimatedListCard
                           ref={(h) => {

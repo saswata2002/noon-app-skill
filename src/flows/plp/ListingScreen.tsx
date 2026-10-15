@@ -180,7 +180,7 @@ export function ListingScreen() {
             {shown.list.slice(0, limit).map((p, i) => {
               const rises = i < T.animateFirst;
               return (
-                <motion.div key={`${shown.epoch}-${p.id}`} className={styles.cell} layout="position" transition={{ layout: { duration: 0.36, ease: [0.4, 0, 0.2, 1] } }}>
+                <motion.div key={`${shown.epoch}-${p.id}`} className={styles.cell} layout="position" transition={{ layout: handoff.spring }}>
                   <SkeletonReveal
                     skeleton={<SkeletonCard />}
                     animateIn={rises}

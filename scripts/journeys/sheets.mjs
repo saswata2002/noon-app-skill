@@ -65,7 +65,7 @@ export default [
   {
     name: 'pdp-variants-size-warning',
     area: 'sheets',
-    title: 'Variants sheet: ADD TO CART without a size warns and adds nothing; pick a size → closes, toast, badge +1',
+    title: 'Variants sheet: ADD TO CART without a size warns and adds nothing; pick a size → closes, badge +1',
     async run(page, shot) {
       // the sheet a sized product card's + opens (ProductCard QuickAdd → pdp/variants); p3 is the fashion mock
       await open(page, 'pdp/variants?productId=p3', { settle: 1600, expectRoute: 'pdp/variants' });
@@ -90,8 +90,8 @@ export default [
       await shot('size-picked');
       await tap(page, atc, { scroll: false });
       await waitRoute(page, 'pdp/detail', 'pdp/detail (sheet closed after ATC)');
-      await waitFor(async () => (await page.getByText(/added to cart/i).count()) > 0, 'no "Added to cart" toast');
-      const badge1 = await cartBadge(page);
+      // the demo runs with toasts off (Navigator toasts={false}), so the badge is the confirmation
+      const badge1 = await waitFor(async () => { const b = await cartBadge(page); return b === badge0 + 1 && b; }, '').catch(() => cartBadge(page));
       expect(badge1 === badge0 + 1, `cart badge ${badge0} → ${badge1} after ATC with size ${sizeName}`);
       await shot('added-toast');
     },
@@ -99,7 +99,7 @@ export default [
   {
     name: 'home-address-sheet',
     area: 'sheets',
-    title: 'Home address tap opens the address book over home (isBottomSheet); picking another address closes it with "Address updated"; a dimmed-page tap closes it',
+    title: 'Home address tap opens the address book over home (isBottomSheet); picking another address closes it; a dimmed-page tap closes it',
     async run(page, shot) {
       await open(page, 'home/home', { settle: 1600 });
       const address = (await top(page)).locator('button:has(img[src*="delivery-home"])').first();
@@ -121,7 +121,7 @@ export default [
       await waitFor(async () => (await again.getByText('Work', { exact: true }).count()) > 0, 'the saved addresses did not load on reopen', 4000);
       await tap(page, again.getByText('Work', { exact: true }).first());
       await waitRoute(page, 'home/home', 'home/home (address picked)', 4000);
-      await waitFor(async () => (await page.getByText('Address updated').count()) > 0, 'no "Address updated" toast after picking an address', 3000);
+      // no "Address updated" toast: the demo runs with toasts off (Navigator toasts={false})
       await shot('picked');
     },
   },

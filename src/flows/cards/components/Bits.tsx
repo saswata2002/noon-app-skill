@@ -3,6 +3,7 @@ import { useMemo, type CSSProperties, type ReactNode } from 'react';
 import { acceptedBrands, brandIcons, cardsIcons } from '../data';
 import { cardsSprings } from '../tokens';
 import { getTypeFromNumber } from '../utils';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { MaskIcon } from '../../../components';
 import s from './components.module.css';
 
@@ -32,7 +33,7 @@ export function CardTypeLogo({ cardNumber }: { cardNumber: string }) {
       style={{ width: icon.w }}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.15 }}
+      transition={{ scale: handoff.spring, opacity: { duration: duration.fast, ease: easing.out } }}
     />
   );
 }

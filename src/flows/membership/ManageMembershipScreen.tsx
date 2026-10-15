@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Screen } from '../../components';
+import { spring } from '../../motion/presets';
 import { useNav } from '../../kit/Navigator';
 import { membershipActions, membershipStore, useMembershipManage, membershipManageActions } from '../../kit/membership';
 import { cardImage, capitalize, t } from './data';
@@ -163,7 +164,7 @@ export function ManageMembershipScreen({ params }: { params: { state?: string } 
         <motion.div
           initial={false}
           animate={contentHidden ? { y: 200, opacity: 0 } : { y: 0, opacity: 1 }}
-          transition={contentHidden ? { duration: 0 } : { type: 'spring', stiffness: 80, mass: 1, damping: 10 }}
+          transition={contentHidden ? { duration: 0 } : spring.bouncy}
         >
           <div className={styles.topSection}>
             <div className={styles.plansContainer}>

@@ -9,6 +9,7 @@ import { Crescent, InfoEditButton, ProviderLogo } from './RewardsPrimitives';
 import { Button, Spinner } from '../../../components';
 import styles from './providerForm.module.css';
 import { currency } from '../../../data';
+import { spring } from '../../../motion/presets';
 
 /**
  * marketplaces/noon/components/NoonCheckoutProvider/* — the pieces of the provider burn / earn overlays.
@@ -256,7 +257,7 @@ export function VerifyOtp({ value, onChange, length, color, error, timer, otpMes
             >
               <AnimatePresence>
                 {value[i] && (
-                  <motion.span key={value[i] + i} className={styles.otpText} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 25 }}>
+                  <motion.span key={value[i] + i} className={styles.otpText} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={spring.bouncy}>
                     {value[i]}
                   </motion.span>
                 )}

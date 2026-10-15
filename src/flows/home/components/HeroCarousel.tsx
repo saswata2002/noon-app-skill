@@ -4,21 +4,24 @@ import { heroSlides } from '../data';
 import { homeTokens } from '../tokens';
 import styles from '../home.module.css';
 import { useReduceMotion } from '../../../motion/reducedMotion';
+import { useIsTop } from '../../../kit/Navigator';
 
 const { heroCardWidth: W, heroCardHeight: H, heroGap: GAP, heroInterval } = homeTokens;
 
 /**
  * Hero carousel as on the live noon home: portrait cards (244×366), centred with neighbours peeking,
- * snap scrolling, auto-advance every 4s (paused while the user is touching it).
+ * snap scrolling, auto-advance every 4s (paused while the user is touching it, and while another screen covers it: it
+ * restarts with a full interval on return, so it never slides during the transition back).
  */
 export function HeroCarousel({ onPress }: { onPress?: (query: string) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [held, setHeld] = useState(false);
   const reduce = useReduceMotion();
+  const isTop = useIsTop();
 
   useEffect(() => {
-    // no auto-advance under reduced motion (still swipeable)
-    if (held || reduce) return;
+    // no auto-advance under reduced motion (still swipeable), nor while covered
+    if (held || reduce || !isTop) return;
     const t = setInterval(() => {
       const el = ref.current;
       if (!el) return;
@@ -26,7 +29,7 @@ export function HeroCarousel({ onPress }: { onPress?: (query: string) => void })
       el.scrollTo({ left: next * (W + GAP), behavior: 'smooth' });
     }, heroInterval);
     return () => clearInterval(t);
-  }, [held, reduce]);
+  }, [held, reduce, isTop]);
 
   return (
     <div className={styles.heroWrap}>

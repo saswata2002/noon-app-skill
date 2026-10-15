@@ -77,7 +77,7 @@ export function VariantsSheet({ params }: ScreenProps<{ productId?: string }>) {
   }
 
   return (
-    <div className={styles.root}>
+    <div className={`${styles.root} nk-content-in`}>
       <div className={styles.scroll}>
         <div className={styles.header}>
           <div className={styles.imageBox}>

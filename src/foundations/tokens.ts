@@ -763,11 +763,13 @@ export const stepper = {
 
 /** <SearchBarButton> / <SearchInput> (NoonSearchBarButton, NoonSearchScreen). CSS: var(--nk-search-bar-<key>). */
 export const searchBar = {
-  height: 52,
+  /** one bar size everywhere (home header, search page, results, deals, categories): the bar flies between them */
+  height: 48,
   radius: ref.radius('r12'),
   paddingX: 12,
   gap: 8,
-  pressScale: 0.98,
+  /** no press shrink: the tapped bar is the shared element that flies into the search page, at one size throughout */
+  pressScale: 1,
   bg: ref.color('bgSurface'),
   border: ref.color('borderInput'),
   inputBorder: ref.palette('gray400'),

@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { HtmlText } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
 import { useMembership } from '../../../kit/membership';
+import { duration, easing } from '../../../motion/presets';
 import chevronUp from '@assets/vip/chevron-up-rounded.svg';
 import { cardImage, t } from '../data';
 import { acquisitionRoute } from '../links';
@@ -70,7 +71,7 @@ function PartnerContent() {
                 data-with-payment={showPayment || undefined}
                 disabled={plan.isSubscribed}
                 whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: duration.base, ease: easing.inOut }}
                 onClick={() => window.setTimeout(subscribe, 200)}
               >
                 <HtmlText value={b.text} stylesheet={{ p: { font: mb.type('mbPerkButton18') }, s: { fontWeight: 400, textDecorationLine: 'line-through', fontSize: 16 } }} />

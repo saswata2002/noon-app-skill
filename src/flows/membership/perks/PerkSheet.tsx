@@ -1,6 +1,7 @@
 import { animate, motion, useMotionValue, type PanInfo } from 'motion/react';
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import { useNav } from '../../../kit/Navigator';
+import { duration, easing, handoff } from '../../../motion/presets';
 import closeOverlayIcon from '@assets/vip/close-overlay.webp';
 import styles from './perks.module.css';
 
@@ -18,11 +19,11 @@ export type PerkSheetApi = { close: (after?: () => void, callDismiss?: boolean) 
 const Ctx = createContext<PerkSheetApi | null>(null);
 export const usePerkSheet = () => useContext(Ctx)!;
 
-const overlaySpring = { type: 'spring', stiffness: 230, damping: 22, mass: 1 } as const;
-const overlayTiming = { duration: 0.25, ease: [0.42, 0, 0.58, 1] } as const;
-// gorhom iOS default spring (damping 500, stiffness 1000, mass 3, overshootClamping) is heavily overdamped and settles in ~300ms
-const gorhomSpring = { duration: 0.3, ease: [0.215, 0.61, 0.355, 1] } as const;
-const gorhomClose = { duration: 0.25, ease: [0.42, 0, 0.58, 1] } as const;
+// both sheets open on the Test01 spring (was stiffness 230 / damping 22, and a 300ms ease-out for gorhom's overdamped spring)
+const overlaySpring = handoff.spring;
+const overlayTiming = { duration: duration.medium, ease: easing.inOut };
+const gorhomSpring = handoff.spring;
+const gorhomClose = { duration: duration.medium, ease: easing.inOut };
 
 export function PerkSheet({
   kind,

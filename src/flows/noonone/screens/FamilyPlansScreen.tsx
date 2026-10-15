@@ -14,16 +14,17 @@ import { noononeStore } from '../store';
 import { ChevronLeftRounded, DashedBorder, PlanMembers, ScrollHeader, SubscriptionButton } from '../components/plans/parts';
 import s from './FamilyPlansScreen.module.css';
 import { useReduceMotion } from '../../../motion/reducedMotion';
+import { duration, easing, handoff, spring } from '../../../motion/presets';
 
 type FamilyPlan = (typeof familyPlansData.plans)[number];
 
 /** constants.ts */
 const FAMILY_TO_DUO_END_FRAME = Math.round((1350 / 1000) * 60);
 const DUO_TO_FAMILY_END_FRAME = Math.round((2683 / 1000) * 60);
-/** PLAN_SELECTION_SPRING { damping 12, stiffness 107 } */
-const SELECTION_SPRING = { type: 'spring' as const, damping: 12, stiffness: 107 };
+/** PLAN_SELECTION_SPRING { damping 12, stiffness 107 } (ζ 0.58, a bounce) → the kit's bouncy spring */
+const SELECTION_SPRING = spring.bouncy;
 /** VIPScrollEnterView: 480ms, offsetY 24, Easing.out(cubic) */
-const enter = { initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.25 }, transition: { duration: 0.48, ease: [0.215, 0.61, 0.355, 1] as [number, number, number, number] } };
+const enter = { initial: { opacity: 0, y: 24 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: 0.25 }, transition: { y: handoff.spring, opacity: { duration: duration.slower, ease: easing.out } } };
 
 function PlanTile({ plan, selected, onSelect }: { plan: FamilyPlan; selected: boolean; onSelect: () => void }) {
   const p = useMotionValue(selected ? 1 : 0);
@@ -128,12 +129,12 @@ function Faq({ rows }: { rows: { header: string; body: string }[] }) {
               <div className={s.faqHeaderRow}>
                 <span className={s.faqHeader}>{r.header}</span>
                 {/* AnimatedExpandableChevron: 300ms Easing.out(cubic), 0° collapsed → 180° */}
-                <motion.span className={s.faqChevron} animate={{ rotate: open === i ? 180 : 0 }} transition={{ duration: 0.3, ease: [0.215, 0.61, 0.355, 1] }}>
+                <motion.span className={s.faqChevron} animate={{ rotate: open === i ? 180 : 0 }} transition={{ duration: duration.medium, ease: easing.out }}>
                   <img src={chevronDownM} width={16} height={16} alt="" />
                 </motion.span>
               </div>
               {open === i && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.medium, ease: easing.out }}>
                   <div className={s.faqSep} />
                   <span className={s.faqBody}>{r.body}</span>
                 </motion.div>

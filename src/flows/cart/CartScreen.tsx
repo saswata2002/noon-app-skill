@@ -23,6 +23,7 @@ import { PaymentOffers } from './components/PaymentOffers';
 import { cartUpdates, cobrandCards, freeGift, paymentCallouts, t } from './data';
 import styles from './cart.module.css';
 import { useReduceMotion } from '../../motion/reducedMotion';
+import { duration, easing, handoff } from '../../motion/presets';
 
 /** NoonCartResponseType.sectionsOrder as the cart API returns it for this cart */
 // All flows 127:39687 order: groups → offers carousel → wishlist carousel → (free gifts) → coupon → cobrand cards → payment offers
@@ -160,7 +161,7 @@ export function CartScreen({ params }: ScreenProps<{ state?: 'empty' | 'loading'
 /** renderEmptyCart: white view, 150×150 empty-generic image, 18/bold header + 14 message (marginTop 10 / 5). */
 function EmptyCart() {
   return (
-    <motion.div className={styles.empty} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+    <motion.div className={styles.empty} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ y: handoff.spring, opacity: { duration: duration.slow, ease: easing.out } }}>
       <img src={emptyGeneric} alt="" className={styles.emptyImage} />
       <div className={styles.emptyText}>
         <div className={styles.emptyHeader}>{t.emptyHeader}</div>

@@ -1,5 +1,5 @@
 import type { Transition } from 'motion/react';
-import { duration, easing, supermall } from '../../motion/presets';
+import { duration, easing, handoff, spring } from '../../motion/presets';
 
 /**
  * R&R 2.0 motion, mapped from repo src/tokens/motion.ts (+ the inline timings in src/screens/*) onto kit presets.
@@ -11,40 +11,37 @@ import { duration, easing, supermall } from '../../motion/presets';
  * Full table: MAPPING.md → "Motion".
  */
 
-/** repo `ease.inOut` [0.77, 0, 0.175, 1] (strong in-out) — no kit preset; AI loader bloom sweep only. */
-const strongInOut: [number, number, number, number] = [0.77, 0, 0.175, 1];
-
 export const reviewsMotion = {
   ease: {
-    /** repo `ease.out` [0.23, 1, 0.32, 1] ≈ supermall.ease.soft [0.22, 1, 0.36, 1] */
-    out: supermall.ease.soft,
-    /** repo `ease.inOut` — kept (AILoaderScreen GradientField 1.1s sweep) */
-    inOut: strongInOut,
+    /** repo `ease.out` [0.23, 1, 0.32, 1] → Test01 ease-out */
+    out: easing.out,
+    /** repo `ease.inOut` [0.77, 0, 0.175, 1] → Test01 S-curve (AILoaderScreen GradientField 1.1s sweep) */
+    inOut: easing.inOut,
     /** repo `ease.drawer` [0.32, 0.72, 0, 1] = easing.ios */
     drawer: easing.ios,
   },
-  /** repo src/tokens/motion.ts `duration` (s). `slow` .3 = duration.medium; the rest are R&R values. */
+  /** repo src/tokens/motion.ts `duration` (s) on the Test01 scale: press .13 → base, fast .18 → fast, base .24 / slow .3 → medium. */
   duration: {
-    press: 0.13,
-    fast: 0.18,
-    base: 0.24,
+    press: duration.base,
+    fast: duration.fast,
+    base: duration.medium,
     slow: duration.medium,
   },
   /**
-   * repo springs, kept in motion's duration/bounce form (motion/react accepts it as is).
+   * repo springs → Test01: no / low bounce rides `handoff.spring`, deliberate bounce rides `spring.bouncy`.
    * Press feedback does NOT use these: taps go through <Pressable>/<Button> (spring.press).
    */
   spring: {
     /** repo spring.snappy — toggles, checkbox, chip borders, crisp state (no overshoot) */
-    snappy: { type: 'spring', duration: 0.32, bounce: 0 } as Transition,
+    snappy: handoff.spring as Transition,
     /** repo spring.gentle — cards, list items, deck / slider moves */
-    gentle: { type: 'spring', duration: 0.5, bounce: 0.12 } as Transition,
+    gentle: handoff.spring as Transition,
     /** repo spring.bouncy — stars, check badge, thank-you moments */
-    bouncy: { type: 'spring', duration: 0.55, bounce: 0.42 } as Transition,
+    bouncy: spring.bouncy as Transition,
     /** repo in-screen sheets (ProgressSheet / EditReviewSheet / DraftB save bar): duration .5, bounce .14 */
-    sheet: { type: 'spring', duration: 0.5, bounce: 0.14 } as Transition,
+    sheet: handoff.spring as Transition,
     /** repo fold/unfold of card meta + note actions: duration .45, bounce 0 */
-    fold: { type: 'spring', duration: 0.45, bounce: 0 } as Transition,
+    fold: handoff.spring as Transition,
   },
   /** taps: repo `tap` .97 → kit pressScale .96 (Pressable default); `tapStrong` .94 → pill.pressScale (.94) */
   press: {
@@ -61,7 +58,7 @@ export const reviewsMotion = {
   /** ReviewDraftB StarRow timings */
   starAppearB: { delay: 0.2, stagger: 0.06 },
   /** Submitted photo thumbs: scale .7 → 1, spring.gentle with bounce .5, 150ms + 50ms apart */
-  photoPop: { from: 0.7, delay: 0.15, stagger: 0.05, spring: { type: 'spring', duration: 0.5, bounce: 0.5 } as Transition },
+  photoPop: { from: 0.7, delay: 0.15, stagger: 0.05, spring: spring.bouncy as Transition },
   /** CraftingLines white sweep: x −130% → 130%, 1.2s linear loop, 120ms apart per line */
   craftSweep: { from: '-130%', to: '130%', duration: 1.2, stagger: 0.12 },
   /** skeleton sweep (ManualReview SkeletonBlock): x −120% → 120%, 1.1s linear loop */
@@ -72,8 +69,8 @@ export const reviewsMotion = {
   fadeRise: { y: 10 },
   /** blur cross-fade used for every in-place swap (AI ⇄ manual, skeleton ⇄ questions, product switch): blur 4px, y ±6 */
   swap: { blur: 4, y: 6 },
-  /** mocked keyboard rises with its height: 0.34s easing.ios (= ease.drawer) */
-  keyboard: { duration: 0.34, ease: easing.ios } as Transition,
+  /** mocked keyboard rises with its height: was 0.34s → duration.slow, easing.ios (= ease.drawer) */
+  keyboard: { duration: duration.slow, ease: easing.ios } as Transition,
   /** timeline (ms) */
   timing: {
     /** ManualReview: skeleton shown after a rating change */
@@ -85,8 +82,8 @@ export const reviewsMotion = {
     loaderDoneMs: 1300,
     /** AILoader bloom sweep (s) */
     bloomSweep: 1.1,
-    /** AILoader label cross-fade (s) */
-    labelSwap: 0.32,
+    /** AILoader label cross-fade (s): was .32 → duration.medium */
+    labelSwap: duration.medium,
     /** SubmittedScreen: Lottie backstop, then dwell before advancing */
     submittedBackstopMs: 2600,
     submittedAdvanceMs: 1500,
@@ -99,8 +96,8 @@ export const reviewsMotion = {
   deck: { y: [0, -8, -15], scale: [1, 0.9, 0.8], throwX: -440, throwRotate: -8, swipeDist: 90, swipeVelocity: 500, elastic: 0.7 },
   /** horizontal slider (PastOrderRatingScreenB): card 286 + 16 gap */
   slider: { card: 286, gap: 16 },
-  /** sheet / scrim fade (in-screen overlays): .2s */
-  scrimFade: 0.2,
+  /** sheet / scrim fade (in-screen overlays): was .2s → duration.base */
+  scrimFade: duration.base,
 } as const;
 
 export type ReviewsMotion = typeof reviewsMotion;

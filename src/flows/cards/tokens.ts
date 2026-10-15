@@ -1,4 +1,5 @@
 import type { TokenOverrides } from '../../foundations/tokens';
+import { easing, handoff } from '../../motion/presets';
 
 /**
  * Saved cards (payment V2) tokens — features/payment/theme/{PaymentColors,PaymentMetrics}.ts and the
@@ -84,18 +85,18 @@ export const cardsTimings = {
   shimmerFade: 100,
 };
 
-/** reanimated withTiming default easing = Easing.inOut(Easing.quad); Easing.out(Easing.quad). */
+/** the reanimated curves (inOut / out quad) mapped onto the app-wide Test01 curves so the cards flow moves like the rest */
 export const cardsEasing = {
-  inOutQuad: [0.455, 0.03, 0.515, 0.955] as [number, number, number, number],
-  outQuad: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
-  inQuad: [0.55, 0.085, 0.68, 0.53] as [number, number, number, number],
-  outEase: [0.42, 0, 0.58, 1] as [number, number, number, number],
+  inOutQuad: easing.inOut,
+  outQuad: easing.out,
+  inQuad: easing.in,
+  outEase: easing.inOut,
 };
 
 /** withSpring configs used across the payment feature. */
 export const cardsSprings = {
   press: { type: 'spring', stiffness: 300, damping: 20, mass: 0.5 } as const, // PaymentButtonV2 / AdditionOption
-  form: { type: 'spring', stiffness: 300, damping: 28, mass: 1 } as const, // ManualAddition calculateAnimationTimingFunction
+  form: handoff.spring, // ManualAddition calculateAnimationTimingFunction (300/28, ζ 0.81) → the Test01 spring
 };
 
 export const cardsFlowTokens: TokenOverrides = {

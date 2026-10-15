@@ -35,6 +35,8 @@ Values and recipes: `.claude/skills/noon-ui/references/motion.md` · per-flow mo
 | `mo:preset/duration.medium` | 1 | home |
 | `mo:preset/duration.slow` | 1 | home |
 | `mo:preset/easing.backOut` | 1 | home |
+| `mo:preset/easing.inOut` | 1 | home |
+| `mo:preset/easing.ios` | 1 | home |
 | `mo:preset/easing.out` | 1 | home |
 | `mo:preset/easing.standard` | 1 | home |
 | `mo:preset/fieldMotion` | 1 | home |

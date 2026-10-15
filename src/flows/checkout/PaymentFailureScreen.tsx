@@ -4,6 +4,7 @@ import { useNav } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
 import type { PaymentCode } from './data';
 import { mockPaymentError, postorderIcons, supportEmail as defaultEmail, tp } from './data.postorder';
+import { duration, easing } from '../../motion/presets';
 import styles from './postorder.module.css';
 import { Button } from '../../components';
 
@@ -69,7 +70,7 @@ export function PaymentFailureScreen({ params }: ScreenProps<PaymentFailureParam
         </div>
       </div>
 
-      <motion.div className={styles.ctaContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: 0.5 }}>
+      <motion.div className={styles.ctaContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2, duration: duration.slower, ease: easing.out }}>
         <Button variant="noon" block whileTap={undefined} onClick={() => nav.back()}>
           {ctaText}
         </Button>

@@ -32,6 +32,17 @@ registerTransition('slide-left', {
   transition: handoff.spring,
 });
 
+registerTransition('search-morph', {
+  // search bar → search page (src/kit/searchMorph.ts): the layer itself never moves or fades; the page flies its
+  // bar from the tapped one, fades its own background and content in, drifts the page underneath, and plays it all
+  // in reverse on back while it holds its removal (usePresence)
+  initial: { opacity: 1 },
+  animate: { opacity: 1 },
+  exit: { opacity: 1 },
+  transition: { duration: 0 },
+  transparent: true,
+});
+
 registerTransition('results-fade', {
   // search → results "in place": the PLP layer appears at once (no layer fade, so the search bar — drawn at the
   // same spot on both screens — never cross-fades with the one under it); the PLP fades in everything below its

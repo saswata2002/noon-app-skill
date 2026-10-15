@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { duration, easing, handoff } from '../../motion/presets';
 import { useState } from 'react';
 import { Pressable, Switch } from '../../components';
 import { useNav } from '../../kit/Navigator';
@@ -9,12 +10,12 @@ import { setAccountState, useAccountState } from './store';
 import styles from './inner.module.css';
 
 const p = copy.preferences;
-const confirmSpring = { type: 'spring' as const, mass: 1, damping: 18, stiffness: 190 };
+const confirmSpring = handoff.spring;
 
 /**
  * NoonAccountPreferences: haptics switch + clear-cache row (2,2 dashed section).
- * Clear cache fades the list out (250ms) and swaps in NoonAccountClearCacheConfirmation:
- * header drops from -100 and buttons rise from +100 on a spring (18/190), fade 300ms.
+ * Clear cache fades the list out (Test01 S-curve) and swaps in NoonAccountClearCacheConfirmation:
+ * header drops from -100 and buttons rise from +100 on the Test01 spring, fade on the S-curve.
  */
 export function PreferencesSheet() {
   const nav = useNav();
@@ -35,7 +36,7 @@ export function PreferencesSheet() {
     <SheetBody>
       <AnimatePresence mode="wait" initial={false}>
         {!confirming ? (
-          <motion.div key="list" className={styles.listContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+          <motion.div key="list" className={styles.listContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.medium, ease: easing.inOut }}>
             <AccountSection dash="2,2" className={styles.mt12}>
               <AccountSectionItem
                 before={<AccountIconImg name="haptics" />}
@@ -56,8 +57,8 @@ export function PreferencesSheet() {
             </AccountSection>
           </motion.div>
         ) : (
-          <motion.div key="confirm" className={styles.cacheContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}>
-            <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100, transition: { duration: 0.2 } }} transition={confirmSpring}>
+          <motion.div key="confirm" className={styles.cacheContainer} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.medium, ease: easing.inOut }}>
+            <motion.div initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100, transition: { duration: duration.base, ease: easing.inOut } }} transition={confirmSpring}>
               <div className={styles.cacheHeader}>
                 <Pressable className={styles.cacheBack} onClick={() => setConfirming(false)} aria-label="Back">
                   {/* points left; getChevronStyle on master tests `!I18n.isRTL` (a function), so it never flips */}
@@ -69,7 +70,7 @@ export function PreferencesSheet() {
                 <span className={styles.cacheText}>{p.clearCacheConfirm}</span>
               </div>
             </motion.div>
-            <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100, transition: { duration: 0.2 } }} transition={confirmSpring}>
+            <motion.div initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100, transition: { duration: duration.base, ease: easing.inOut } }} transition={confirmSpring}>
               <SheetButtons
                 cancelClass={styles.cacheCancel}
                 confirmClass={styles.cacheYes}

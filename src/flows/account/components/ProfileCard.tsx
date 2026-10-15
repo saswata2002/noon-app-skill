@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { Lottie, Pressable } from '../../../components';
 import { useIsNoonOneMember, useMembership, useMembershipEligibility } from '../../../kit/membership';
 import { currency } from '../../../data';
@@ -11,11 +12,11 @@ import { accountTokens } from '../tokens';
 import { EditRing } from './EditRing';
 import styles from '../account.module.css';
 
-/** NoonAccountNoonOne* SPRING_CONFIG { damping 14, stiffness 160, mass 0.8 } after withDelay; opacity withTiming 300ms */
+/** NoonAccountNoonOne* SPRING_CONFIG (now the Test01 spring) after withDelay; opacity fades in on the Test01 ease-out */
 const slide = (delay: number, x = -20) => ({
   initial: { x, opacity: 0 },
   animate: { x: 0, opacity: 1 },
-  transition: { x: { type: 'spring' as const, damping: 14, stiffness: 160, mass: 0.8, delay }, opacity: { duration: 0.3, delay } },
+  transition: { x: { ...handoff.spring, delay }, opacity: { duration: duration.medium, ease: easing.out, delay } },
 });
 
 /** Profile header card + noon One strip (NoonAccountProfileHeader / NoonAccountNoonOne). */

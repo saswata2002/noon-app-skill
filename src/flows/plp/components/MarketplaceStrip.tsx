@@ -2,6 +2,7 @@ import { animate, motion, useMotionValue } from 'motion/react';
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { MarketplaceTag, Pressable } from '../../../components';
 import { haptic } from '../../../motion/haptics';
+import { handoff } from '../../../motion/presets';
 import noonLogo from '@assets/plp/fulfillment/noon-wide-assortment.png';
 import { plpTokens } from '../tokens';
 import styles from '../plp.module.css';
@@ -55,8 +56,8 @@ export function MarketplaceStrip({ active, onSelect }: { active: MarketplaceId; 
       placed.current = true;
       return;
     }
-    // reanimated withTiming default: 200ms, Easing.inOut(Easing.quad)
-    const opts = { duration: reduce ? 0 : 0.2, ease: [0.455, 0.03, 0.515, 0.955] as const };
+    // the indicator moves on the Test01 spring (was reanimated withTiming default: 200ms, Easing.inOut(Easing.quad))
+    const opts = reduce ? { duration: 0 } : handoff.spring;
     animate(x, nextX, opts);
     animate(width, nextW, opts);
   }, [selected, x, width, reduce]);

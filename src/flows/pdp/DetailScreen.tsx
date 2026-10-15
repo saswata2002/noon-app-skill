@@ -80,19 +80,23 @@ export function DetailScreen({ params }: ScreenProps<{ productId: string; delive
   // First screen only (gallery, main info, bundle, sponsored row, delivery) mounts with the push; the ~20 sections below
   // the fold join in an idle slot once the slide has settled (mounting them all in the tap frame stalled ~200ms, so the
   // push's first visible frame was already half way in). Jumping to reviews mounts them at once.
-  const [full, setFull] = useState(false);
+  // two idle batches (the next ~6 cards, then the long tail and its rails), so neither mount is a long frame
+  const [stage, setStage] = useState(0);
+  const full = stage >= 2;
   useEffect(() => {
     if (full) return;
     let idle = 0;
+    const next = () => setStage((s) => Math.max(s, stage + 1));
     const t = window.setTimeout(() => {
-      idle = window.requestIdleCallback ? window.requestIdleCallback(() => setFull(true), { timeout: 400 }) : window.setTimeout(() => setFull(true), 16);
-    }, BELOW_FOLD_AFTER_MS);
+      idle = window.requestIdleCallback ? window.requestIdleCallback(next, { timeout: 400 }) : window.setTimeout(next, 16);
+    }, stage === 0 ? BELOW_FOLD_AFTER_MS : 0);
     return () => {
       window.clearTimeout(t);
       if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
       else window.clearTimeout(idle);
     };
-  }, [full]);
+  }, [stage, full]);
+  const setFull = (v: boolean) => v && setStage(2);
   const toReviews = () => {
     if (!full) setFull(true);
     requestAnimationFrame(() => reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
@@ -183,7 +187,7 @@ export function DetailScreen({ params }: ScreenProps<{ productId: string; delive
           <SfBundleCard product={product} content={content} />
           <SfSponsoredRow product={product} content={content} />
           <SfDeliveryCard content={content} variant={deliveryVariants.includes(params.delivery as DeliveryVariant) ? params.delivery : undefined} />
-          {full && (
+          {stage >= 1 && (
             <>
               <SfNewerModelCard product={product} />
               <SfFreeGifts items={freebiesFor(product)} />
@@ -216,6 +220,10 @@ export function DetailScreen({ params }: ScreenProps<{ productId: string; delive
               </div>
               <SfPaymentOffers content={content} />
               <SfTrustCard content={content} />
+            </>
+          )}
+          {full && (
+            <>
               <SfProductDetails content={content} product={product} onAccordionOpen={() => scrollBy(scrollRef.current, ACCORDION_SCROLL)} />
               <SfAdditionalInfo content={content} />
               <SfBestsellerRow content={content} />

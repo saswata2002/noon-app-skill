@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ProductImage } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
+import { duration, easing } from '../../../motion/presets';
 import { currency, formatPrice, type Product } from '../../../data';
 import addPlus from '@assets/cart/figma/add-plus-16.svg';
 import giftGreen from '@assets/cart/figma/gift-green.svg';
@@ -44,7 +45,7 @@ export function FreeGifts({ product, unlockAt, current }: { product: Product; un
                   <b>{`${currency}${formatPrice(left)}`}</b> {t.leftToUnlock}
                 </span>
                 <span className={styles.freebieTrack}>
-                  <motion.span className={styles.freebieFill} initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6 }} />
+                  <motion.span className={styles.freebieFill} initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: duration.slower, ease: easing.out }} />
                 </span>
               </div>
               <motion.button type="button" className={styles.addButton} whileTap={{ scale: 0.95 }} onClick={() => nav.push('plp/listing')}>

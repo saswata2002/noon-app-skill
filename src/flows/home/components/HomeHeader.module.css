@@ -45,4 +45,4 @@
 .wishlistButton { display: flex !important; align-items: center; justify-content: center; flex-shrink: 0; }
 
 /* search 1337:6727 at x15 y194, 343×48 (stretches on the 390 device) */
-.searchRow { padding: 0 16px 0 15px; } /* the address row's 12 bottom padding is the gap */
+.searchRow { padding: 0 16px; } /* the address row's 12 bottom padding is the gap; 16px insets like the search page and results bars, so the flying bar keeps its width */

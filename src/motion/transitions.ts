@@ -15,6 +15,8 @@ export interface ScreenTransition {
   /** applied to the screen below while this one is on top */
   under?: TargetAndTransition;
   transition: Transition;
+  /** the stack layer paints no page background while it uses this transition (the screen draws and fades its own) */
+  transparent?: boolean;
 }
 
 /** screen movement (push, modal): the Test01 spring (the recorded page push settles in ≈ 0.547s) */

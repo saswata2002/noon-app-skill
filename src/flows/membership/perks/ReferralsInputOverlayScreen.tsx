@@ -4,6 +4,7 @@ import { HtmlText } from '../../../components';
 import { ref } from '../../../foundations/tokens';
 import { useNav } from '../../../kit/Navigator';
 import { membershipManageActions } from '../../../kit/membership';
+import { handoff } from '../../../motion/presets';
 import closeModal from '@assets/membership/close-modal.webp';
 import otpInfo from '@assets/membership/otp-info.webp';
 import { icons } from '../assets';
@@ -22,7 +23,7 @@ type Params = { state?: string; preselectedIndex?: number; prefilledReferralCode
  * uppercase header, Bank offers / Voucher codes switcher (#0000003D track, white active pill, tabWidth 115), bank-offer
  * cards (325 wide) or the referral card (white r16 shadow2, -8 top) with code input → valid (#DFF1DA + check-circle) /
  * invalid (red border + cancellation-error) + message + optional info row; Continue enabled only for a valid code.
- * Container height animates minHeight (400 with switcher / 330) ↔ 500 (Animated.timing 250ms, delay 100, Easing.ease).
+ * Container height animates minHeight (400 with switcher / 330) ↔ 500 (Animated.timing 250ms, delay 100, Easing.ease; here the Test01 spring, same delays).
  */
 export function ReferralsInputOverlayScreen({ params }: { params: Params }) {
   useEnsureMembership(params.state);
@@ -41,8 +42,6 @@ export function ReferralsInputOverlayScreen({ params }: { params: Params }) {
   );
 }
 
-const ease = [0.25, 0.1, 0.25, 1] as const; // Easing.ease
-
 function ReferralsInputContent({ params }: { params: Params }) {
   const nav = useNav();
   const { close } = usePerkSheet();
@@ -60,7 +59,7 @@ function ReferralsInputContent({ params }: { params: Params }) {
   const anim = useMotionValue(selectedIndex === 0 ? 1 : 0);
   const height = useMotionValue(minHeight + anim.get() * (500 - minHeight));
   useEffect(() => anim.on('change', (v) => height.set(minHeight + v * (500 - minHeight))), [anim, height, minHeight]);
-  const animateTo = (to: number, duration = 250, delay = 100) => animate(anim, to, { duration: duration / 1000, delay: delay / 1000, ease });
+  const animateTo = (to: number, delay = 100) => animate(anim, to, { ...handoff.spring, delay: delay / 1000 });
 
   useEffect(() => {
     if (params.prefilledReferralCode) {
@@ -86,19 +85,19 @@ function ReferralsInputContent({ params }: { params: Params }) {
       setMessage(r.message);
       setInfo(r.info ?? '');
       setLoading(false);
-      if (r.info) animateTo(1, 250, 0);
+      if (r.info) animateTo(1, 0);
     }, 600);
   };
 
   const edit = () => {
-    if (info) animateTo(0, 250, 200);
+    if (info) animateTo(0, 200);
     setStatus(undefined);
     setMessage('');
     setInfo('');
     window.setTimeout(() => inputRef.current?.focus(), 0);
   };
   const clear = () => {
-    if (info) animateTo(0, 250, 100);
+    if (info) animateTo(0, 100);
     setStatus(undefined);
     setMessage('');
     setInfo('');
@@ -119,7 +118,7 @@ function ReferralsInputContent({ params }: { params: Params }) {
           <div className={styles.refTabs}>
             {[capitalize(t('vip_bank_offers')), capitalize(t('vip_voucher_code'))].map((label, i) => (
               <button key={label} type="button" className={styles.refTab} data-active={selectedIndex === i || undefined} onClick={() => switchTab(i)}>
-                {selectedIndex === i && <motion.span layoutId="mb-ref-tab" className={styles.refTabPill} transition={{ duration: 0.25 }} />}
+                {selectedIndex === i && <motion.span layoutId="mb-ref-tab" className={styles.refTabPill} transition={handoff.spring} />}
                 <span className={styles.refTabText}>{label}</span>
               </button>
             ))}

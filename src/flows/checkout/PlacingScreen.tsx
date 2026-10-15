@@ -4,7 +4,7 @@ import { Lottie } from '../../components';
 import { useDemoStore } from '../../kit/DemoStore';
 import { useNav } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
-import { easing } from '../../motion/presets';
+import { duration, easing, handoff } from '../../motion/presets';
 import { getPaymentFlowType, mockPaymentError, postOrderMessage, supportEmail, tp } from './data.postorder';
 import { useCheckout } from './store';
 import styles from './placing.module.css';
@@ -82,13 +82,13 @@ export function PlacingScreen({ params }: ScreenProps<PlacingParams>) {
   };
 
   return (
-    <motion.div className={styles.container} initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ duration: 0.4, ease: outCubic }}>
+    <motion.div className={styles.container} initial={{ y: '100%' }} animate={{ y: 0 }} transition={handoff.spring}>
       <div className={styles.animationContainer}>
         {showProcessing && (
           <motion.div
             className={styles.animationWrapper}
             animate={{ opacity: showTick ? 0 : 1 }}
-            transition={{ duration: 0.5, ease: inOutCubic }}
+            transition={{ duration: duration.slower, ease: inOutCubic }}
             onAnimationComplete={() => {
               if (!showTick) return;
               setShowProcessing(false);
@@ -100,13 +100,13 @@ export function PlacingScreen({ params }: ScreenProps<PlacingParams>) {
         )}
 
         {showTick && (
-          <motion.div className={styles.animationWrapper} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, ease: inOutCubic }}>
+          <motion.div className={styles.animationWrapper} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.slower, ease: inOutCubic }}>
             <Lottie name="orderConf" style={{ width: '100%', height: '100%' }} onComplete={onTickFinish} />
           </motion.div>
         )}
 
         {showTick ? (
-          <motion.div className={styles.tickTextContainer} initial={{ opacity: 0 }} animate={{ opacity: tickTextVisible ? 1 : 0 }} transition={{ duration: 0.25, ease: outCubic }}>
+          <motion.div className={styles.tickTextContainer} initial={{ opacity: 0 }} animate={{ opacity: tickTextVisible ? 1 : 0 }} transition={{ duration: duration.medium, ease: outCubic }}>
             <p className={`${styles.statusHeader} ${styles.reducedWidth}`}>{tp.noon_order_confirmation_title}</p>
           </motion.div>
         ) : (

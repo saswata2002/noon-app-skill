@@ -3,6 +3,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { HtmlText, MaskIcon, Spinner } from '../../../components';
 import { ref } from '../../../foundations/tokens';
 import { useNav } from '../../../kit/Navigator';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { icons } from '../assets';
 import { cardImage, t } from '../data';
 import { DashedLine, VipButton } from '../components/primitives';
@@ -124,7 +125,7 @@ export function SurveyPage({ data, reasons, onChange }: { data: SurveyData; reas
     onChange(selected, comment);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected, comment]);
-  const animateTo = (v: number) => animate(label, v, { duration: 0.2 });
+  const animateTo = (v: number) => animate(label, v, handoff.spring);
 
   return (
     <div className={styles.survey} onPointerDown={(e) => !(e.target as HTMLElement).closest('textarea') && inputRef.current?.blur()}>
@@ -142,7 +143,7 @@ export function SurveyPage({ data, reasons, onChange }: { data: SurveyData; reas
                 <span className={styles.optionText}>{r.text}</span>
                 <img src={on ? icons.radio2Checked : icons.radio2Unchecked} alt="" />
               </button>
-              <motion.div className={styles.commentsOuter} initial={false} animate={{ height: showComment ? 'auto' : 0, opacity: showComment ? 1 : 0 }} transition={{ duration: 0.3 }}>
+              <motion.div className={styles.commentsOuter} initial={false} animate={{ height: showComment ? 'auto' : 0, opacity: showComment ? 1 : 0 }} transition={{ height: handoff.spring, opacity: { duration: duration.medium, ease: showComment ? easing.out : easing.inOut } }}>
                 <div className={[styles.comments, error ? styles.commentsError : ''].join(' ')}>
                   <motion.span className={styles.commentsLabel} style={{ y: ly, x: lx, scale: ls }}>
                     {t('vip_membership_cancellation_comment_placeholder')}

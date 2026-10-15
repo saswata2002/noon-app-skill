@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { HtmlText, ProductImage, Spinner } from '../../../components';
 import { useDemoStore, type CartLine } from '../../../kit/DemoStore';
 import { useNav } from '../../../kit/Navigator';
+import { duration, easing, handoff } from '../../../motion/presets';
 import moveToWishlistIcon from '@assets/cart/move-to-wishlist.webp';
 import trashNew from '@assets/cart/trash-new.svg?raw';
 import copy from '@assets/cart/copy.svg?raw';
@@ -51,7 +52,7 @@ export function InactiveGroup({ onMovedToWishlist }: { onMovedToWishlist: (line:
           <div className={styles.items}>
             <AnimatePresence initial={false}>
               {inactiveCart.map((l, i) => (
-                <motion.div key={l.product.id} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }} style={{ overflow: 'hidden' }}>
+                <motion.div key={l.product.id} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0, transition: { ...handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } } }} transition={{ ...handoff.spring, opacity: { duration: duration.medium, ease: easing.out } }} style={{ overflow: 'hidden' }}>
                   {i > 0 && <div className={styles.separator} />}
                   <InactiveItem line={l} onMovedToWishlist={onMovedToWishlist} />
                 </motion.div>

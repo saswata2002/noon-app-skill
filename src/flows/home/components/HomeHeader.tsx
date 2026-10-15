@@ -1,7 +1,8 @@
 import { motion } from 'motion/react';
 import { Pressable, SearchBarButton } from '../../../components';
-import { useNav } from '../../../kit/Navigator';
-import { tween } from '../../../motion/presets';
+import { useIsTop, useNav } from '../../../kit/Navigator';
+import { openSearch } from '../../../kit/searchMorph';
+import { easing, tween } from '../../../motion/presets';
 import stars from '@assets/home/2025/header/stars.svg';
 import glow from '@assets/home/2025/header/bg-glow.svg';
 import swoosh from '@assets/home/2025/header/bg-swoosh.svg';
@@ -26,6 +27,7 @@ import styles from './HomeHeader.module.css';
  */
 export function HomeHeader({ collapsed }: { collapsed: boolean }) {
   const nav = useNav();
+  const isTop = useIsTop();
   const fold = tween('medium', 'out'); // bappzaar: react-native-collapsible 300ms easeOutCubic
   const { itemHeight, collapsedItemHeight, bottomMargin, topOffset, duration } = switcherMetrics;
   return (
@@ -33,7 +35,7 @@ export function HomeHeader({ collapsed }: { collapsed: boolean }) {
       className={styles.header}
       initial={false}
       animate={{ paddingTop: `calc(var(--nk-inset-top) + ${topOffset + (collapsed ? collapsedItemHeight : itemHeight) + bottomMargin}px)` }}
-      transition={{ duration, ease: [0.5, 1, 0.89, 1] }}
+      transition={{ duration, ease: easing.out }}
     >
       <div className={styles.decor} aria-hidden>
         <div className={styles.glowBox}>
@@ -77,7 +79,9 @@ export function HomeHeader({ collapsed }: { collapsed: boolean }) {
             icons={{ divider: dividerLine }}
             rotatingPrefix={searchPrefix}
             rotatingWords={searchBrands}
-            onPress={() => nav.push('search/search')}
+            onPress={(e) => openSearch(nav, e.currentTarget)}
+            // the word holds while another screen covers home (the search page carries the same shared words)
+            tickerActive={isTop}
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
 import { easing, fieldMotion, handoff } from '../../motion/presets';
 import { Pressable } from '../Pressable/Pressable';
 import { OriginIcon } from '../Icon/OriginIcon';
@@ -10,6 +10,66 @@ import backIcon from '@assets/shared/search-bar/back.webp';
 import clearIcon from '@assets/shared/search-bar/clear-input.webp';
 import { field, searchBar as t } from '../../foundations/tokens';
 import styles from './SearchBar.module.css';
+
+/**
+ * The rotating hint ("Search for “<word>”") is one shared value per word list: every bar showing that list shows the
+ * same word (the home bar and the search page's field after the bar flies into it, src/kit/searchMorph.ts), and it
+ * holds still while `holdSearchHints(true)` is on (a bar in flight); the next word comes a full interval after release.
+ */
+const HINT_INTERVAL = 2200;
+const hintIndex = new Map<string, number>();
+let hintHold = false;
+const hintSubs = new Set<() => void>();
+const hintSubscribe = (f: () => void) => {
+  hintSubs.add(f);
+  return () => hintSubs.delete(f);
+};
+const hintEmit = () => hintSubs.forEach((f) => f());
+/** freeze every rotating search hint (on while a search bar flies between screens) */
+export function holdSearchHints(on: boolean) {
+  if (hintHold === on) return;
+  hintHold = on;
+  hintEmit();
+}
+/** the current word of a shared rotating hint; `active` bars advance it every HINT_INTERVAL unless held */
+function useHintIndex(words: readonly string[] | undefined, active: boolean): number {
+  const key = words?.join('\u0001') ?? '';
+  const i = useSyncExternalStore(hintSubscribe, () => hintIndex.get(key) ?? 0);
+  const held = useSyncExternalStore(hintSubscribe, () => hintHold);
+  const n = words?.length ?? 0;
+  useEffect(() => {
+    if (n < 2 || !active || held) return;
+    const t = window.setTimeout(() => {
+      hintIndex.set(key, ((hintIndex.get(key) ?? 0) + 1) % n);
+      hintEmit();
+    }, HINT_INTERVAL);
+    return () => window.clearTimeout(t);
+  }, [key, n, i, active, held]);
+  return n ? i % n : 0;
+}
+
+/** "<prefix> <word>" with the word on the vertical ticker (ease-out-back) */
+function HintTicker({ prefix, words, index }: { prefix?: string; words: readonly string[]; index: number }) {
+  return (
+    <>
+      {prefix ? <>{prefix}&nbsp;</> : null}
+      <span className={styles.ticker}>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={index}
+            className={styles.word}
+            initial={{ y: t.tickerHeight, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -t.tickerHeight, opacity: 0 }}
+            transition={{ duration: 0.45, ease: easing.backOut }}
+          >
+            {words[index]}
+          </motion.span>
+        </AnimatePresence>
+      </span>
+    </>
+  );
+}
 
 /**
  * Home search pill (NoonSearchBarButton): 52h, r12, 1px #D7DAE3, 20px search-bar.webp, 24px search-bar-camera.webp.
@@ -28,8 +88,10 @@ export function SearchBarButton({
   height = t.height,
   variant = 'default',
   icons,
+  tickerActive = true,
 }: {
-  onPress?: () => void;
+  /** gets the click, so a caller can hand the bar element on (`openSearch(nav, e.currentTarget)` morphs it into the search page) */
+  onPress?: (e: MouseEvent<HTMLElement>) => void;
   placeholder?: string;
   rotatingWords?: string[];
   rotatingPrefix?: string;
@@ -37,45 +99,30 @@ export function SearchBarButton({
   height?: number;
   variant?: 'default' | '2025';
   icons?: { search?: string; camera?: string; divider?: string };
+  /** advance the rotating words (pass false while the bar's screen is covered, e.g. `useIsTop()`) */
+  tickerActive?: boolean;
 }) {
   const v2025 = variant === '2025';
   // NoonSearchBarButton: 20 × 20 search-bar.webp, 24 × 24 search-bar-camera.webp. The 2025 variant keeps those
   // sizes when it shows the bappzaar artwork; Figma artwork passed through `icons` renders at the Figma 18 / 20.
   const iconSize = v2025 && icons?.search ? 18 : t.iconSize;
   const cameraSize = v2025 && icons?.camera ? 20 : t.cameraSize;
-  const [i, setI] = useState(0);
-  useEffect(() => {
-    if (!rotatingWords?.length) return;
-    const t = setInterval(() => setI((x) => (x + 1) % rotatingWords.length), 2200);
-    return () => clearInterval(t);
-  }, [rotatingWords]);
+  const i = useHintIndex(rotatingWords, tickerActive);
 
   return (
-    <Pressable className={`${styles.bar}${v2025 ? ` ${styles.v2025}` : ''}`} style={{ height }} onClick={onPress} scale={t.pressScale}>
+    <Pressable
+      className={`${styles.bar}${v2025 ? ` ${styles.v2025}` : ''}`}
+      style={{ height }}
+      onClick={onPress}
+      scale={t.pressScale}
+      // what the bar shows, for a search page it flies into (src/kit/searchMorph.ts)
+      data-hint-prefix={rotatingWords?.length ? rotatingPrefix : ''}
+      data-hint-words={JSON.stringify(rotatingWords?.length ? rotatingWords : [placeholder])}
+    >
       <span className={styles.lead}>
       <img src={icons?.search ?? searchIcon} alt="" width={iconSize} height={iconSize} />
       <span className={styles.placeholder}>
-        {rotatingWords?.length ? (
-          <>
-            {rotatingPrefix}&nbsp;
-            <span className={styles.ticker}>
-              <AnimatePresence mode="popLayout" initial={false}>
-                <motion.span
-                  key={i}
-                  className={styles.word}
-                  initial={{ y: t.tickerHeight, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -t.tickerHeight, opacity: 0 }}
-                  transition={{ duration: 0.45, ease: easing.backOut }}
-                >
-                  {rotatingWords[i]}
-                </motion.span>
-              </AnimatePresence>
-            </span>
-          </>
-        ) : (
-          placeholder
-        )}
+        {rotatingWords?.length ? <HintTicker prefix={rotatingPrefix} words={rotatingWords} index={i} /> : placeholder}
       </span>
       </span>
       {camera && (
@@ -115,6 +162,13 @@ export interface SearchInputProps {
    * shows, so the PLP's identical bar takes over without the icon popping. Default look only.
    */
   committed?: boolean;
+  /**
+   * Default look: a rotating hint in place of `placeholder` while the field is empty — the same shared words as the
+   * SearchBarButton it came from (`SearchBarButton` `rotatingWords`), drawn in its type (`--nk-search-hint-*`).
+   */
+  hint?: { prefix?: string; words: readonly string[] };
+  /** advance the hint's words (default true) */
+  hintActive?: boolean;
   /** `field`: Field DS M-SearchBar look (opt-in); `default` (NoonSearchScreen) is unchanged */
   variant?: 'default' | 'field';
   /** field variant: `H48` (padding 12, 24 icons, B14 Medium, default) · `H44` (padding 10 / 12, 20 icons, B12 Medium) */
@@ -183,8 +237,12 @@ function KitSearchInput({
   onFieldPress,
   fill,
   committed,
+  hint,
+  hintActive = true,
 }: SearchInputProps) {
   const filling = useFill(value, fill);
+  const hintAt = useHintIndex(hint?.words, hintActive && !value);
+  const hintText = hint ? `${hint.prefix ? `${hint.prefix} ` : ''}${hint.words[hintAt] ?? ''}` : undefined;
   const showClear = !!value && !onFieldPress && !committed;
   return (
     <div className={`${styles.bar} ${styles.input}`}>
@@ -198,7 +256,8 @@ function KitSearchInput({
         <input
           className={styles.field}
           value={value}
-          placeholder={placeholder}
+          placeholder={hint ? '' : placeholder}
+          aria-label={hintText}
           autoFocus={autoFocus}
           readOnly={!!onFieldPress}
           onClick={onFieldPress}
@@ -207,6 +266,11 @@ function KitSearchInput({
           style={filling ? { color: 'transparent' } : undefined}
         />
         {filling && fill && <FillCopy value={value} fill={fill} />}
+        {hint && !value && (
+          <span className={styles.hintOverlay} aria-hidden>
+            <HintTicker prefix={hint.prefix} words={hint.words} index={hintAt} />
+          </span>
+        )}
       </span>
       {/* clear (x) ⇄ camera share one end-aligned slot and crossfade, so swapping them never moves either */}
       <span className={styles.trail}>

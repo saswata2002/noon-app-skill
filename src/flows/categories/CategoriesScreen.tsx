@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Screen, SearchBarButton } from '../../components';
 import { useNav, useParams, usePageLoader } from '../../kit/Navigator';
+import { openSearch } from '../../kit/searchMorph';
 import { AdBannerModule } from './components/AdBannerModule';
 import { CollapsibleBannerModule } from './components/CollapsibleBannerModule';
 import { ErrorView } from './components/ErrorView';
@@ -61,7 +62,7 @@ export function CategoriesScreen() {
 
   const header = (
     <div className={styles.searchBarContainer}>
-      <SearchBarButton placeholder={copy.searchPlaceholder} onPress={() => nav.push('search/search')} />
+      <SearchBarButton placeholder={copy.searchPlaceholder} onPress={(e) => openSearch(nav, e.currentTarget)} />
     </div>
   );
 

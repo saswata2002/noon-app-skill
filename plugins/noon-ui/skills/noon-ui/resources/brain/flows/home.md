@@ -21,17 +21,17 @@
 
 ## `home/home`
 
-- Module `src/flows/home/HomeScreen.tsx` · 34 own files, 83 in the import closure
+- Module `src/flows/home/HomeScreen.tsx` · 34 own files, 84 in the import closure
 - Source: bappzaar master ba159e20: NoonHomeScreen → NoonHomeToggleContent → Module/ModuleRenderer (live app home CMS payload order); header Figma iRE9RwO94eMAyW3j3XKNXW · 1337:5102 except the ExperienceSwitcher (useExperienceSwi…
 - Styles: components/AdProductLedDisplay.module.css, components/BannerModules.module.css, components/BzModuleWrapper.module.css, components/EidBanners.module.css, components/HomeHeader.module.css, components/ItemCarousel.module.css, components/MegaDeals.module.css, components/ProductCarousel.module.css, home.module.css, home2025.module.css
 - Data / helpers: data.eid.ts, data.feed.ts, data.header.ts, data.ts, tokens.eid.ts, tokens.feed.ts, tokens.header.ts, tokens.modules.ts, tokens.rails.ts, tokens.tabs.ts, tokens.ts
 - Shared components: `Badge`, `OriginIcon`, `Pressable`, `ProductCard`, `ProductImage`, `QuickAdd`, `Screen`, `SearchBarButton`, `Text`
 - Flow components: `AdBannerModule`, `AdProductLedDisplay`, `BannerCarousel`, `BannerScroller`, `BzModuleWrapper`, `EasyBannerScroller`, `EidBanners`, `ExperienceSwitcher`, `HomeHeader`, `ItemCarousel`, `MegaDeals`, `ProductCarousel`, `SnappedBannerCarousel`, `Sponsored`
 - Tokens (86): colors 11 · flow:home 34 · local 1 · palette 18 · radius 7 · spacing 8 · type 7
-- Motion: `preset/appleSpring`, `preset/easing.out`, `preset/tween`, `recipe/Stagger`, `reduced-motion`
+- Motion: `preset/appleSpring`, `preset/duration.medium`, `preset/easing.ios`, `preset/easing.out`, `preset/tween`, `recipe/Stagger`, `reduced-motion`
 - Icons: `arrow-right`, `hourglass` · assets 47
 - State / data: `data:currency`, `data:formatPrice`, `data:getProduct`, `data:user`
-- Nav out: push `address/selectSheet` · push `pdp/detail` (via ProductCard) · sheet `pdp/variants` (via ProductCard) · push `plp/listing` · push `search/search` · push `wishlist/wishlist`
+- Nav out: push `address/selectSheet` · push `pdp/detail` (via ProductCard) · sheet `pdp/variants` (via ProductCard) · push `plp/listing` · push `search/search` (via searchMorph) · push `wishlist/wishlist`
 - `home`: tests `test:journey/back-direct-url`, `test:journey/back-from-pushed`, `test:journey/cart-add-from-card`, `test:journey/checkout-slide-to-pay`, `test:journey/home-address-sheet`, `test:journey/tab-bar-switching`, `test:journey/wishlist-toggle` · docs `resources/flows/home.md:5-16`, `resources/flows/home.md:32-50`, `resources/flows/home.md:51-63`, `../home-page/spec.md:8-15`, `../home-page/spec.md:27-50`, `../home-page/spec.md:51-70`, `../home-page/spec.md:84-89`, `../home-page/spec.md:100-111`, `src/flows/home/FIGMA-MAPPING.md:96-145`, `resources/flows/checkout.md:58-69`, `../checkout/spec.md:171-183`
 
 ## `home/classic`

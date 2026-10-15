@@ -49,7 +49,7 @@ export function NotificationsSheet() {
   const tabIndex = languages.findIndex((l) => l.id === lang);
 
   return (
-    <SheetBody>
+    <SheetBody className="nk-content-in">
       <div className={styles.notifScroll}>
         <AccountSection dash="2,2" className={styles.notifCard}>
           <div className={styles.notifHeader}>

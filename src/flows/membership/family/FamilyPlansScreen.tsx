@@ -14,12 +14,13 @@ import { FaqGroup, FamilyBenefits, FamilySection, PlanMembers, ScrollEnter, Step
 import { familyPlansError, familyPlansTouchpoint, type FamilyPlanOption } from './familyData';
 import styles from './family.module.css';
 import { useReduceMotion } from '../../../motion/reducedMotion';
+import { duration, easing, spring } from '../../../motion/presets';
 
 /** constants.ts: header Lottie (60fps) FAMILY_TO_DUO_END_FRAME = 1350ms, DUO_TO_FAMILY_END_FRAME = 2683ms */
 const FAMILY_TO_DUO_END_FRAME = Math.round(1.35 * 60);
 const DUO_TO_FAMILY_END_FRAME = Math.round(2.683 * 60);
-/** PLAN_SELECTION_SPRING { damping: 12, stiffness: 107 } */
-const selectionSpring = { type: 'spring', damping: 12, stiffness: 107, mass: 1 } as const;
+/** PLAN_SELECTION_SPRING { damping: 12, stiffness: 107 } (ζ 0.58, a bounce) → the kit's bouncy spring */
+const selectionSpring = spring.bouncy;
 /** skeleton while getVIPTouchpoints('familyPlans') loads */
 const LOAD_MS = 600;
 
@@ -172,7 +173,7 @@ export function FamilyPlansScreen({ params }: { params: { state?: string } }) {
       header={
         <div className={styles.header}>
           <span className={styles.headerBg} style={{ opacity: headerOpacity }} />
-          <motion.div className={styles.headerRow} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
+          <motion.div className={styles.headerRow} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.medium, ease: easing.out }}>
             <VipBackButton onPress={back} />
             <span className={styles.headerTitle} style={{ opacity: headerOpacity }}>
               <HtmlText value={t('vip_try_family_for_free')} stylesheet={{ highlight: { color: ref.color('success') } }} />

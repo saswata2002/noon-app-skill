@@ -672,13 +672,13 @@ Variants:
 
 ### SearchBarButton
 
-`src/components/SearchBar/SearchBar.tsx:22`
+`src/components/SearchBar/SearchBar.tsx:82`
 
 Home search pill (NoonSearchBarButton): 52h, r12, 1px #D7DAE3, 20px search-bar.webp, 24px search-bar-camera.webp. `rotatingWords` reproduces the "Search <word>" vertical ticker (30px rows, ease-out-back); `rotatingPrefix` changes "Search". `variant="2025"` (opt-in, Homepage Revamp 2025, Figma iRE9RwO94eMAyW3j3XKNXW · 1337:6727): lighter 1px gray400 border, 15/18 Medium placeholder in textProduct, 18 search icon 4 from the text, 12 gaps to a 24 divider and a 20 camera. Pass the Figma artwork through `icons` (search / camera / divider); defaults are unchanged.
 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
-| `onPress?` | `() => void` | — |  |
+| `onPress?` | `(e: MouseEvent<HTMLElement>) => void` | — | gets the click, so a caller can hand the bar element on (`openSearch(nav, e.currentTarget)` morphs it into the search page) |
 | `placeholder?` | `string` | `'What are you looking for?'` |  |
 | `rotatingWords?` | `string[]` | — |  |
 | `rotatingPrefix?` | `string` | `'Search'` |  |
@@ -686,13 +686,14 @@ Home search pill (NoonSearchBarButton): 52h, r12, 1px #D7DAE3, 20px search-bar.w
 | `height?` | `number` | `t.height` |  |
 | `variant?` | `'default' \| '2025'` | `'default'` |  |
 | `icons?` | `{ search?: string; camera?: string; divider?: string }` | — |  |
+| `tickerActive?` | `boolean` | `true` | advance the rotating words (pass false while the bar's screen is covered, e.g. `useIsTop()`) |
 
 Variants:
 - `variant`: `2025` · `default`
 
 ### SearchInput
 
-`src/components/SearchBar/SearchBar.tsx:171` · props `SearchInputProps`
+`src/components/SearchBar/SearchBar.tsx:225` · props `SearchInputProps`
 
 Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `variant="field"` (opt-in): Field DS M-SearchBar (`@field-ds/components` SearchBar/SearchBar.tsx, Figma 892:244) — H48 (padding 12, 24px icons, B14 Medium) or H44 (padding 10 / 12, 20px icons, B12 Medium), surfacePrimary, 1px borderSubtle, r12, gap 8, optional Sm `elevation`, Origin `search` icon (Field tertiary → primary once focused or typed), `iconRight` + `iconRightTwo` after a 1 × 24 divider, auto clear (x) while typing, placeholder Field textPrimary at rest / textTertiary focused, press scale .98 over 160ms. `fill`, `onFieldPress`, `onBack`, `onSubmit` work in both looks.
 
@@ -708,6 +709,8 @@ Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `
 | `onFieldPress?` | `() => void` | — |  |
 | `fill?` | `{ from: number; key: number }` | — |  |
 | `committed?` | `boolean` | — | The query is being submitted (a suggestion was picked): the clear (x) crossfades into the camera the results bar shows, so the PLP's identical bar takes over without the icon popping. Default look only. |
+| `hint?` | `{ prefix?: string; words: readonly string[] }` | — | Default look: a rotating hint in place of `placeholder` while the field is empty — the same shared words as the SearchBarButton it came from (`SearchBarButton` `rotatingWords`), drawn in its type (`--nk-search-hint-*`). |
+| `hintActive?` | `boolean` | — | advance the hint's words (default true) |
 | `variant?` | `'default' \| 'field'` | — | `field`: Field DS M-SearchBar look (opt-in); `default` (NoonSearchScreen) is unchanged |
 | `fieldSize?` | `'H48' \| 'H44'` | — | field variant: `H48` (padding 12, 24 icons, B14 Medium, default) · `H44` (padding 10 / 12, 20 icons, B12 Medium) |
 | `elevation?` | `boolean` | — | field variant: Sm elevation shadow |
@@ -1159,7 +1162,7 @@ Search these before you create a component (`components.md` → "Search before y
 | account | `LanguageSwitcher` | `src/flows/account/components/MenuGroup.tsx:39` | — |
 | account | `LanguageRow` | `src/flows/account/components/MenuGroup.tsx:71` | — |
 | account | `CountryRow` | `src/flows/account/components/MenuGroup.tsx:76` | — |
-| account | `ProfileCard` | `src/flows/account/components/ProfileCard.tsx:22` | `noonOne` |
+| account | `ProfileCard` | `src/flows/account/components/ProfileCard.tsx:23` | `noonOne` |
 | address | `StreetMap` | `src/flows/address/components/StreetMap.tsx:38` | `highlightPlaceId` `highlightKey` |
 | address | `AddressDetailsForm` | `src/flows/address/components/form.tsx:148` | `initialValues` `placeName` `area` `onClose` `onChangeLocation` `onSubmit` `startExpandedCustomer` |
 | address | `MapPin` | `src/flows/address/components/map.tsx:15` | `title` `isError` `isWarning` `isMapDragging` `pinScale` |
@@ -1190,19 +1193,19 @@ Search these before you create a component (`components.md` → "Search before y
 | address | `SearchResultsCard` | `src/flows/address/components/select.tsx:275` | `results` `onPress` `style` |
 | cards | `CardActionsOverlay` | `src/flows/cards/components/ActionsOverlay.tsx:79` | `card` `open` `onRequestClose` `onClosed` `onSetDefault` `onDelete` `onRename` `initialAction` |
 | cards | `AnimatedListCard` | `src/flows/cards/components/AnimatedListCard.tsx:59` | `card` `index` `isInFirstSection` `isLastInSection` `firstSectionCount` `activeId` `selection` `overScroll` `topStackVisible` `isLoading` `onLoad` `onSelect` |
-| cards | `SectionTitle` | `src/flows/cards/components/Bits.tsx:10` | `children` `style` |
-| cards | `CardTypeLogo` | `src/flows/cards/components/Bits.tsx:22` | `cardNumber` |
-| cards | `CardBrands` | `src/flows/cards/components/Bits.tsx:41` | `compact` `className` |
-| cards | `ScanCardIcon` | `src/flows/cards/components/Bits.tsx:56` | `size` |
-| cards | `TapCardIcon` | `src/flows/cards/components/Bits.tsx:81` | `size` |
-| cards | `AdditionOption` | `src/flows/cards/components/Bits.tsx:112` | `icon` `title` `subtitle` `onPress` `disabled` |
-| cards | `ScanOptionButton` | `src/flows/cards/components/Bits.tsx:130` | `icon` `title` `onPress` `disabled` |
-| cards | `EnterManuallyField` | `src/flows/cards/components/Bits.tsx:140` | `text` |
-| cards | `LockNote` | `src/flows/cards/components/Bits.tsx:149` | `text` `variant` |
-| cards | `EmptyCards` | `src/flows/cards/components/EmptyCards.tsx:8` | `onBack` `onAddCard` |
-| cards | `PaymentTextInputV2` | `src/flows/cards/components/Form.tsx:24` | `label` `value` `error` `onChangeText` `renderAfter` |
-| cards | `PaymentSwitchV2` | `src/flows/cards/components/Form.tsx:70` | `label` `value` `onChange` |
-| cards | `PaymentCardFormV2` | `src/flows/cards/components/Form.tsx:120` | `isAdditionLoading` `onSubmit` `defaultIsDefault` |
+| cards | `SectionTitle` | `src/flows/cards/components/Bits.tsx:11` | `children` `style` |
+| cards | `CardTypeLogo` | `src/flows/cards/components/Bits.tsx:23` | `cardNumber` |
+| cards | `CardBrands` | `src/flows/cards/components/Bits.tsx:42` | `compact` `className` |
+| cards | `ScanCardIcon` | `src/flows/cards/components/Bits.tsx:57` | `size` |
+| cards | `TapCardIcon` | `src/flows/cards/components/Bits.tsx:82` | `size` |
+| cards | `AdditionOption` | `src/flows/cards/components/Bits.tsx:113` | `icon` `title` `subtitle` `onPress` `disabled` |
+| cards | `ScanOptionButton` | `src/flows/cards/components/Bits.tsx:131` | `icon` `title` `onPress` `disabled` |
+| cards | `EnterManuallyField` | `src/flows/cards/components/Bits.tsx:141` | `text` |
+| cards | `LockNote` | `src/flows/cards/components/Bits.tsx:150` | `text` `variant` |
+| cards | `EmptyCards` | `src/flows/cards/components/EmptyCards.tsx:9` | `onBack` `onAddCard` |
+| cards | `PaymentTextInputV2` | `src/flows/cards/components/Form.tsx:25` | `label` `value` `error` `onChangeText` `renderAfter` |
+| cards | `PaymentSwitchV2` | `src/flows/cards/components/Form.tsx:71` | `label` `value` `onChange` |
+| cards | `PaymentCardFormV2` | `src/flows/cards/components/Form.tsx:121` | `isAdditionLoading` `onSubmit` `defaultIsDefault` |
 | cards | `PaymentScreenHeader` | `src/flows/cards/components/Headers.tsx:14` | `onBack` `transparent` `children` `action` |
 | cards | `PaymentScrollableHeader` | `src/flows/cards/components/Headers.tsx:71` | `onBack` `action` `scrollY` |
 | cards | `PaymentCard` | `src/flows/cards/components/PaymentCard.tsx:7` | `card` `isLoading` `onLoad` |
@@ -1211,26 +1214,26 @@ Search these before you create a component (`components.md` → "Search before y
 | cards | `HeaderButton` | `src/flows/cards/components/primitives.tsx:50` | `icon` `onPress` `transparent` `reversed` `label` |
 | cards | `AdditionContainer` | `src/flows/cards/components/primitives.tsx:59` | `title` `className` `children` |
 | cart | `CartCarousel` | `src/flows/cart/components/CartCarousel.tsx:16` | `title` `sponsored` `items` |
-| cart | `CartFooter` | `src/flows/cart/components/CartFooter.tsx:25` | `totals` `cart` `isTabRoot` `disabled` `onCheckout` `onHeightChange` |
-| cart | `CartGlassFooter` | `src/flows/cart/components/CartGlassFooter.tsx:32` | `totals` `cart` `disabled` `onCheckout` `onHeightChange` |
-| cart | `CartGroup` | `src/flows/cart/components/CartGroup.tsx:35` | `type` `lines` `subtotal` `onMovedToWishlist` |
+| cart | `CartFooter` | `src/flows/cart/components/CartFooter.tsx:26` | `totals` `cart` `isTabRoot` `disabled` `onCheckout` `onHeightChange` |
+| cart | `CartGlassFooter` | `src/flows/cart/components/CartGlassFooter.tsx:31` | `totals` `cart` `disabled` `onCheckout` `onHeightChange` |
+| cart | `CartGroup` | `src/flows/cart/components/CartGroup.tsx:36` | `type` `lines` `subtotal` `onMovedToWishlist` |
 | cart | `CartHeader` | `src/flows/cart/components/CartHeader.tsx:17` | `scrollY` `hidden` `showBackButton` |
 | cart | `CartIcon` | `src/flows/cart/components/CartIcon.tsx:19` | `name` `size` `color` `style` `flipRtl` |
-| cart | `CartItem` | `src/flows/cart/components/CartItem.tsx:43` | `line` `group` `onMovedToWishlist` `onRemoveStart` |
-| cart | `CartSnackBar` | `src/flows/cart/components/CartSnackBar.tsx:11` | `product` `onHide` `onPress` |
+| cart | `CartItem` | `src/flows/cart/components/CartItem.tsx:44` | `line` `group` `onMovedToWishlist` `onRemoveStart` |
+| cart | `CartSnackBar` | `src/flows/cart/components/CartSnackBar.tsx:12` | `product` `onHide` `onPress` |
 | cart | `CartWave` | `src/flows/cart/components/CartWave.tsx:2` | `color` `height` `className` `style` |
 | cart | `CobrandCards` | `src/flows/cart/components/CobrandCards.tsx:11` | `cards` |
 | cart | `CouponInput` | `src/flows/cart/components/CouponInput.tsx:19` | `onBusyChange` |
 | cart | `DiscountTags` | `src/flows/cart/components/DiscountTags.tsx:11` | `tags` `onOpen` |
-| cart | `DynamicInvoice` | `src/flows/cart/components/DynamicInvoice.tsx:12` | `sections` `part` |
-| cart | `FreeGifts` | `src/flows/cart/components/FreeGifts.tsx:17` | `product` `unlockAt` `current` |
-| cart | `GroupProgressBar` | `src/flows/cart/components/GroupProgressBar.tsx:21` | `message` `current` `threshold` `shouldHide` `showButton` `onAdd` `animateIn` `trackColor` `fillColor` `addVariant` `addBorder` `addInk` |
-| cart | `InactiveGroup` | `src/flows/cart/components/InactiveGroup.tsx:23` | `onMovedToWishlist` |
+| cart | `DynamicInvoice` | `src/flows/cart/components/DynamicInvoice.tsx:13` | `sections` `part` |
+| cart | `FreeGifts` | `src/flows/cart/components/FreeGifts.tsx:18` | `product` `unlockAt` `current` |
+| cart | `GroupProgressBar` | `src/flows/cart/components/GroupProgressBar.tsx:22` | `message` `current` `threshold` `shouldHide` `showButton` `onAdd` `animateIn` `trackColor` `fillColor` `addVariant` `addBorder` `addInk` |
+| cart | `InactiveGroup` | `src/flows/cart/components/InactiveGroup.tsx:24` | `onMovedToWishlist` |
 | cart | `ItemPoint` | `src/flows/cart/components/ItemPoint.tsx:26` | `kind` `label` |
 | cart | `NoonOneLogo` | `src/flows/cart/components/NoonOneLogo.tsx:6` | — |
 | cart | `NoonOneNudge` | `src/flows/cart/components/NoonOneNudge.tsx:12` | `className` |
 | cart | `PaymentOffers` | `src/flows/cart/components/PaymentOffers.tsx:15` | `entries` |
-| cart | `QuantitySelector` | `src/flows/cart/components/QuantitySelector.tsx:15` | `qty` `min` `max` `disabled` `removeLoading` `onCommit` `onRemove` `onPendingChange` |
+| cart | `QuantitySelector` | `src/flows/cart/components/QuantitySelector.tsx:16` | `qty` `min` `max` `disabled` `removeLoading` `onCommit` `onRemove` `onPendingChange` |
 | cart | `SalesCallout` | `src/flows/cart/components/SalesCallout.tsx:13` | `entry` `sheet` `onAction` `lines` `className` `style` `wrapperStyle` `iconSize` `iconRender` `children` |
 | cart | `VariantOptionChip` | `src/flows/cart/components/VariantOptionChip.tsx:6` | `name` `product` `swatch` `isSelected` `isDisabled` `isFirst` `isLast` `onSelect` |
 | cart | `BestPriceSection` | `src/flows/cart/components/couponTray/BestPriceSection.tsx:17` | `bestPrice` `shared` `activeId` `onApply` `onRemove` |
@@ -1243,37 +1246,37 @@ Search these before you create a component (`components.md` → "Search before y
 | categories | `ErrorView` | `src/flows/categories/components/ErrorView.tsx:10` | `onRetry` |
 | categories | `ProgressLoader` | `src/flows/categories/components/ProgressLoader.tsx:10` | — |
 | checkout | `AddressCard` | `src/flows/checkout/components/AddressCard.tsx:11` | `address` `onPress` |
-| checkout | `NewBadge` | `src/flows/checkout/components/BurnSection.tsx:45` | `className` |
-| checkout | `BurnSection` | `src/flows/checkout/components/BurnSection.tsx:85` | — |
+| checkout | `NewBadge` | `src/flows/checkout/components/BurnSection.tsx:46` | `className` |
+| checkout | `BurnSection` | `src/flows/checkout/components/BurnSection.tsx:86` | — |
 | checkout | `ChevronThick` | `src/flows/checkout/components/CheckoutHeader.tsx:13` | `color` `stroke` `size` |
 | checkout | `CheckoutHeader` | `src/flows/checkout/components/CheckoutHeader.tsx:37` | `address` `scrollY` `onBack` `onAddressPress` `title` |
 | checkout | `CheckoutShipment` | `src/flows/checkout/components/CheckoutShipment.tsx:120` | `shipment` `index` `selected` |
 | checkout | `CheckoutTag` | `src/flows/checkout/components/CheckoutTag.tsx:15` | `tag` |
-| checkout | `CouponStatus` | `src/flows/checkout/components/CouponStatus.tsx:25` | — |
+| checkout | `CouponStatus` | `src/flows/checkout/components/CouponStatus.tsx:26` | — |
 | checkout | `DeliveryInstruction` | `src/flows/checkout/components/DeliveryInstruction.tsx:28` | — |
 | checkout | `ItemContainer` | `src/flows/checkout/components/DeliveryPrimitives.tsx:5` | `title` `rightHeader` `children` `className` |
 | checkout | `InfoIcon` | `src/flows/checkout/components/DeliveryPrimitives.tsx:18` | — |
 | checkout | `DetachedAddress` | `src/flows/checkout/components/DetachedAddress.tsx:11` | `address` `onPress` |
 | checkout | `Donation` | `src/flows/checkout/components/Donation.tsx:22` | — |
-| checkout | `DynamicInvoice` | `src/flows/checkout/components/DynamicInvoice.tsx:44` | `sections` |
+| checkout | `DynamicInvoice` | `src/flows/checkout/components/DynamicInvoice.tsx:53` | `sections` |
 | checkout | `EarnCallout` | `src/flows/checkout/components/EarnCallout.tsx:16` | — |
 | checkout | `NoonOneCtaReveal` | `src/flows/checkout/components/NoonOneCtaReveal.tsx:131` | `card` `cta` `animation` `onDone` |
 | checkout | `NoonOneSection` | `src/flows/checkout/components/NoonOneSection.tsx:65` | `variant` |
 | checkout | `PaymentCard` | `src/flows/checkout/components/PaymentCard.tsx:20` | `card` `showCVV` `isDisabled` `cvv` `onUpdateCvv` `isLargeIcon` `message` `cvvInputRef` `onCvvInputPress` |
 | checkout | `PaymentMethods` | `src/flows/checkout/components/PaymentMethods.tsx:51` | `cvvInputRef` |
-| checkout | `PaymentSummary` | `src/flows/checkout/components/PaymentSummary.tsx:50` | `totals` `coupon` `flush` |
+| checkout | `PaymentSummary` | `src/flows/checkout/components/PaymentSummary.tsx:51` | `totals` `coupon` `flush` |
 | checkout | `PointsVouchers` | `src/flows/checkout/components/PointsVouchers.tsx:63` | — |
-| checkout | `DynamicBackground` | `src/flows/checkout/components/ProviderForm.tsx:17` | `colors` `angle` `className` `style` `children` |
-| checkout | `ProviderHeader` | `src/flows/checkout/components/ProviderForm.tsx:28` | `header` `onCtaPress` |
-| checkout | `FormTitle` | `src/flows/checkout/components/ProviderForm.tsx:45` | `title` `logo` `color` `isVouchersProvider` |
-| checkout | `FormFields` | `src/flows/checkout/components/ProviderForm.tsx:79` | `values` `onChange` `error` `disabled` `page` `color` |
-| checkout | `SubmitButton` | `src/flows/checkout/components/ProviderForm.tsx:148` | `text` `bg` `textColor` `disabled` `loading` `onPress` `minHeight` `inset` |
-| checkout | `AmountTicket` | `src/flows/checkout/components/ProviderForm.tsx:168` | `logo` `amount` `currency` `voucherCode` `onEdit` `notchColor` `color` |
-| checkout | `AmountEntry` | `src/flows/checkout/components/ProviderForm.tsx:193` | `amount` `setAmount` `currency` `disabled` `color` `min` `max` `isOutOfRange` |
-| checkout | `AvailableBalance` | `src/flows/checkout/components/ProviderForm.tsx:222` | `checked` `onToggle` `providerName` `balance` `disabled` |
-| checkout | `VerifyOtp` | `src/flows/checkout/components/ProviderForm.tsx:233` | `value` `onChange` `length` `color` `error` `timer` `otpMessage` `onResend` `autoFocus` `disabled` |
-| checkout | `TermsNote` | `src/flows/checkout/components/ProviderForm.tsx:300` | `text` `color` |
-| checkout | `OtpLoading` | `src/flows/checkout/components/ProviderForm.tsx:310` | `isLoading` |
+| checkout | `DynamicBackground` | `src/flows/checkout/components/ProviderForm.tsx:18` | `colors` `angle` `className` `style` `children` |
+| checkout | `ProviderHeader` | `src/flows/checkout/components/ProviderForm.tsx:29` | `header` `onCtaPress` |
+| checkout | `FormTitle` | `src/flows/checkout/components/ProviderForm.tsx:46` | `title` `logo` `color` `isVouchersProvider` |
+| checkout | `FormFields` | `src/flows/checkout/components/ProviderForm.tsx:80` | `values` `onChange` `error` `disabled` `page` `color` |
+| checkout | `SubmitButton` | `src/flows/checkout/components/ProviderForm.tsx:149` | `text` `bg` `textColor` `disabled` `loading` `onPress` `minHeight` `inset` |
+| checkout | `AmountTicket` | `src/flows/checkout/components/ProviderForm.tsx:169` | `logo` `amount` `currency` `voucherCode` `onEdit` `notchColor` `color` |
+| checkout | `AmountEntry` | `src/flows/checkout/components/ProviderForm.tsx:194` | `amount` `setAmount` `currency` `disabled` `color` `min` `max` `isOutOfRange` |
+| checkout | `AvailableBalance` | `src/flows/checkout/components/ProviderForm.tsx:223` | `checked` `onToggle` `providerName` `balance` `disabled` |
+| checkout | `VerifyOtp` | `src/flows/checkout/components/ProviderForm.tsx:234` | `value` `onChange` `length` `color` `error` `timer` `otpMessage` `onResend` `autoFocus` `disabled` |
+| checkout | `TermsNote` | `src/flows/checkout/components/ProviderForm.tsx:301` | `text` `color` |
+| checkout | `OtpLoading` | `src/flows/checkout/components/ProviderForm.tsx:311` | `isLoading` |
 | checkout | `ReceiverDetails` | `src/flows/checkout/components/ReceiverDetails.tsx:22` | — |
 | checkout | `Reloader` | `src/flows/checkout/components/Reloader.tsx:6` | `visible` |
 | checkout | `RichText` | `src/flows/checkout/components/RewardsPrimitives.tsx:18` | `value` `stylesheet` `className` `style` |
@@ -1301,12 +1304,12 @@ Search these before you create a component (`components.md` → "Search before y
 | home | `DealTimer` | `src/flows/home/components/DealTimer.tsx:6` | `seconds` `left` |
 | home | `DepartmentTabs` | `src/flows/home/components/DepartmentTabs.tsx:21` | `active` `onChange` |
 | home | `EasyBannerScroller` | `src/flows/home/components/EasyBannerScroller.tsx:19` | `wrap` `header` `numPerView` `rows` `banners` |
-| home | `EidBanners` | `src/flows/home/components/EidBanners.tsx:21` | — |
-| home | `EidAdBanner` | `src/flows/home/components/EidBanners.tsx:127` | — |
-| home | `ExperienceSwitcher` | `src/flows/home/components/ExperienceSwitcher.tsx:9` | `expanded` `selected` |
+| home | `EidBanners` | `src/flows/home/components/EidBanners.tsx:22` | — |
+| home | `EidAdBanner` | `src/flows/home/components/EidBanners.tsx:129` | — |
+| home | `ExperienceSwitcher` | `src/flows/home/components/ExperienceSwitcher.tsx:10` | `expanded` `selected` |
 | home | `HeroBanners` | `src/flows/home/components/HeroBanners.tsx:19` | — |
-| home | `HeroCarousel` | `src/flows/home/components/HeroCarousel.tsx:14` | `onPress` |
-| home | `HomeHeader` | `src/flows/home/components/HomeHeader.tsx:27` | `collapsed` |
+| home | `HeroCarousel` | `src/flows/home/components/HeroCarousel.tsx:16` | `onPress` |
+| home | `HomeHeader` | `src/flows/home/components/HomeHeader.tsx:28` | `collapsed` |
 | home | `ItemCarousel` | `src/flows/home/components/ItemCarousel.tsx:15` | `wrap` `header` |
 | home | `KeepShopping` | `src/flows/home/components/KeepShopping.tsx:14` | — |
 | home | `LaunchModule` | `src/flows/home/components/LaunchModule.tsx:10` | — |
@@ -1321,13 +1324,13 @@ Search these before you create a component (`components.md` → "Search before y
 | membership | `ManagePlan` | `src/flows/membership/components/ManagePlan.tsx:24` | `plan` `isCurrent` `tagText` `showBenefits` `hasUpcomingPlan` `onCta` |
 | membership | `VipOverlay` | `src/flows/membership/components/VipOverlay.tsx:29` | `children` `variant` `canBeClosed` `onDismiss` `startY` `className` `style` `childrenClassName` `childrenStyle` `hideHandle` |
 | membership | `ChevronLeftRounded` | `src/flows/membership/components/icons.tsx:10` | `width` `height` `stroke` `strokeWidth` `direction` `style` `className` |
-| membership | `VipButton` | `src/flows/membership/components/primitives.tsx:14` | `onPress` `loading` `before` `after` `children` |
-| membership | `DashedLine` | `src/flows/membership/components/primitives.tsx:50` | `strokeWidth` `strokeSpacing` `strokeHeight` `color` `style` |
-| membership | `VipBackButton` | `src/flows/membership/components/primitives.tsx:65` | `onPress` `className` `style` `label` |
-| membership | `RowChevron` | `src/flows/membership/components/primitives.tsx:74` | `className` |
-| membership | `MemberAvatar` | `src/flows/membership/components/primitives.tsx:83` | `name` `index` `size` |
-| membership | `MemberHexagon` | `src/flows/membership/components/primitives.tsx:96` | `initial` `width` `height` `background` `color` `border` `borderWidth` `style` |
-| membership | `SuccessAnim` | `src/flows/membership/components/primitives.tsx:137` | `title` `subtitle` `rtl` `onContentReturn` `onComplete` |
+| membership | `VipButton` | `src/flows/membership/components/primitives.tsx:15` | `onPress` `loading` `before` `after` `children` |
+| membership | `DashedLine` | `src/flows/membership/components/primitives.tsx:51` | `strokeWidth` `strokeSpacing` `strokeHeight` `color` `style` |
+| membership | `VipBackButton` | `src/flows/membership/components/primitives.tsx:66` | `onPress` `className` `style` `label` |
+| membership | `RowChevron` | `src/flows/membership/components/primitives.tsx:75` | `className` |
+| membership | `MemberAvatar` | `src/flows/membership/components/primitives.tsx:84` | `name` `index` `size` |
+| membership | `MemberHexagon` | `src/flows/membership/components/primitives.tsx:97` | `initial` `width` `height` `background` `color` `border` `borderWidth` `style` |
+| membership | `SuccessAnim` | `src/flows/membership/components/primitives.tsx:138` | `title` `subtitle` `rtl` `onContentReturn` `onComplete` |
 | noonone | `VIPButton` | `src/flows/noonone/components/VIPButton.tsx:26` | `onPress` `title` `htmlTitle` `htmlTextStyleSheet` `textClassName` `isLoading` `loaderColor` `renderBefore` `renderAfter` |
 | noonone | `VIPOverlay` | `src/flows/noonone/components/VIPOverlay.tsx:42` | `children` `popup` `floating` `canBeClosed` `sheetClassName` `sheetStyle` `childrenClassName` `onDismiss` `hideHandle` |
 | noonone | `LegacyOverlay` | `src/flows/noonone/components/entry/LegacyOverlay.tsx:19` | `children` `onDismiss` `sheetClassName` |
@@ -1337,19 +1340,19 @@ Search these before you create a component (`components.md` → "Search before y
 | noonone | `SubscriptionButton` | `src/flows/noonone/components/landing/StickyFooter.tsx:55` | `title` `showPayment` `payment` `isLoading` `onPress` `onPaymentPress` `buttonClassName` `buttonPayClassName` `textClassName` |
 | noonone | `StickyFooter` | `src/flows/noonone/components/landing/StickyFooter.tsx:107` | `showFlyout` `subscription` `viewPlansTitle` `onViewPlans` |
 | noonone | `TransitionAnim` | `src/flows/noonone/components/landing/TransitionAnim.tsx:15` | `message` `onFadeStart` `onComplete` |
-| noonone | `LottieBox` | `src/flows/noonone/components/landing/modules.tsx:17` | `src` `fit` `loop` `onComplete` `style` `className` |
-| noonone | `ModuleBox` | `src/flows/noonone/components/landing/modules.tsx:40` | `title` `iconUrl` `children` |
-| noonone | `BenefitsModule` | `src/flows/noonone/components/landing/modules.tsx:58` | `title` `benefits` |
-| noonone | `GuideStepsModule` | `src/flows/noonone/components/landing/modules.tsx:87` | `title` `stepUnit` `rows` |
-| noonone | `Slider` | `src/flows/noonone/components/landing/modules.tsx:115` | `views` `labels` `autoplay` `offset` `labelHeight` `labelsClassName` `labelClassName` |
-| noonone | `MpBenefitsCarousel` | `src/flows/noonone/components/landing/modules.tsx:205` | `items` |
-| noonone | `BannerModule` | `src/flows/noonone/components/landing/modules.tsx:226` | `lottieUrl` `ratio` `title` |
-| noonone | `PlanMembers` | `src/flows/noonone/components/landing/modules.tsx:238` | `members` `size` `overlap` `max` `style` |
-| noonone | `FamilyPlanModule` | `src/flows/noonone/components/landing/modules.tsx:272` | `title` `subtitle` `members` `maxNumMembers` `tags` `buttonText` `onPress` |
-| noonone | `FaqModule` | `src/flows/noonone/components/landing/modules.tsx:321` | `title` `rows` |
-| noonone | `StatusIndicator` | `src/flows/noonone/components/landing/modules.tsx:369` | `size` `color` |
-| noonone | `MembershipOverviewModule` | `src/flows/noonone/components/landing/modules.tsx:408` | `lottieUrl` `title` `subtitle` `plan` `footerText` `onManage` |
-| noonone | `SavingsOverviewModule` | `src/flows/noonone/components/landing/modules.tsx:485` | `title` `savingsText` `multiplier` `subtitle` `customerState` `totalSavings` `bare` |
+| noonone | `LottieBox` | `src/flows/noonone/components/landing/modules.tsx:18` | `src` `fit` `loop` `onComplete` `style` `className` |
+| noonone | `ModuleBox` | `src/flows/noonone/components/landing/modules.tsx:41` | `title` `iconUrl` `children` |
+| noonone | `BenefitsModule` | `src/flows/noonone/components/landing/modules.tsx:59` | `title` `benefits` |
+| noonone | `GuideStepsModule` | `src/flows/noonone/components/landing/modules.tsx:88` | `title` `stepUnit` `rows` |
+| noonone | `Slider` | `src/flows/noonone/components/landing/modules.tsx:116` | `views` `labels` `autoplay` `offset` `labelHeight` `labelsClassName` `labelClassName` |
+| noonone | `MpBenefitsCarousel` | `src/flows/noonone/components/landing/modules.tsx:206` | `items` |
+| noonone | `BannerModule` | `src/flows/noonone/components/landing/modules.tsx:227` | `lottieUrl` `ratio` `title` |
+| noonone | `PlanMembers` | `src/flows/noonone/components/landing/modules.tsx:239` | `members` `size` `overlap` `max` `style` |
+| noonone | `FamilyPlanModule` | `src/flows/noonone/components/landing/modules.tsx:273` | `title` `subtitle` `members` `maxNumMembers` `tags` `buttonText` `onPress` |
+| noonone | `FaqModule` | `src/flows/noonone/components/landing/modules.tsx:322` | `title` `rows` |
+| noonone | `StatusIndicator` | `src/flows/noonone/components/landing/modules.tsx:370` | `size` `color` |
+| noonone | `MembershipOverviewModule` | `src/flows/noonone/components/landing/modules.tsx:409` | `lottieUrl` `title` `subtitle` `plan` `footerText` `onManage` |
+| noonone | `SavingsOverviewModule` | `src/flows/noonone/components/landing/modules.tsx:486` | `title` `savingsText` `multiplier` `subtitle` `customerState` `totalSavings` `bare` |
 | noonone | `NpOverviewModule` | `src/flows/noonone/components/landing/npModules.tsx:121` | `title` `subtitle` |
 | noonone | `NpBenefitsModule` | `src/flows/noonone/components/landing/npModules.tsx:135` | `benefits` `footer` |
 | noonone | `NpSavingsModule` | `src/flows/noonone/components/landing/npModules.tsx:174` | `mpId` `mpBenefits` |
@@ -1427,8 +1430,8 @@ Search these before you create a component (`components.md` → "Search before y
 | pdp | `SfVariantsCard` | `src/flows/pdp/components/storefront/SfVariantsCard.tsx:30` | `product` `content` `selection` `loading` `onSelect` `onSizeGuide` `onLearnMore` |
 | plp | `BrandWidget` | `src/flows/plp/components/BrandWidget.tsx:40` | `config` `selected` `landed` `onSelect` `onClear` `children` |
 | plp | `CatalogListHeader` | `src/flows/plp/components/CatalogListHeader.tsx:30` | `sortLabel` `sorted` `nFilters` `filters` `results` `onFilter` `onSort` `onFacet` `onQuick` |
-| plp | `CatalogNavPill` | `src/flows/plp/components/CatalogNavPill.tsx:42` | `kind` `label` `selected` `count` `icon` `onPress` |
-| plp | `MarketplaceStrip` | `src/flows/plp/components/MarketplaceStrip.tsx:37` | `active` `onSelect` |
+| plp | `CatalogNavPill` | `src/flows/plp/components/CatalogNavPill.tsx:43` | `kind` `label` `selected` `count` `icon` `onPress` |
+| plp | `MarketplaceStrip` | `src/flows/plp/components/MarketplaceStrip.tsx:38` | `active` `onSelect` |
 | plp | `RevealChip` | `src/flows/plp/components/NavPills.tsx:12` | `index` `children` `skeleton` |
 | plp | `SkeletonCard` | `src/flows/plp/components/SkeletonCard.tsx:9` | — |
 | returns | `AFSBackHeader` | `src/flows/returns/components/AFSBackHeader.tsx:11` | `title` `onBack` `blur` `solid` `titleClassName` `children` |
@@ -1501,14 +1504,14 @@ Search these before you create a component (`components.md` → "Search before y
 | reviews | `SparkleIcon` | `src/flows/reviews/components/icons.tsx:20` | `size` |
 | reviews | `ExclamationIcon` | `src/flows/reviews/components/icons.tsx:30` | `size` |
 | search | `GroupReveal` | `src/flows/search/components/GroupReveal.tsx:20` | `intro` `group` `index` `radius` `children` `style` |
-| search | `RecentSearches` | `src/flows/search/components/RecentSearches.tsx:18` | `items` `editing` `onToggleEdit` `onRemove` `onPress` `intro` |
+| search | `RecentSearches` | `src/flows/search/components/RecentSearches.tsx:19` | `items` `editing` `onToggleEdit` `onRemove` `onPress` `intro` |
 | search | `SuggestionRow` | `src/flows/search/components/SuggestionRow.tsx:20` | `text` `query` `product` `category` `onPress` `onFill` |
 | wishlist | `CollectionTile` | `src/flows/wishlist/components/CollectionTile.tsx:13` | `name` `items` |
 | wishlist | `EmptyState` | `src/flows/wishlist/components/EmptyState.tsx:14` | — |
 | wishlist | `EmptyWishlist` | `src/flows/wishlist/components/EmptyState.tsx:32` | — |
 | wishlist | `NoCollectionWidget` | `src/flows/wishlist/components/NoCollectionWidget.tsx:12` | `onDismiss` |
 | wishlist | `ViewCartPill` | `src/flows/wishlist/components/ViewCartPill.tsx:14` | — |
-| wishlist | `WishlistAtc` | `src/flows/wishlist/components/WishlistAtc.tsx:19` | `productId` |
+| wishlist | `WishlistAtc` | `src/flows/wishlist/components/WishlistAtc.tsx:20` | `productId` |
 | wishlist | `WishlistHeader` | `src/flows/wishlist/components/WishlistHeader.tsx:15` | `progress` `showCreate` |
 | wishlist | `WishlistProductBox` | `src/flows/wishlist/components/WishlistProductBox.tsx:18` | `product` |
 

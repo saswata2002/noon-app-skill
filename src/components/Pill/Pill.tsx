@@ -5,7 +5,7 @@ import { OriginIcon } from '../Icon/OriginIcon';
 import type { OriginIconName } from '../Icon/originIcons';
 import { Pressable } from '../Pressable/Pressable';
 import { pill as t } from '../../foundations/tokens';
-import { fieldMotion } from '../../motion/presets';
+import { fieldMotion, spring } from '../../motion/presets';
 import { useReduceMotion } from '../../motion/reducedMotion';
 import styles from './Pill.module.css';
 
@@ -82,7 +82,7 @@ export function Pill({
       {icon && <Icon name={icon} size={t.iconSize} />}
       <span>{children}</span>
       {!!count && (
-        <motion.span key={count} className={styles.count} initial={{ scale: 0.6 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 500, damping: 18 }}>
+        <motion.span key={count} className={styles.count} initial={{ scale: 0.6 }} animate={{ scale: 1 }} transition={spring.bouncy}>
           {count}
         </motion.span>
       )}

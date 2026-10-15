@@ -2,6 +2,7 @@ import { LayoutGroup, motion } from 'motion/react';
 import { Fragment } from 'react';
 import { HtmlText, type HtmlStylesheet } from '../../../components';
 import section from './section.module.css';
+import { duration, easing, handoff } from '../../../motion/presets';
 import styles from './DynamicInvoice.module.css';
 
 /** NoonDynamicInvoiceType (subset used by checkout) */
@@ -41,7 +42,8 @@ const invoiceSubtitle: HtmlStylesheet = {
   highlight: { color: 'var(--nk-color-chk-invoice-highlight)' },
 };
 
-const layout = { duration: 0.3 }; // LinearTransition.duration(300)
+const layout = handoff.spring; // LinearTransition.duration(300) → Test01 movement spring
+const entryFade = { ...handoff.spring, opacity: { duration: duration.medium, ease: easing.out } };
 
 /**
  * NoonDynamicInvoice in the checkout "invoice" section: white r16 card (sectionsContainer), paddingVertical 16,
@@ -61,7 +63,7 @@ export function DynamicInvoice({ sections }: { sections: InvoiceSection[] }) {
           </div>
         )}
         {s.entries.map((e, j) => (
-          <motion.div key={e.title} layout="position" transition={layout} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={styles.entry} data-first={j === 0 || undefined}>
+          <motion.div key={e.title} layout="position" transition={entryFade} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className={styles.entry} data-first={j === 0 || undefined}>
             <div className={styles.entryRow}>
               <span className={styles.entryLeft}>
                 <HtmlText value={e.title} stylesheet={invoiceText} />

@@ -13,6 +13,9 @@
 .fillCopy { position: absolute; inset: 0; padding: 1px 2px; /* the input's own UA padding, so the copy lands on its text */ display: flex; align-items: center; white-space: pre; overflow: hidden; pointer-events: none; font: var(--nk-search-bar-field-font); color: var(--nk-search-bar-field-fg); }
 .field { flex: 1; min-width: 0; border: 0; outline: 0; padding: 1px 2px; /* explicit (not the UA's), so the fill copy lands on the text in every engine */ background: transparent; font: var(--nk-search-bar-field-font); color: var(--nk-search-bar-field-fg); }
 .field::placeholder { color: var(--nk-search-bar-field-placeholder); }
+/* SearchInput `hint`: the rotating hint over the empty field, on its text spot, in the type of the bar it came from */
+.hintOverlay { position: absolute; inset: 0; padding: 1px 2px; display: flex; align-items: center; white-space: nowrap; overflow: hidden; pointer-events: none; font: var(--nk-search-hint-font, var(--nk-search-bar-field-font)); letter-spacing: var(--nk-search-hint-tracking, normal); color: var(--nk-search-hint-color, var(--nk-search-bar-field-placeholder)); }
+.hintOverlay .ticker { height: var(--nk-search-hint-ticker-height, var(--nk-search-bar-ticker-height)); }
 /* icon + placeholder group: transparent in the default bar, its own 4px-gap row in the 2025 variant */
 .lead { display: contents; }
 /* variant="2025" (Homepage Revamp 2025, Figma 1337:6727) — opt-in, defaults above unchanged */

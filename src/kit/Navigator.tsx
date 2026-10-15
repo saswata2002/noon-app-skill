@@ -1,7 +1,22 @@
 import { AnimatePresence, motion, useDragControls, type PanInfo } from 'motion/react';
-import { createContext, memo, Suspense, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ComponentType, type CSSProperties, type ReactNode } from 'react';
+import {
+  createContext,
+  memo,
+  Suspense,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ComponentType,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import { getTransition as getTransitionRaw, reducedTransition, type TransitionName } from '../motion/transitions';
-import { duration, easing, pageLoader as pl, spring } from '../motion/presets';
+import { duration, easing, handoff, pageLoader as pl, spring } from '../motion/presets';
 import { haptic } from '../motion/haptics';
 import { useReduceMotion } from '../motion/reducedMotion';
 import { TokenScope } from '../foundations/ThemeProvider';
@@ -71,7 +86,9 @@ function createStackStore(initial: StackEntry[]): StackStore {
 }
 
 // a stable value: navigating never re-renders a screen through this context
-const NavCtx = createContext<{ actions: NavActions; store: StackStore; canGoBack: (s: StackEntry[]) => boolean; registry: Registry; pageLoader: boolean; toasts: boolean } | null>(null);
+const NavCtx = createContext<{ actions: NavActions; store: StackStore; canGoBack: (s: StackEntry[]) => boolean; registry: Registry; pageLoader: boolean; toasts: boolean } | null>(
+  null,
+);
 const EntryCtx = createContext<StackEntry | null>(null);
 
 export const TAB_ROUTES: Record<TabId, Route> = {
@@ -186,12 +203,14 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
     (route: Route, params: Record<string, unknown> = {}, opts: NavigateOptions = {}, currentFlow?: string): StackEntry | null => {
       const resolved = registry.resolve(route, currentFlow);
       if (!resolved) {
-        console.warn(`[noon-flow-kit] Unknown route "${route}". Registered:`, registry.all().map((r) => r.route));
+        console.warn(
+          `[noon-flow-kit] Unknown route "${route}". Registered:`,
+          registry.all().map((r) => r.route),
+        );
         return null;
       }
       const presentation = opts.presentation ?? resolved.screen.presentation ?? 'screen';
-      const transition: TransitionName =
-        opts.transition ?? resolved.screen.transition ?? (presentation === 'sheet' ? 'sheet' : presentation === 'modal' ? 'modal' : 'push');
+      const transition: TransitionName = opts.transition ?? resolved.screen.transition ?? (presentation === 'sheet' ? 'sheet' : presentation === 'modal' ? 'modal' : 'push');
       return {
         key: nextKey(),
         route: resolved.route,
@@ -239,7 +258,14 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
     };
   }, [stack, armed]);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const stackRef = useMemo(() => ({ get current() { return store.get(); } }), [store]);
+  const stackRef = useMemo(
+    () => ({
+      get current() {
+        return store.get();
+      },
+    }),
+    [store],
+  );
 
   useEffect(() => onChange?.(stack), [stack, onChange]);
   // after the first screen is up, fetch the other lazy screens in idle time so pushes don't wait on a download
@@ -382,29 +408,35 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
     },
     [rootStack, setStack],
   );
-  const switchTab = useCallback((tab: TabId) => {
-    const target = TAB_ROUTES[tab];
-    const there = () => stackRef.current.length === 1 && stackRef.current[0].route === target;
-    // while loading, a tap on the loader's tab bar retargets (even back to the page being left)
-    if (there() && !(pageLoader && loading.current)) return;
-    const e = makeEntry(target, {}, { transition: 'none' });
-    if (!e) return;
-    const commit = () => {
-      if (there()) return; // retargeted back to where we were: the page just scales back in
-      setInstantExit(true);
-      setStack([e]);
-    };
-    if (pageLoader) return via.current(commit, target);
-    commit();
-  }, [makeEntry, stackRef, setStack, pageLoader]);
+  const switchTab = useCallback(
+    (tab: TabId) => {
+      const target = TAB_ROUTES[tab];
+      const there = () => stackRef.current.length === 1 && stackRef.current[0].route === target;
+      // while loading, a tap on the loader's tab bar retargets (even back to the page being left)
+      if (there() && !(pageLoader && loading.current)) return;
+      const e = makeEntry(target, {}, { transition: 'none' });
+      if (!e) return;
+      const commit = () => {
+        if (there()) return; // retargeted back to where we were: the page just scales back in
+        setInstantExit(true);
+        setStack([e]);
+      };
+      if (pageLoader) return via.current(commit, target);
+      commit();
+    },
+    [makeEntry, stackRef, setStack, pageLoader],
+  );
 
-  const toast = useCallback<NavApi['toast']>((message, opts = {}) => {
-    if (!toastsOn) return; // toasts switched off
-    const id = Date.now() + Math.random();
-    // keep at most 3 queued: the newest shows in front, the stack card signals the rest
-    setToasts((t) => [...t.slice(-2), { id, message, ...opts }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), opts.duration ?? 2600);
-  }, [toastsOn]);
+  const toast = useCallback<NavApi['toast']>(
+    (message, opts = {}) => {
+      if (!toastsOn) return; // toasts switched off
+      const id = Date.now() + Math.random();
+      // keep at most 3 queued: the newest shows in front, the stack card signals the rest
+      setToasts((t) => [...t.slice(-2), { id, message, ...opts }]);
+      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), opts.duration ?? 2600);
+    },
+    [toastsOn],
+  );
 
   useEffect(() => {
     if (resetSignal) reset(resetSignal.route, resetSignal.params);
@@ -452,7 +484,11 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
             const content = <ScreenHost entry={entry} Screen={Screen} tokens={resolved.flow.tokens} />;
 
             if (entry.presentation === 'sheet') {
-              return <SheetLayer key={entry.key} dataKey={entry.key} options={resolveSheet(resolved.screen.sheet)} onDismiss={back} isTop={isTop} zIndex={i} reduce={reduce}>{content}</SheetLayer>;
+              return (
+                <SheetLayer key={entry.key} dataKey={entry.key} options={resolveSheet(resolved.screen.sheet)} onDismiss={back} isTop={isTop} zIndex={i} reduce={reduce}>
+                  {content}
+                </SheetLayer>
+              );
             }
 
             const cover = coveredBy(i);
@@ -476,7 +512,7 @@ export function Navigator({ registry, initialRoute, initialParams, onChange, res
                 animate={holding ? 'initial' : under ? 'covered' : 'shown'}
                 exit="exit"
                 transition={t.transition}
-                style={{ zIndex: i, pointerEvents: isTop ? 'auto' : 'none', background: resolved.screen.transparent ? 'transparent' : undefined }}
+                style={{ zIndex: i, pointerEvents: isTop ? 'auto' : 'none', background: resolved.screen.transparent || t.transparent ? 'transparent' : undefined }}
                 // a covered screen is out of the tab order and the accessibility tree (the sheet / screen on top is modal)
                 inert={!isTop}
                 data-route={entry.route}
@@ -540,7 +576,23 @@ const ScreenHost = memo(function ScreenHost({ entry, Screen, tokens }: { entry: 
   );
 });
 
-function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce, dataKey }: { children: ReactNode; options: ReturnType<typeof resolveSheet>; onDismiss: () => void; isTop: boolean; zIndex: number; reduce: boolean; dataKey: string }) {
+function SheetLayer({
+  children,
+  options,
+  onDismiss,
+  isTop,
+  zIndex,
+  reduce,
+  dataKey,
+}: {
+  children: ReactNode;
+  options: ReturnType<typeof resolveSheet>;
+  onDismiss: () => void;
+  isTop: boolean;
+  zIndex: number;
+  reduce: boolean;
+  dataKey: string;
+}) {
   const drag = useDragControls();
   const onDragEnd = (_: unknown, info: PanInfo) => {
     if (info.offset.y > 120 || info.velocity.y > 600) onDismiss();
@@ -552,6 +604,66 @@ function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce, dataK
     floating: { scrim: styles.floatingScrim, column: styles.floatingColumn, zone: styles.floatingHandleZone, bar: styles.floatingHandle },
     classic: { scrim: styles.scrim, column: styles.sheet, zone: styles.grabberZone, bar: styles.grabber },
   }[layout];
+  /*
+   * Sheets rise only once their content is there, and glide when it changes size (audit 2026-10-15):
+   *  · arming: the scrim dims at once, the column waits off-screen until its content has real height (a lazy screen's
+   *    Suspense resolved: taller than the grabber alone) and has painted twice, then rises (fallback 800ms) — it used to
+   *    rise as a 50px sliver and snap to full height half a second later
+   *  · height changes after that (a loading state turning into content, an expanding section) are FLIPped: the column
+   *    is bottom-anchored, so when it grows by Δ its top jumps up Δ — a plain wrapper is offset by Δ in the same paint
+   *    (inline transform from the ResizeObserver callback) and springs back to 0 on the Test01 spring (WAAPI), so the
+   *    top edge glides to the new height (a translate: the content never stretches). The wrapper is a plain div on
+   *    purpose: as a motion component it joined the column's drag projection and got moved with it.
+   */
+  const columnRef = useRef<HTMLDivElement>(null);
+  const flipRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+  /** true once the column is up: only then is a height change a visible jump worth gliding */
+  const shownRef = useRef(false);
+  useEffect(() => {
+    shownRef.current = ready;
+  }, [ready]);
+  useLayoutEffect(() => {
+    const el = columnRef.current;
+    if (!el) return;
+    let armed = false;
+    let r1 = 0;
+    let r2 = 0;
+    let lastH = 0;
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      r1 = requestAnimationFrame(() => {
+        r2 = requestAnimationFrame(() => setReady(true));
+      });
+    };
+    const fallback = window.setTimeout(arm, 800);
+    const ro = new ResizeObserver(() => {
+      const h = el.offsetHeight;
+      if (!armed && h > SHEET_ARM_MIN_H) arm();
+      const wrap = flipRef.current;
+      if (shownRef.current && lastH && wrap && Math.abs(h - lastH) > 2 && !reduce) {
+        // keep the top edge where it was (this paint), then let it travel to the new height
+        const now = new DOMMatrix(getComputedStyle(wrap).transform === 'none' ? undefined : getComputedStyle(wrap).transform).m42;
+        const from = now + (h - lastH);
+        wrap.getAnimations().forEach((a) => a.cancel());
+        wrap.style.transform = `translateY(${from}px)`;
+        const anim = wrap.animate([{ transform: `translateY(${from}px)` }, { transform: 'none' }], { duration: SHEET_FLIP_MS, easing: SHEET_FLIP_EASE });
+        anim.onfinish = () => {
+          wrap.style.transform = '';
+        };
+      }
+      lastH = h;
+    });
+    ro.observe(el);
+    if (el.offsetHeight > SHEET_ARM_MIN_H) arm();
+    return () => {
+      ro.disconnect();
+      window.clearTimeout(fallback);
+      cancelAnimationFrame(r1);
+      cancelAnimationFrame(r2);
+    };
+  }, [reduce]);
   const grabber = options.grabber && (
     // floating: OverlayBottomSheet renderHandle — a Pressable that also closes on tap
     <div className={cls.zone} onPointerDown={(e) => drag.start(e)} onClick={layout === 'floating' ? onDismiss : undefined}>
@@ -563,54 +675,80 @@ function SheetLayer({ children, options, onDismiss, isTop, zIndex, reduce, dataK
       <motion.div
         className={cls.scrim}
         variants={{ hidden: { opacity: 0 }, shown: { opacity: 1 } }}
-        transition={{ duration: layout === 'floating' ? 0.35 : 0.25 }}
+        transition={{ duration: layout === 'floating' ? duration.slow : duration.medium, ease: easing.inOut }}
         onClick={options.dismissible ? onDismiss : undefined}
       />
-      <motion.div
-        className={cls.column}
-        // reduced motion: the sheet fades in place with its scrim instead of rising (dragging still works)
-        variants={reduce ? { hidden: { opacity: 0 }, shown: { opacity: 1 } } : { hidden: { y: '100%' }, shown: { y: 0 } }}
-        transition={reduce ? { duration: duration.base, ease: easing.standard } : spring.sheet}
-        drag={options.grabber ? 'y' : false}
-        dragControls={drag}
-        dragListener={false}
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0.05, bottom: 0.8 }}
-        onDragEnd={onDragEnd}
-        data-sheet={layout}
-        // classic: the column is the sheet, so `surface` fills it (grabber zone included)
-        style={
-          layout === 'classic' && options.surface
-            ? { background: options.surface }
-            : layout === 'floating'
-              ? // per-screen floating geometry (e.g. a gorhom `detached` sheet: inset 8, bottom 36)
-                ({ ...(options.inset != null && { '--nk-sheet-floating-inset': `${options.inset}px` }), ...(options.bottomGap != null && { '--nk-sheet-floating-bottom-gap': `${options.bottomGap}px` }) } as CSSProperties)
-              : undefined
-        }
-      >
-        <SheetCtx.Provider value={ctx}>
-          {layout === 'origin' ? (
-            <>
-              {grabber}
-              {/* Origin M-BottomSheet: grabber + home-indicator gap sit outside the sheet body; the body holds only the
+      <div ref={flipRef} className={styles.sheetFlip}>
+        <motion.div
+          ref={columnRef}
+          className={cls.column}
+          initial="hidden"
+          animate={ready ? 'shown' : 'hidden'}
+          exit="hidden"
+          // reduced motion: the sheet fades in place with its scrim instead of rising (dragging still works)
+          variants={reduce ? { hidden: { opacity: 0 }, shown: { opacity: 1 } } : { hidden: { y: '100%' }, shown: { y: 0 } }}
+          transition={reduce ? { duration: duration.base, ease: easing.standard } : spring.sheet}
+          drag={options.grabber ? 'y' : false}
+          dragControls={drag}
+          dragListener={false}
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={{ top: 0.05, bottom: 0.8 }}
+          onDragEnd={onDragEnd}
+          data-sheet={layout}
+          // classic: the column is the sheet, so `surface` fills it (grabber zone included)
+          style={
+            layout === 'classic' && options.surface
+              ? { background: options.surface }
+              : layout === 'floating'
+                ? // per-screen floating geometry (e.g. a gorhom `detached` sheet: inset 8, bottom 36)
+                  ({
+                    ...(options.inset != null && { '--nk-sheet-floating-inset': `${options.inset}px` }),
+                    ...(options.bottomGap != null && { '--nk-sheet-floating-bottom-gap': `${options.bottomGap}px` }),
+                  } as CSSProperties)
+                : undefined
+          }
+        >
+          <SheetCtx.Provider value={ctx}>
+            {layout === 'origin' ? (
+              <>
+                {grabber}
+                {/* Origin M-BottomSheet: grabber + home-indicator gap sit outside the sheet body; the body holds only the
                   Header / Body / Footer slots (<SheetHeader> <SheetBody> <SheetFooter>) */}
-              <div className={styles.originSheet} style={options.surface ? { background: options.surface } : undefined}>
-                {children}
+                <div className={styles.originSheet} style={options.surface ? { background: options.surface } : undefined}>
+                  {children}
+                </div>
+              </>
+            ) : layout === 'floating' ? (
+              <div className={styles.floatingSheet} style={options.surface ? { background: options.surface } : undefined}>
+                {grabber}
+                <div className={`nk-scroll ${styles.floatingChildren}`}>{children}</div>
               </div>
-            </>
-          ) : layout === 'floating' ? (
-            <div className={styles.floatingSheet} style={options.surface ? { background: options.surface } : undefined}>
-              {grabber}
-              <div className={`nk-scroll ${styles.floatingChildren}`}>{children}</div>
-            </div>
-          ) : (
-            <>
-              {grabber}
-              {children}
-            </>
-          )}
-        </SheetCtx.Provider>
-      </motion.div>
+            ) : (
+              <>
+                {grabber}
+                {children}
+              </>
+            )}
+          </SheetCtx.Provider>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
+
+/** a sheet column with only its grabber / padding (lazy content not rendered yet) stays below this */
+const SHEET_ARM_MIN_H = 90;
+/** the Test01 spring (280.6 / 27.14 / 1) as a CSS linear() over its settle, for the sheet FLIP */
+const SHEET_FLIP_MS = 560;
+const SHEET_FLIP_EASE = (() => {
+  const { stiffness: k, damping: c } = handoff.spring;
+  const w = Math.sqrt(k),
+    z = c / (2 * w),
+    wd = w * Math.sqrt(1 - z * z);
+  const pts = Array.from({ length: 41 }, (_, i) => {
+    const t = (SHEET_FLIP_MS / 1000) * (i / 40);
+    return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + ((z * w) / wd) * Math.sin(wd * t));
+  });
+  pts[40] = 1;
+  return `linear(${pts.map((v) => +v.toFixed(4)).join(', ')})`;
+})();

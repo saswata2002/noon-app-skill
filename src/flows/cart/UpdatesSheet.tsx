@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { HtmlText, ProductImage } from '../../components';
 import { currency, formatPrice, productById } from '../../data';
-import { easing } from '../../motion/presets';
+import { duration, easing, handoff } from '../../motion/presets';
 import { cartUpdates, t } from './data';
 import styles from './updates.module.css';
 
@@ -30,7 +30,7 @@ export function UpdatesSheet() {
               className={styles.update}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, ease: easing.out, delay: 0.08 * i }}
+              transition={{ y: { ...handoff.spring, delay: 0.08 * i }, opacity: { duration: duration.medium, ease: easing.out, delay: 0.08 * i } }}
             >
               <div className={styles.wrapper}>
                 <div className={styles.imageBox}>

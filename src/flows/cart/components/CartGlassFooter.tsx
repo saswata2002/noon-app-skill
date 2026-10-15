@@ -5,7 +5,7 @@ import { currency, formatPrice } from '../../../data';
 import { GlassFade, HtmlText, Pressable } from '../../../components';
 import { t } from '../data';
 import { buildDynamicInvoice } from '../invoice';
-import { cartTokens } from '../tokens';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { NoonOneLogo } from './NoonOneLogo';
 import savingsWave from '@assets/cart/footer/savings-wave.svg';
 import { DynamicInvoice } from './DynamicInvoice';
@@ -13,7 +13,6 @@ import base from './footer.module.css';
 import html from './html.module.css';
 import styles from './glassFooter.module.css';
 
-const INV = cartTokens.invoice;
 /** the savings tab: 239 wide, 32 of its 48 show above the card */
 const TAB_W = 239;
 const TAB_H = 32;
@@ -60,23 +59,23 @@ export function CartGlassFooter({ totals, cart, disabled, onCheckout, onHeightCh
     window.setTimeout(() => setLocked(false), 1750);
   };
 
-  // one spring for every piece of geometry (ζ ≈ 0.98: no overshoot, settles in ~0.45s); fades are short tweens on top
-  const spring: Transition = reduce ? { duration: 0 } : { type: 'spring', stiffness: 340, damping: 36, mass: 1 };
-  const fade = (d: number, delay = 0): Transition => (reduce ? { duration: 0 } : { duration: d, delay, ease: [0.25, 0.1, 0.25, 1] });
+  // one spring for every piece of geometry (the Test01 spring, ζ 0.81, settles in ~0.55s); fades are short tweens on top
+  const spring: Transition = reduce ? { duration: 0 } : handoff.spring;
+  const fade = (d: number, delay = 0): Transition => (reduce ? { duration: 0 } : { duration: d, delay, ease: easing.inOut });
   const geometry = open ? spring : { ...spring, delay: reduce ? 0 : 0.08 }; // closing: the summary folds first
 
   return (
     <div className={`${base.stickyBar} ${styles.bar}`} data-tab="" data-glass-footer="">
       <GlassFade className={base.fade} />
       <AnimatePresence>
-        {open && <motion.div className={base.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} transition={fade(INV.backdropMs / 1000)} onClick={() => setOpen(false)} />}
+        {open && <motion.div className={base.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 0.5 }} exit={{ opacity: 0 }} transition={fade(duration.base)} onClick={() => setOpen(false)} />}
       </AnimatePresence>
 
       <div ref={cardRef} className={styles.card} data-open={open || undefined}>
         {hasSavings && <motion.span className={styles.fillet} initial={false} animate={{ opacity: open ? 0 : 1 }} transition={open ? fade(0.08) : fade(0.12, 0.2)} aria-hidden />}
         {/* the order summary: the card's top edge rises to reveal it */}
         <motion.div className={styles.summary} initial={false} animate={{ height: open ? 'auto' : 0 }} transition={open ? { ...spring, delay: reduce ? 0 : 0.06 } : spring} aria-hidden={!open}>
-          <motion.div initial={false} animate={{ opacity: open ? 1 : 0, y: open ? 0 : 10 }} transition={open ? fade(0.22, 0.14) : fade(0.12)}>
+          <motion.div initial={false} animate={{ opacity: open ? 1 : 0, y: open ? 0 : 10 }} transition={open ? { y: { ...spring, delay: reduce ? 0 : 0.14 }, opacity: fade(duration.medium, 0.14) } : { y: spring, opacity: fade(0.12) }}>
             <div className={styles.summaryInner}>
               <DynamicInvoice sections={sections} part="normal" />
             </div>
@@ -92,12 +91,12 @@ export function CartGlassFooter({ totals, cart, disabled, onCheckout, onHeightCh
             transition={geometry}
           >
             {/* closed: the "Color waves" tab outline (top 32 of the 48 wave) */}
-            <motion.img src={savingsWave} alt="" width={TAB_W} height={48} className={styles.wave} initial={false} animate={{ opacity: open ? 0 : 1 }} transition={open ? fade(0.16) : fade(0.16, 0.14)} />
+            <motion.img src={savingsWave} alt="" width={TAB_W} height={48} className={styles.wave} initial={false} animate={{ opacity: open ? 0 : 1 }} transition={open ? fade(duration.base) : fade(duration.fast, 0.14)} />
             {/* open: the flat emerald panel with the scalloped top edge of the summary above it */}
-            <motion.span className={styles.fill} initial={false} animate={{ opacity: open ? 1 : 0 }} transition={open ? fade(0.18) : fade(0.16, 0.12)} />
-            <motion.span className={styles.scallops} initial={false} animate={{ opacity: open ? 1 : 0 }} transition={open ? fade(0.16, 0.2) : fade(0.1)} />
+            <motion.span className={styles.fill} initial={false} animate={{ opacity: open ? 1 : 0 }} transition={open ? fade(duration.fast) : fade(duration.base, 0.12)} />
+            <motion.span className={styles.scallops} initial={false} animate={{ opacity: open ? 1 : 0 }} transition={open ? fade(duration.fast, 0.2) : fade(0.1)} />
 
-            <motion.span className={styles.tabLabel} initial={false} animate={{ opacity: open ? 0 : 1 }} transition={open ? fade(0.12) : fade(0.16, 0.16)} aria-hidden={open}>
+            <motion.span className={styles.tabLabel} initial={false} animate={{ opacity: open ? 0 : 1 }} transition={open ? fade(0.12) : fade(duration.fast, 0.16)} aria-hidden={open}>
               <span className={base.savingsText}>
                 <b>
                   {currency}
@@ -108,7 +107,7 @@ export function CartGlassFooter({ totals, cart, disabled, onCheckout, onHeightCh
               <NoonOneLogo />
             </motion.span>
             {special && (
-              <motion.span className={styles.panelLabel} initial={false} animate={{ opacity: open ? 1 : 0, y: open ? 0 : 6 }} transition={open ? fade(0.2, 0.14) : fade(0.12, 0.08)} aria-hidden={!open}>
+              <motion.span className={styles.panelLabel} initial={false} animate={{ opacity: open ? 1 : 0, y: open ? 0 : 6 }} transition={open ? { y: { ...spring, delay: reduce ? 0 : 0.14 }, opacity: fade(duration.fast, 0.14) } : { y: spring, opacity: fade(0.12, 0.08) }} aria-hidden={!open}>
                 <HtmlText base value={special.title} className={html.invoiceText} />
               </motion.span>
             )}

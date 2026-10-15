@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon, ProductImage, Screen } from '../../components';
 import { useDemoStore } from '../../kit/DemoStore';
 import { useNav } from '../../kit/Navigator';
-import { easing } from '../../motion/presets';
+import { easing, handoff } from '../../motion/presets';
 import { productById, type Product } from '../../data';
 import { addressTitle, singleLineAddress } from '../address/data';
 import { useAddressStore } from '../address/store';
@@ -65,7 +65,7 @@ export function ConfirmationScreen() {
 
   const header = (
     <div className={styles.headerContainer}>
-      <motion.div className={styles.headerBackground} style={{ backgroundColor: HEADER_BG }} initial={false} animate={{ opacity: headerShown ? 1 : 0 }} transition={{ duration: 0.1, ease: [0.42, 0, 0.58, 1] }} />
+      <motion.div className={styles.headerBackground} style={{ backgroundColor: HEADER_BG }} initial={false} animate={{ opacity: headerShown ? 1 : 0 }} transition={{ duration: 0.1, ease: easing.inOut }} />
       <div className={styles.headerContent}>
         <div className={styles.headerLeft}>
           <button type="button" className={styles.backButtonContainer} onClick={continueShopping} aria-label="Back">
@@ -104,7 +104,7 @@ export function ConfirmationScreen() {
 
   return (
     <Screen header={header} overlayHeader safeTop={false} footer={footer} background="var(--nk-palette-anti-flash-white)" onScroll={(y) => scrollY.set(y)}>
-      <motion.div className={styles.wrapper} initial={{ y: '100%' }} animate={{ y: 0 }} transition={{ duration: 0.6, ease: easing.out }}>
+      <motion.div className={styles.wrapper} initial={{ y: '100%' }} animate={{ y: 0 }} transition={handoff.spring}>
         <div className={styles.shipmentReducedSpacer} />
         <div className={styles.shipmentContainer}>
           <ShipmentV2 items={items} promiseLabel={promiseLabel} onPress={viewOrder} />

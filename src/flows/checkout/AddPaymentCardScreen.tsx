@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState, type InputHTMLAttributes } from 'react';
 import { useNav } from '../../kit/Navigator';
-import { easing } from '../../motion/presets';
+import { duration, easing, handoff } from '../../motion/presets';
 import type { CardType, CheckoutCard } from './data';
 import { acceptedBrands, paymentIcons, tp } from './data.payment';
 import { checkoutStore } from './store';
@@ -77,7 +77,7 @@ export function AddPaymentCardScreen() {
         <div className={hint && !errors[id] ? styles.emptyErrorContainer : styles.errorContainer}>
           <AnimatePresence initial={false}>
             {showError && (
-              <motion.div className={styles.errorInfo} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.15, ease: easing.out }}>
+              <motion.div className={styles.errorInfo} initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ y: handoff.spring, opacity: { duration: duration.fast, ease: easing.out } }}>
                 <img src={paymentIcons.infoCircleRed} width={16} height={17} alt="" />
                 <span className={styles.errorText}>{errors[id]}</span>
               </motion.div>

@@ -2,6 +2,7 @@ import { motion, type HTMLMotionProps } from 'motion/react';
 import { useEffect, useId, useState, type CSSProperties, type ReactNode } from 'react';
 import { Lottie, Spinner } from '../../../components';
 import { ref } from '../../../foundations/tokens';
+import { duration, easing, handoff } from '../../../motion/presets';
 import { lotties } from '../assets';
 import { mb, membershipMotion as m } from '../tokens';
 import { ChevronLeftRounded } from './icons';
@@ -126,7 +127,7 @@ export function MemberHexagon({
 }
 
 const SUCCESS_MS = 4000;
-const FADE_OUT_MS = 500;
+const FADE_OUT_MS = Math.round(duration.slower * 1000); // the layer fade (Test01 slower)
 const FADE_OUT_DELAY = 200;
 
 /**
@@ -148,19 +149,20 @@ export function SuccessAnim({ title, subtitle, rtl, onContentReturn, onComplete 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const ease = [0.39, 0.575, 0.565, 1] as const; // Easing.out(Easing.sin)
+  // title / subtitle rise on the Test01 spring and fade in on its ease-out
+  const rise = (delay: number) => ({ y: { ...handoff.spring, delay }, opacity: { duration: duration.slow, ease: easing.out, delay } });
   return (
-    <motion.div className={styles.anim} initial={{ opacity: 1 }} animate={{ opacity: fading ? 0 : 1 }} transition={{ duration: FADE_OUT_MS / 1000, ease: [0.25, 0.1, 0.25, 1] }}>
+    <motion.div className={styles.anim} initial={{ opacity: 1 }} animate={{ opacity: fading ? 0 : 1 }} transition={{ duration: duration.slower, ease: easing.inOut }}>
       <Lottie src={rtl ? lotties.landingSuccessAnimationAr : lotties.landingSuccessAnimation} style={{ width: '100%', height: '100%' }} />
       {(title || subtitle) && (
         <div className={styles.animText}>
           {title && (
-            <motion.span className={styles.animTitle} initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: -60 }} transition={{ duration: 0.45, ease, delay: (SUCCESS_MS * 0.7) / 1000 }}>
+            <motion.span className={styles.animTitle} initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: -60 }} transition={rise((SUCCESS_MS * 0.7) / 1000)}>
               {title}
             </motion.span>
           )}
           {subtitle && (
-            <motion.span className={styles.animSubtitle} initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: -60 }} transition={{ duration: 0.45, ease, delay: (SUCCESS_MS * 0.725) / 1000 }}>
+            <motion.span className={styles.animSubtitle} initial={{ opacity: 0, y: 0 }} animate={{ opacity: 1, y: -60 }} transition={rise((SUCCESS_MS * 0.725) / 1000)}>
               {subtitle}
             </motion.span>
           )}

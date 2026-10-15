@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useNav, useToastsEnabled } from '../../kit/Navigator';
 import type { ScreenProps } from '../../kit/types';
 import { postorderIcons, supportEmail as defaultEmail, tp } from './data.postorder';
+import { duration, easing, handoff } from '../../motion/presets';
 import styles from './postorder.module.css';
 
 export interface NeedHelpParams {
@@ -49,7 +50,7 @@ export function PaymentFailureHelpScreen({ params }: ScreenProps<NeedHelpParams>
       </div>
       <AnimatePresence>
         {toastsOn && toast !== 0 && (
-          <motion.div key={toast} className={styles.helpToast} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12 }} transition={{ duration: 0.25 }}>
+          <motion.div key={toast} className={styles.helpToast} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 12, transition: { y: handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } } }} transition={{ y: handoff.spring, opacity: { duration: duration.medium, ease: easing.out } }}>
             {tp.noon_gm_c_copied_clipboard}
           </motion.div>
         )}

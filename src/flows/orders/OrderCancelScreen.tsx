@@ -6,6 +6,7 @@ import { currency, formatPrice } from '../../data';
 import { cancelReasons, orderById } from './data';
 import styles from './orders.module.css';
 import { ref } from '../../foundations/tokens';
+import { duration, easing, handoff } from '../../motion/presets';
 
 /** O2DOrderCancelItemsScreen — checkbox cards that expand a reason picker; footer with refund banner. */
 export function OrderCancelScreen({ params }: { params: { orderId?: string } }) {
@@ -73,13 +74,13 @@ export function OrderCancelScreen({ params }: { params: { orderId?: string } }) 
                     {currency} {formatPrice(it.price)}
                   </div>
                 </div>
-                <motion.span className={styles.checkbox} data-on={on || undefined} animate={{ scale: on ? [1, 1.15, 1] : 1 }} transition={{ duration: 0.25 }}>
+                <motion.span className={styles.checkbox} data-on={on || undefined} animate={{ scale: on ? [1, 1.15, 1] : 1 }} transition={{ duration: duration.medium, ease: easing.inOut }}>
                   {on && <Icon name="check" size={16} strokeWidth={3} />}
                 </motion.span>
               </div>
               <AnimatePresence initial={false}>
                 {on && (
-                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: 'spring', damping: 20, stiffness: 200 }} style={{ overflow: 'hidden' }}>
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={handoff.spring} style={{ overflow: 'hidden' }}>
                     <DashedDivider color={ref.color('border')} inset={0} margin="12px 0 0" />
                     <div className={styles.reasonHead}>
                       <span>

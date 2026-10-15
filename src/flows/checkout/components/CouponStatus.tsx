@@ -8,6 +8,7 @@ import { couponFor, rt } from '../data.rewards';
 import { useCheckout } from '../store';
 import { useCheckoutTotals } from '../totals';
 import section from './section.module.css';
+import { duration, easing } from '../../../motion/presets';
 import styles from './CouponStatus.module.css';
 
 /** COUPON_GRADIENT_* (NoonTokens): error noonErrorSubtle → white, default noonSuccessSubtle → white, warning banner paleMint → white */
@@ -32,7 +33,7 @@ export function CouponStatus() {
   const message = coupon.state === 'invalid' ? coupon.error || coupon.message : coupon.message;
 
   return (
-    <motion.div key={`${code}-${coupon.state}`} className={`${section.section} ${styles.cardBorder}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
+    <motion.div key={`${code}-${coupon.state}`} className={`${section.section} ${styles.cardBorder}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.slow, ease: easing.out }}>
       <div className={styles.cardGradient} style={{ background: GRADIENT[coupon.state] }}>
         {coupon.state === 'warning' && (
           <div className={styles.overriddenBanner}>

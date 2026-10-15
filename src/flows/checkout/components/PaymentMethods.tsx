@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import type { ReactNode, RefObject } from 'react';
 import { Switch } from '../../../components';
 import { useNav } from '../../../kit/Navigator';
-import { easing, spring } from '../../../motion/presets';
+import { duration, easing, handoff, spring } from '../../../motion/presets';
 import { currency } from '../../../data';
 import { cashback, tf, type CheckoutCard } from '../data';
 import { formatAmount } from '../utils';
@@ -24,7 +24,7 @@ import { useCheckoutTotals } from '../totals';
 import { NewBadge } from './BurnSection';
 import styles from './PaymentMethods.module.css';
 
-const fade = { duration: 0.2, ease: easing.out };
+const fade = { height: handoff.spring, opacity: { duration: duration.fast, ease: easing.out } };
 
 /** Figma "Hidden digit" ×4 + last four */
 function MaskedNumber({ mask }: { mask: string }) {

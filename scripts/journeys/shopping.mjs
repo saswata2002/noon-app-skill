@@ -4,6 +4,12 @@ import { cartBadge, expect, isSheetOnTop, nav, open, tap, top, waitFor, waitRout
 const boxes = (page) => page.locator('[data-route="plp/listing"] [data-testid=product_box]');
 const pill = (page, name) => page.locator('[data-route="plp/listing"] [class*=pills] button', { hasText: name });
 const plpScroll = async (page) => (await page.locator('[data-route="plp/listing"] .nk-scroll').first().evaluate((el) => el.scrollTop));
+/** the grid's card count once it has grown to `want` (≤ 5s): after a filter swap the first screen lands, then the cards
+ *  below the fold join in idle batches */
+async function gridCount(page, want) {
+  for (let t0 = Date.now(); Date.now() - t0 < 5000; await page.waitForTimeout(100)) if ((await boxes(page).count()) === want) break;
+  return boxes(page).count();
+}
 async function scrollPlp(page, y) {
   await page.locator('[data-route="plp/listing"] .nk-scroll').first().evaluate((el, y) => el.scrollTo({ top: y }), y);
   await page.waitForTimeout(500);
@@ -55,8 +61,7 @@ export default [
       expect(/1/.test(filterText), `Filter pill shows no count: "${filterText}"`);
       await shot('samsung-selected');
       await pill(page, /^Samsung$/).click();
-      await page.waitForTimeout(1400);
-      const after = await boxes(page).count();
+      const after = await gridCount(page, before);
       expect(after === before, `clearing the filter shows ${after} results, expected ${before}`);
       await shot('cleared');
     },
@@ -89,8 +94,7 @@ export default [
       await shot('facet-picked');
       await show.click();
       await waitRoute(page, 'plp/listing', 'plp/listing (filters committed)');
-      await page.waitForTimeout(1600);
-      const after = await boxes(page).count();
+      const after = await gridCount(page, n);
       expect(after === n, `grid shows ${after} results, the sheet promised ${n}`);
       const scrolled = await plpScroll(page);
       expect(scrolled < 5, `the grid did not restart at the top after the filter (scrollTop ${scrolled})`);
@@ -107,8 +111,7 @@ export default [
       await shot('cleared-draft');
       await sheet2.getByRole('button', { name: /Show\s*\d+\s*results/ }).click();
       await waitRoute(page, 'plp/listing', 'plp/listing (filters cleared)');
-      await page.waitForTimeout(1600);
-      const restored = await boxes(page).count();
+      const restored = await gridCount(page, before);
       expect(restored === before, `Clear All shows ${restored} results, expected ${before}`);
       const pillText = await page.locator('[data-route="plp/listing"] [class*=pills] button').first().innerText();
       expect(!/\d/.test(pillText), `Filter pill still shows a count after Clear All: "${pillText}"`);

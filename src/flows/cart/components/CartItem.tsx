@@ -5,6 +5,7 @@ import { cartAddOns, FOUPON_VALUE, type CartGroupType, type CartLine } from '../
 import { useDemoStore } from '../../../kit/DemoStore';
 import { useNav } from '../../../kit/Navigator';
 import { currency, discountPct, formatPrice } from '../../../data';
+import { duration, easing, handoff } from '../../../motion/presets';
 import checkedGreen from '@assets/cart/checkbox-checked-green.webp';
 import uncheckedGreen from '@assets/cart/checkbox-unchecked-green.webp';
 import arrowDownCircle from '@assets/cart/figma/arrow-down-circle.svg';
@@ -231,7 +232,7 @@ export function CartItem({ line, group, onMovedToWishlist, onRemoveStart }: { li
       {(warranty || ewCallout) && (
         <AnimatePresence initial={false} mode="popLayout">
           {warranty ? (
-            <motion.div key="ew" className={styles.warranty} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+            <motion.div key="ew" className={styles.warranty} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8, transition: { y: handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } } }} transition={{ y: handoff.spring, opacity: { duration: duration.medium, ease: easing.out } }}>
               <button type="button" className={styles.warrantyRemove} onClick={() => onAction('remove_ew')} aria-label="Remove warranty">
                 <img src={xMark} alt="" />
               </button>

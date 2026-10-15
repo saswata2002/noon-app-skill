@@ -49,8 +49,8 @@ Props and variants: `.claude/skills/noon-ui/references/component-api.generated.m
 | `cmp:Radio` | `src/components/Radio/Radio.tsx:33` | 0 | — | Pressable |
 | `cmp:RatingPill` | `src/components/Rating/Rating.tsx:15` | 1 | home | Icon, OriginIcon, Pressable |
 | `cmp:Screen` | `src/components/Screen/Screen.tsx:35` | 1 | home | — |
-| `cmp:SearchBarButton` | `src/components/SearchBar/SearchBar.tsx:22` | 1 | home | OriginIcon, Pressable |
-| `cmp:SearchInput` | `src/components/SearchBar/SearchBar.tsx:171` | 0 | — | OriginIcon, Pressable |
+| `cmp:SearchBarButton` | `src/components/SearchBar/SearchBar.tsx:82` | 1 | home | OriginIcon, Pressable |
+| `cmp:SearchInput` | `src/components/SearchBar/SearchBar.tsx:225` | 0 | — | OriginIcon, Pressable |
 | `cmp:SectionCard` | `src/components/SectionCard/SectionCard.tsx:5` | 0 | — | — |
 | `cmp:Segmented` | `src/components/Segmented/Segmented.tsx:29` | 0 | — | — |
 | `cmp:SheetBody` | `src/components/BottomSheet/BottomSheet.tsx:66` | 0 | — | ActionBar, Button, OriginIcon, Pressable |

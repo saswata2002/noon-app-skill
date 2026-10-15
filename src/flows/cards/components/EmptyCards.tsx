@@ -2,12 +2,13 @@ import { motion } from 'motion/react';
 import { cardsIcons, cardsImages, t } from '../data';
 import { PaymentScreenHeader } from './Headers';
 import { PaymentButtonV2 } from './primitives';
+import { duration, easing } from '../../../motion/presets';
 import s from './components.module.css';
 
 /** components/PaymentEmptyCardsScreen — rendered by the list's FeedbackView when `cards.length === 0`. */
 export function EmptyCards({ onBack, onAddCard }: { onBack: () => void; onAddCard: () => void }) {
   return (
-    <motion.div className={s.empty} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.25 }}>
+    <motion.div className={s.empty} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: duration.medium, ease: easing.out }}>
       <div className={s.emptyHeader}>
         <PaymentScreenHeader onBack={onBack} />
       </div>

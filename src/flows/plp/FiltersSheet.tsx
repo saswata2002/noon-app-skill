@@ -3,6 +3,7 @@ import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type R
 import { MarketplaceTag, OriginIcon, Pill, Pressable } from '../../components';
 import { useNav, useParams } from '../../kit/Navigator';
 import { useReduceMotion } from '../../motion/recipes';
+import { duration, easing, handoff } from '../../motion/presets';
 import globalLogo from '@assets/marketplace/global-content.svg';
 import { applyFilters, countFilters, facets, priceBounds, priceRange, searchProducts, sortOptions, type Facet, type FacetId, type FacetOption, type Filters, type SortId } from './data';
 import { plpStore } from './store';
@@ -18,8 +19,6 @@ function facetsFor(query?: string): Facet[] {
     .filter((f) => f.kind === 'range' || f.options.length);
 }
 
-/** NoonFiltersScreenV2 sheet easing (bezier 0.38, 0.7, 0.125, 1), also the search slide */
-const sheetEase = [0.38, 0.7, 0.125, 1] as const;
 const SPY_LOCK_MS = 1200;
 
 /** Utils.getSplitCategoryName: names over 10 characters with 2+ words break after the first word */
@@ -210,7 +209,7 @@ export function FiltersSheet() {
           className={`nk-scroll ${styles.sidebar}`}
           initial={false}
           animate={{ x: searchActive ? '-100%' : 0 }}
-          transition={{ duration: 0.25, ease: sheetEase }}
+          transition={handoff.spring}
         >
           {groups.map((g) => (
             <Pressable key={g.id} scale={1} className={styles.side} data-active={g.id === active || undefined} onClick={() => jump(g.id)}>
@@ -220,7 +219,7 @@ export function FiltersSheet() {
           ))}
         </motion.nav>
 
-        <motion.div className={styles.content} initial={false} animate={{ marginInlineStart: searchActive ? '0%' : '25%' }} transition={{ duration: 0.25, ease: sheetEase }}>
+        <motion.div className={styles.content} initial={false} animate={{ marginInlineStart: searchActive ? '0%' : '25%' }} transition={handoff.spring}>
           {/* browse: every group in one list */}
           <div ref={listRef} className={`nk-scroll ${styles.list}`} onScroll={onScroll} hidden={!!matches}>
             {groups.map((g) => (
@@ -260,7 +259,7 @@ export function FiltersSheet() {
               )}
               <AnimatePresence>
                 {countFilters(draft) > 0 && (
-                  <motion.div className={styles.clearSelectionRow} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }}>
+                  <motion.div className={styles.clearSelectionRow} exit={{ opacity: 0, height: 0 }} transition={{ ...handoff.spring, opacity: { duration: duration.slow, ease: easing.out } }}>
                     <Pressable className={styles.clearSelection} onClick={() => setDraft({})}>
                       Clear selection
                     </Pressable>
@@ -290,7 +289,7 @@ export function FiltersSheet() {
 function GroupCard({ title, children, flash = 0 }: { title: ReactNode; children: ReactNode; flash?: number }) {
   const reduce = useReduceMotion();
   const bg = flash && !reduce ? { backgroundColor: ['var(--nk-palette-filter-container-background)', 'var(--nk-color-bg-info)', 'var(--nk-color-bg-info)', 'var(--nk-palette-filter-container-background)'] } : undefined;
-  const t = { duration: 1.9, times: [0, 0.2 / 1.9, 0.7 / 1.9, 1], delay: 0.45, ease: 'easeInOut' as const };
+  const t = { duration: 1.9, times: [0, 0.2 / 1.9, 0.7 / 1.9, 1], delay: 0.45, ease: easing.inOut };
   return (
     <>
       <div className={styles.groupHeaderWrap}>
@@ -376,7 +375,7 @@ function SortSection({ sort, onSort, flash }: { sort: SortId; onSort: (s: SortId
       <Pressable scale={1} className={styles.sortHeader} onClick={() => setOpen((v) => !v)} aria-expanded={open}>
         <span className={styles.sortTitle}>Sort by</span>
         {!open && <span className={styles.sortValue}>{label}</span>}
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25 }} style={{ display: 'flex' }}>
+        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={handoff.spring} style={{ display: 'flex' }}>
           <OriginIcon name="chevron-down" size={16} color="var(--nk-color-text-body)" />
         </motion.span>
       </Pressable>

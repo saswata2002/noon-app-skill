@@ -2,7 +2,7 @@ import { useReduceMotion } from '../../../motion/reducedMotion';
 import { useEffect, useRef, useState } from 'react';
 import { Badge, OriginIcon, Pressable } from '../../../components';
 import { ref as tok } from '../../../foundations/tokens';
-import { useNav } from '../../../kit/Navigator';
+import { useIsTop, useNav } from '../../../kit/Navigator';
 import { currency, formatPrice } from '../../../data';
 import { eidAdBanner, eidSlides, type EidSlide } from '../data.eid';
 import { homeEidCarousel as C } from '../tokens.eid';
@@ -15,17 +15,19 @@ const adBadge = { bg: tok.palette('whiteAlpha80'), color: tok.color('textSeconda
  * NoonDynamicCarouselModule with the live home CMS layout (numPerView 1.4, gap 15, ratio 150 → 263.67 × 395.67 r16
  * cards, 15 apart with a 15 gutter; the Figma's 220×330 / 12 was the hook's 1.7 default), each card snaps to the centre (`snapToOffsets`;
  * the first sits at the gutter), auto-advance every 3s while on screen, stopped for good by the first touch
- * (useNoonDynamicCarouselAutoScroll). No autoplay under reduced motion. Kinds: full-bleed hero creative (image or video,
+ * (useNoonDynamicCarouselAutoScroll). No autoplay under reduced motion, nor while another screen covers home (it
+ * restarts with a full interval on return, so it never slides during the transition back). Kinds: full-bleed hero creative (image or video,
  * "Ad" top-right, pause / play action bottom-left) and brand banner (header creative + product tiles).
  */
 export function EidBanners() {
   const railRef = useRef<HTMLDivElement>(null);
   const [touched, setTouched] = useState(false);
   const reduced = useReduceMotion();
+  const isTop = useIsTop();
 
   useEffect(() => {
     const el = railRef.current;
-    if (!el || touched || reduced || eidSlides.length < 2) return;
+    if (!el || touched || reduced || !isTop || eidSlides.length < 2) return;
     let visible = true;
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.5 });
     io.observe(el);
@@ -43,7 +45,7 @@ export function EidBanners() {
       window.clearInterval(t);
       io.disconnect();
     };
-  }, [touched, reduced]);
+  }, [touched, reduced, isTop]);
 
   return (
     <div ref={railRef} className={`${styles.rail} nk-hscroll`} onPointerDown={() => setTouched(true)} onWheel={() => setTouched(true)} aria-label="Eid offers" role="region">

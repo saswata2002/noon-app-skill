@@ -8,19 +8,20 @@ import { HtmlText } from '../../../components';
 import html from './html.module.css';
 import styles from './group.module.css';
 import { useReduceMotion } from '../../../motion/reducedMotion';
+import { handoff } from '../../../motion/presets';
 
 const P = cartTokens.progress;
 
 /**
  * NoonCartGroupProgressBar, Figma "Progress bars" (e.g. 7484:49906): message 13/16 500 #101628 + 4px bar
  * (gap 8; track r6 / fill r2, colours per group) and the 57×26 "+ Add" button.
- * Bar slides in (translateY 20→0 after 1000ms, height after 1200ms), width springs (damping 16, stiffness 100)
+ * Bar slides in (translateY 20→0 after 1000ms, height after 1200ms), width springs (Test01 spring; was damping 16, stiffness 100)
  * on every change, and a skewed shimmer sweeps 7× (1800ms, inOut quad) the first time the group is seen.
  * "+ Add" (white, 1px rgba(14,14,14,.07), r6) opens the CMS page.
  */
 export function GroupProgressBar({ message, current, threshold, shouldHide, showButton, onAdd, animateIn, trackColor, fillColor, addVariant, addBorder, addInk }: { message: string; current: number; threshold: number; shouldHide?: boolean; showButton: boolean; onAdd: () => void; animateIn: boolean; trackColor?: string; fillColor?: string; /** supermall "+ Add" (All flows 127:39717): 14px Persian-Blue plus, 13px label, pl 4 pr 8 */ addVariant?: 'supermall'; addBorder?: string; addInk?: string }) {
   const pct = current <= 0 ? 0 : Math.min((current / threshold) * 100, 100);
-  const width = useSpring(0, { damping: P.spring.damping, stiffness: P.spring.stiffness, mass: P.spring.mass });
+  const width = useSpring(0, { damping: handoff.spring.damping, stiffness: handoff.spring.stiffness, mass: handoff.spring.mass });
   const widthPct = useTransform(width, (v) => `${v}%`);
   const barRef = useRef<HTMLDivElement>(null);
   const shimmer = useMotionValue(0);
@@ -61,9 +62,9 @@ export function GroupProgressBar({ message, current, threshold, shouldHide, show
           initial={{ height: 0, y: P.hiddenTranslateY, marginTop: 0 }}
           animate={shouldHide ? { height: 0, y: P.hiddenTranslateY, marginTop: 0 } : { height: P.barHeight, y: 0, marginTop: P.visibleMarginTop }}
           transition={{
-            height: { delay: (P.delayMs + P.delayOffsetMs) / 1000, duration: 0.3 },
-            y: { delay: P.delayMs / 1000, duration: 0.3 },
-            marginTop: { delay: P.delayMs / 1000, duration: 0.3 },
+            height: { ...handoff.spring, delay: (P.delayMs + P.delayOffsetMs) / 1000 },
+            y: { ...handoff.spring, delay: P.delayMs / 1000 },
+            marginTop: { ...handoff.spring, delay: P.delayMs / 1000 },
           }}
         >
           <motion.div ref={barRef} className={styles.progressFill} style={{ width: widthPct, background: fillColor }}>

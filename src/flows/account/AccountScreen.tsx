@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { handoff } from '../../motion/presets';
 import { memo, useCallback, useState } from 'react';
 import { NeedHelpButton, Pressable, Screen } from '../../components';
 import { useNav } from '../../kit/Navigator';
@@ -15,7 +16,7 @@ import styles from './account.module.css';
 const enter = (i: number) => ({
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  transition: { type: 'spring' as const, mass: 1, damping: 15, stiffness: 120, delay: 0.05 * i },
+  transition: { ...handoff.spring, delay: 0.05 * i },
 });
 
 /**

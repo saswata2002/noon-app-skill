@@ -4,6 +4,7 @@ import { HtmlText } from '../../../components';
 import type { CartGroupType, CartLine } from '../../../kit/DemoStore';
 import { useNav } from '../../../kit/Navigator';
 import { currency, formatPrice } from '../../../data';
+import { duration, easing, handoff } from '../../../motion/presets';
 import clockIcon from '@assets/cart/figma/clock.svg';
 import logoExpress from '@assets/cart/figma/logo-express.svg';
 import globalIcon from '@assets/cart/figma/logo-global-icon.svg';
@@ -54,8 +55,8 @@ export function CartGroup({ type, lines, subtotal, onMovedToWishlist }: { type: 
                 layout="position"
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0, transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] } }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, height: 0, transition: { ...handoff.spring, opacity: { duration: duration.medium, ease: easing.inOut } } }}
+                transition={{ ...handoff.spring, opacity: { duration: duration.medium, ease: easing.out } }}
                 className={styles.itemWrap}
               >
                 <CartItem line={line} group={type} onMovedToWishlist={onMovedToWishlist} />

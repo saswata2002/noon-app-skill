@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { HtmlText, Screen, Skeleton } from '../../../components';
 import { membershipActions, membershipStore, useMembershipManage } from '../../../kit/membership';
 import { useNav } from '../../../kit/Navigator';
+import { duration, easing } from '../../../motion/presets';
 import { MemberHexagon, VipBackButton, VipButton } from '../components/primitives';
 import { applyDemo, ownerName } from '../data';
 import { useEnsureMembership } from '../store';
@@ -104,7 +105,7 @@ export function SharePlanInviteScreen({ params }: { params: { state?: string } }
             type="button"
             className={styles.heroButton}
             whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: duration.base, ease: easing.inOut }}
             onClick={() => window.setTimeout(shareInvite, 200)}
           >
             {/* heroImageUrl (server illustration: logo + people + badge) — composed from kit pieces */}

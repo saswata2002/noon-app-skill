@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { ProductCard, Pressable, Screen, SearchBarButton, Text } from '../../components';
-import { useNav } from '../../kit/Navigator';
+import { useIsTop, useNav } from '../../kit/Navigator';
+import { openSearch } from '../../kit/searchMorph';
 import { products, user } from '../../data';
-import { easing } from '../../motion/presets';
+import { duration as motionDuration, easing, handoff } from '../../motion/presets';
 import chevronDownIcon from '@assets/icons/noon-chevron-down.webp';
 import deliveryHomeIcon from '@assets/icons/noon-delivery-home.webp';
 import wishlistIcon from '@assets/icons/noon-wishlist-home-v2.webp';
@@ -26,6 +27,7 @@ type Mode = 'noon' | 'supermall';
  */
 export function ClassicHomeScreen() {
   const nav = useNav();
+  const isTop = useIsTop();
   const [mode, setMode] = useState<Mode>('noon');
   const [collapsed, setCollapsed] = useState(false);
   const dark = mode === 'supermall';
@@ -37,7 +39,7 @@ export function ClassicHomeScreen() {
   const collapse = {
     initial: false,
     animate: collapsed ? { height: 0, opacity: 0 } : { height: 'auto', opacity: 1 },
-    transition: { duration: 0.3, ease: easing.out },
+    transition: { duration: motionDuration.medium, ease: easing.out },
     style: { overflow: 'hidden' },
   } as const;
 
@@ -46,10 +48,10 @@ export function ClassicHomeScreen() {
       className={styles.header}
       initial={false}
       animate={{ paddingTop: `calc(var(--nk-inset-top) + ${topOffset + (collapsed ? collapsedItemHeight : itemHeight) + bottomMargin}px)` }}
-      transition={{ duration, ease: [0.5, 1, 0.89, 1] }}
+      transition={{ duration, ease: easing.out }}
     >
       <AnimatePresence initial={false}>
-        <motion.div key={mode} className={styles.headerBg} style={{ background: homeTokens.headerBg[mode] }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} />
+        <motion.div key={mode} className={styles.headerBg} style={{ background: homeTokens.headerBg[mode] }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: motionDuration.base, ease: easing.inOut }} />
       </AnimatePresence>
       <ExperienceSwitcher expanded={!collapsed} />
       <div className={styles.headerContent} style={{ color: dark ? ref.color('textInverse') : undefined }}>
@@ -71,7 +73,7 @@ export function ClassicHomeScreen() {
           </div>
         </motion.div>
         <div className={styles.searchRow}>
-          <SearchBarButton rotatingWords={rotatingWords} onPress={() => nav.push('search/search')} />
+          <SearchBarButton rotatingWords={rotatingWords} onPress={(e) => openSearch(nav, e.currentTarget)} tickerActive={isTop} />
         </div>
         <motion.div {...collapse}>
           <div className={styles.toggleRow}>
@@ -153,7 +155,7 @@ export function ClassicHomeScreen() {
           </Text>
           <div className={styles.grid}>
             {products.map((p, i) => (
-              <motion.div key={p.id} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ type: 'spring', stiffness: 380, damping: 39, delay: (i % 2) * 0.035 }}>
+              <motion.div key={p.id} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ ...handoff.spring, delay: (i % 2) * 0.035 }}>
                 <ProductCard product={p} />
               </motion.div>
             ))}
@@ -169,7 +171,7 @@ function ModeSwitch({ value, onChange }: { value: Mode; onChange: (m: Mode) => v
   const on = value === 'supermall';
   return (
     <button type="button" aria-label="Toggle Supermall" onClick={() => onChange(on ? 'noon' : 'supermall')} className={styles.switch} data-on={on || undefined}>
-      <motion.span className={styles.knob} animate={{ x: on ? 24 : 0 }} transition={{ type: 'spring', stiffness: 500, damping: 30 }}>
+      <motion.span className={styles.knob} animate={{ x: on ? 24 : 0 }} transition={handoff.spring}>
         {on ? '✦' : 'n'}
       </motion.span>
     </button>

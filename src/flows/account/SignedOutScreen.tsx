@@ -10,6 +10,7 @@ import styles from './account.module.css';
 import { ref } from '../../foundations/tokens';
 import { palette } from '../../foundations/palette';
 import { useReduceMotion } from '../../motion/reducedMotion';
+import { duration, easing } from '../../motion/presets';
 
 /** Signed-out Account: blue hero (320 + status bar) with swipeable frames + dots, black Login/Sign up CTA. */
 export function SignedOutScreen() {
@@ -37,7 +38,7 @@ export function SignedOutScreen() {
         <span className={styles.heroBubble} style={{ width: 220, height: 220, top: 40, right: -60 }} />
         <span className={styles.heroBubble} style={{ width: 140, height: 140, bottom: 30, left: -40 }} />
         <AnimatePresence mode="wait">
-          <motion.div key={s.id} className={styles.heroContent} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+          <motion.div key={s.id} className={styles.heroContent} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: duration.medium, ease: easing.inOut }}>
             <motion.span
               className={styles.heroEmoji}
               animate={{ y: [0, -10, 0], rotate: [0, -4, 0] }}
@@ -51,7 +52,7 @@ export function SignedOutScreen() {
         </AnimatePresence>
         <div className={styles.dots}>
           {signedOutSlides.map((d, idx) => (
-            <motion.span key={d.id} animate={{ width: idx === i ? 22 : 8, background: idx === i ? palette.slateGray : palette.lightGreyColor }} transition={{ duration: 0.25 }} style={{ height: 8, borderRadius: 4 }} />
+            <motion.span key={d.id} animate={{ width: idx === i ? 22 : 8, background: idx === i ? palette.slateGray : palette.lightGreyColor }} transition={{ duration: duration.medium, ease: easing.inOut }} style={{ height: 8, borderRadius: 4 }} />
           ))}
         </div>
       </motion.div>

@@ -1,5 +1,5 @@
 import type { TokenOverrides } from '../../foundations/tokens';
-import { appleSpring } from '../../motion/presets';
+import { appleSpring, duration, easing } from '../../motion/presets';
 
 /**
  * Department tabs + tab CMS widget (ashbun/noon-app `experiments/marketplace-switcher` TabLayout / TabContent /
@@ -55,11 +55,11 @@ export const homeTabsTokens = {
   /** content panel height per kind (tab band = nav + panel) */
   panelH: { cms: 348, tiles: 200, grocery: 308, sponsored: 347, none: 200 } as Record<TabContentKind, number>,
   tile: { w: 84, h: 100, radius: 16, gap: 12, inset: 16 },
-  /** noon-app sheetMotion: fade 0.22s iOS curve, control spring 0.3s / bounce 0.15 */
-  fade: { duration: 0.22, ease: [0.32, 0.72, 0, 1] as [number, number, number, number] },
+  /** noon-app sheetMotion: fade (was 0.22s iOS curve → Test01 duration.medium, easing.ios), control spring 0.3s / bounce 0.15 */
+  fade: { duration: duration.medium, ease: easing.ios },
   control: appleSpring(0.3, 0.85),
   /** the band grows / shrinks to the next panel's height */
-  resize: { duration: 0.3, ease: [0.215, 0.61, 0.355, 1] as [number, number, number, number] },
+  resize: { duration: duration.medium, ease: easing.out },
 };
 
 export const homeTabsFlowTokens: TokenOverrides = {

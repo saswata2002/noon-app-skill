@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { duration, easing, handoff } from '../../motion/presets';
 import { Fragment, useEffect, useState } from 'react';
 import { DottedDivider, Pressable, Screen, Spinner } from '../../components';
 import { useNav } from '../../kit/Navigator';
@@ -97,7 +98,7 @@ export function ManageDevicesScreen() {
           <Spinner size={28} thickness={3} track="var(--nk-color-border)" color="var(--nk-color-text-primary)" />
         </div>
       ) : (
-        <div className={styles.devicesScreen}>
+        <div className={`${styles.devicesScreen} nk-content-in`}>
           {current && (
             <>
               <span className={styles.sectionLabel}>{d.thisDevice}</span>
@@ -111,10 +112,10 @@ export function ManageDevicesScreen() {
               {others.length ? d.otherDevices(others.length) : d.otherDevicesTitle}
             </span>
           </div>
-          <motion.div layout transition={{ duration: 0.3 }} className={styles.deviceCard}>
+          <motion.div layout transition={handoff.spring} className={styles.deviceCard}>
             <AnimatePresence initial={false}>
               {others.map((dev, i) => (
-                <motion.div key={dev.id} layout exit={{ opacity: 0, transition: { duration: 0.3 } }} transition={{ layout: { duration: 0.3 } }}>
+                <motion.div key={dev.id} layout exit={{ opacity: 0, transition: { duration: duration.medium, ease: easing.inOut } }} transition={{ layout: handoff.spring }}>
                   <Fragment>
                     {i > 0 && <DottedDivider height={2} dash="4,4" cap="butt" width="93%" centered />}
                     <DeviceItem device={dev} onSignOut={onSignOut} />

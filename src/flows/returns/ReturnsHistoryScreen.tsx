@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Icon, MaskIcon, Pressable, ProductImage, Screen } from '../../components';
 import { useNav } from '../../kit/Navigator';
-import { easing } from '../../motion/presets';
+import { duration, easing } from '../../motion/presets';
 import { icons, images } from './assets';
 import { AFSButton, Tap } from './components/AFSButton';
 import { ReturnsOverlay } from './components/ReturnsOverlay';
@@ -155,7 +155,7 @@ function HistoryCard({ record: r, onPress, onTrack }: { record: ReturnRecord; on
   const code = normalizeColorCode(r.status.colorCode) ?? '';
   return (
     <div className={styles.itemWrap}>
-      <Pressable className={styles.card} scale={1} whileTap={{ opacity: 0.2 }} transition={{ duration: 0.15 }} onClick={onPress}>
+      <Pressable className={styles.card} scale={1} whileTap={{ opacity: 0.2 }} transition={{ duration: duration.base, ease: easing.inOut }} onClick={onPress}>
         <span className={styles.statusStrip} style={{ '--strip': itemStatusGradient[code] ?? 'var(--nk-color-bg-subtle)' } as CSSProperties}>
           {/* SD status.iconV2 (svg) → kit glyph in the status colour */}
           <Icon name={r.status.icon} size={18} color={itemStatusText[code]} strokeWidth={2.2} />

@@ -125,3 +125,18 @@
   scroll-behavior: auto !important;
 }
 
+
+/* Loaded content replacing a sheet's loader: a plain Test01 fade-in (183ms, fast start) while the sheet height glides */
+@keyframes nk-content-in {
+  from {
+    opacity: 0;
+  }
+}
+.nk-content-in {
+  animation: nk-content-in 183ms cubic-bezier(0, 0.204, 0.316, 1.066) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nk-content-in {
+    animation: none;
+  }
+}

@@ -3,6 +3,7 @@ import { Icon, Pressable, Text } from '../../../components';
 import { GroupReveal, type GroupIntro } from './GroupReveal';
 import { searchTokens } from '../tokens';
 import { ref } from '../../../foundations/tokens';
+import { duration, easing, handoff } from '../../../motion/presets';
 
 export interface RecentItem {
   id: string;
@@ -57,13 +58,13 @@ export function RecentSearches({
               layout
               initial={intro ? false : { opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1, y: editing ? 9 : 0 }}
-              exit={{ opacity: 0, scale: 0.6, transition: { duration: 0.18 } }}
-              transition={{ duration: 0.2 }}
+              exit={{ opacity: 0, scale: 0.6, transition: { duration: duration.base, ease: easing.inOut } }}
+              transition={{ ...handoff.spring, opacity: { duration: duration.fast, ease: easing.out } }}
               style={{ position: 'relative', width: w, flexShrink: 0 }}
             >
               <motion.div
                 animate={editing ? { rotate: [-2, 2, -2] } : { rotate: 0 }}
-                transition={editing ? { duration: 1 / 3, repeat: Infinity, ease: 'easeInOut', delay: (i % 3) * 0.08 } : { duration: 0.15 }}
+                transition={editing ? { duration: 1 / 3, repeat: Infinity, ease: 'easeInOut', delay: (i % 3) * 0.08 } : handoff.spring}
               >
                 <Pressable onClick={() => (editing ? onRemove(it.id) : onPress(it.label))} style={{ display: 'flex', flexDirection: 'column', gap: 6, width: w }}>
                   <GroupReveal intro={intro} group={0} index={2 + i} radius={w / 10}>
@@ -99,8 +100,8 @@ export function RecentSearches({
                     aria-label={`Remove ${it.label}`}
                     initial={{ opacity: 0, scale: 0.6 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.6 }}
-                    transition={{ duration: 0.2 }}
+                    exit={{ opacity: 0, scale: 0.6, transition: { ...handoff.spring, opacity: { duration: duration.base, ease: easing.inOut } } }}
+                    transition={{ ...handoff.spring, opacity: { duration: duration.fast, ease: easing.out } }}
                     onClick={() => onRemove(it.id)}
                     style={{
                       position: 'absolute',

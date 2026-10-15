@@ -2,7 +2,7 @@ import { motion, useReducedMotion, useSpring, useTransform, type Transition } fr
 import { useEffect, type CSSProperties } from 'react';
 import styles from './Switch.module.css';
 import { field, ref } from '../../foundations/tokens';
-import { easing, fieldMotion } from '../../motion/presets';
+import { duration, easing, fieldMotion, handoff } from '../../motion/presets';
 
 export interface SwitchProps {
   value: boolean;
@@ -68,8 +68,8 @@ function ClassicSwitch({
   onColor = ref.color('textPrimary'),
   offColor = ref.color('border'),
   knobColor = ref.color('bgSurface'),
-  transition = { duration: 0.2, ease: easing.out },
-  colorTransition = 'background-color 0.2s',
+  transition = handoff.spring,
+  colorTransition = `background-color ${duration.base}s cubic-bezier(${easing.inOut.join(', ')})`,
   as = 'button',
   className,
   style,

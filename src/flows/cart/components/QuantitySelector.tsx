@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { cartTokens } from '../tokens';
+import { duration, easing } from '../../../motion/presets';
 import minusIcon from '@assets/cart/figma/minus.svg';
 import plusIcon from '@assets/cart/figma/plus.svg';
 import trashIcon from '@assets/cart/figma/trash.svg';
@@ -79,7 +80,7 @@ export function QuantitySelector({
             <Spinner size={14} thickness={14 / 9} duration={0.7} color="var(--nk-color-text-ink)" />
           ) : (
             <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span key={local} className={styles.qtyText} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: 0.16 }}>
+              <motion.span key={local} className={styles.qtyText} initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -8, opacity: 0 }} transition={{ duration: duration.base, ease: easing.inOut }}>
                 {local}
               </motion.span>
             </AnimatePresence>

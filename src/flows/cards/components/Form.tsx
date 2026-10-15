@@ -7,6 +7,7 @@ import { PaymentButtonV2 } from './primitives';
 import { Switch } from '../../../components';
 import s from './components.module.css';
 import { ref as tokenRef } from '../../../foundations/tokens';
+import { duration, easing } from '../../../motion/presets';
 
 /* ── components/PaymentTextInputV2 ─────────────────────────────────────── */
 
@@ -77,8 +78,8 @@ export function PaymentSwitchV2({ label, value, onChange }: { label: string; val
         width={34}
         onColor={tokenRef.color('textInk')}
         offColor={tokenRef.palette('filterCheckboxBorder')}
-        transition={{ duration: 0.15, ease: [0.455, 0.03, 0.515, 0.955] }}
-        colorTransition="background-color 0.15s cubic-bezier(0.455, 0.03, 0.515, 0.955)"
+        transition={{ duration: duration.base, ease: easing.inOut }}
+        colorTransition={`background-color ${duration.base}s cubic-bezier(${easing.inOut.join(', ')})`}
       />
     </label>
   );

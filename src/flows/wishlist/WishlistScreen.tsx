@@ -4,6 +4,7 @@ import { Screen } from '../../components';
 import { useDemoStore } from '../../kit/DemoStore';
 import type { ScreenProps } from '../../kit/types';
 import { productById } from '../../data';
+import { duration, easing } from '../../motion/presets';
 import { CollectionTile } from './components/CollectionTile';
 import { EmptyState, EmptyWishlist } from './components/EmptyState';
 import { NoCollectionWidget } from './components/NoCollectionWidget';
@@ -69,7 +70,7 @@ export function WishlistScreen({ params }: ScreenProps<{ collections?: 'none' }>
         <div className={styles.grid} data-pill={cart.length ? '' : undefined}>
           <AnimatePresence initial={false}>
             {items.map((p) => (
-              <motion.div key={p.id} layout className={styles.cell} exit={{ opacity: 0, transition: { duration: 0.2 } }}>
+              <motion.div key={p.id} layout className={styles.cell} exit={{ opacity: 0, transition: { duration: duration.base, ease: easing.inOut } }}>
                 <WishlistProductBox product={p} />
               </motion.div>
             ))}

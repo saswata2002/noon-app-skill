@@ -2082,15 +2082,16 @@
     {
       "name": "SearchBarButton",
       "file": "src/components/SearchBar/SearchBar.tsx",
-      "line": 22,
+      "line": 82,
       "doc": "Home search pill (NoonSearchBarButton): 52h, r12, 1px #D7DAE3, 20px search-bar.webp, 24px search-bar-camera.webp. `rotatingWords` reproduces the \"Search <word>\" vertical ticker (30px rows, ease-out-back); `rotatingPrefix` changes \"Search\". `variant=\"2025\"` (opt-in, Homepage Revamp 2025, Figma iRE9RwO94eMAyW3j3XKNXW · 1337:6727): lighter 1px gray400 border, 15/18 Medium placeholder in textProduct, 18 search icon 4 from the text, 12 gaps to a 24 divider and a 20 camera. Pass the Figma artwork through `icons` (search / camera / divider); defaults are unchanged.",
       "generic": false,
       "forwardRef": false,
       "props": [
         {
           "name": "onPress",
-          "type": "() => void",
-          "optional": true
+          "type": "(e: MouseEvent<HTMLElement>) => void",
+          "optional": true,
+          "doc": "gets the click, so a caller can hand the bar element on (`openSearch(nav, e.currentTarget)` morphs it into the search page)"
         },
         {
           "name": "placeholder",
@@ -2131,6 +2132,13 @@
           "name": "icons",
           "type": "{ search?: string; camera?: string; divider?: string }",
           "optional": true
+        },
+        {
+          "name": "tickerActive",
+          "type": "boolean",
+          "optional": true,
+          "default": "true",
+          "doc": "advance the rotating words (pass false while the bar's screen is covered, e.g. `useIsTop()`)"
         }
       ],
       "variants": {
@@ -2143,7 +2151,7 @@
     {
       "name": "SearchInput",
       "file": "src/components/SearchBar/SearchBar.tsx",
-      "line": 171,
+      "line": 225,
       "doc": "Editable search field. Default: NoonSearchScreen (52h, r12, back icon inside). `variant=\"field\"` (opt-in): Field DS M-SearchBar (`@field-ds/components` SearchBar/SearchBar.tsx, Figma 892:244) — H48 (padding 12, 24px icons, B14 Medium) or H44 (padding 10 / 12, 20px icons, B12 Medium), surfacePrimary, 1px borderSubtle, r12, gap 8, optional Sm `elevation`, Origin `search` icon (Field tertiary → primary once focused or typed), `iconRight` + `iconRightTwo` after a 1 × 24 divider, auto clear (x) while typing, placeholder Field textPrimary at rest / textTertiary focused, press scale .98 over 160ms. `fill`, `onFieldPress`, `onBack`, `onSubmit` work in both looks.",
       "generic": false,
       "forwardRef": false,
@@ -2198,6 +2206,18 @@
           "type": "boolean",
           "optional": true,
           "doc": "The query is being submitted (a suggestion was picked): the clear (x) crossfades into the camera the results bar shows, so the PLP's identical bar takes over without the icon popping. Default look only."
+        },
+        {
+          "name": "hint",
+          "type": "{ prefix?: string; words: readonly string[] }",
+          "optional": true,
+          "doc": "Default look: a rotating hint in place of `placeholder` while the field is empty — the same shared words as the SearchBarButton it came from (`SearchBarButton` `rotatingWords`), drawn in its type (`--nk-search-hint-*`)."
+        },
+        {
+          "name": "hintActive",
+          "type": "boolean",
+          "optional": true,
+          "doc": "advance the hint's words (default true)"
         },
         {
           "name": "variant",
@@ -3769,7 +3789,7 @@
       "flow": "account",
       "name": "ProfileCard",
       "file": "src/flows/account/components/ProfileCard.tsx",
-      "line": 22,
+      "line": 23,
       "doc": "Profile header card + noon One strip (NoonAccountProfileHeader / NoonAccountNoonOne).",
       "props": [
         "noonOne"
@@ -4172,7 +4192,7 @@
       "flow": "cards",
       "name": "SectionTitle",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 10,
+      "line": 11,
       "doc": "components/PaymentCardsSectionTitle — \"Your saved cards\" between two group-line glyphs.",
       "props": [
         "children",
@@ -4183,7 +4203,7 @@
       "flow": "cards",
       "name": "CardTypeLogo",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 22,
+      "line": 23,
       "doc": "components/PaymentCardTypeLogo — live brand logo inside the card number field (height 32, nudged up 8).",
       "props": [
         "cardNumber"
@@ -4193,7 +4213,7 @@
       "flow": "cards",
       "name": "CardBrands",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 41,
+      "line": 42,
       "doc": "components/PaymentCardBrands — accepted brands from noonConfig.cardBrandConfigs.",
       "props": [
         "compact",
@@ -4204,7 +4224,7 @@
       "flow": "cards",
       "name": "ScanCardIcon",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 56,
+      "line": 57,
       "doc": "components/PaymentScanCardIcon (react-native-svg → inline svg)",
       "props": [
         "size"
@@ -4214,7 +4234,7 @@
       "flow": "cards",
       "name": "TapCardIcon",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 81,
+      "line": 82,
       "doc": "components/PaymentTapCardIcon (react-native-svg → inline svg)",
       "props": [
         "size"
@@ -4224,7 +4244,7 @@
       "flow": "cards",
       "name": "AdditionOption",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 112,
+      "line": 113,
       "doc": "components/PaymentCardAdditionOption — icon, title/subtitle, slim chevron; spring press 0.97.",
       "props": [
         "icon",
@@ -4238,7 +4258,7 @@
       "flow": "cards",
       "name": "ScanOptionButton",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 130,
+      "line": 131,
       "doc": "components/PaymentScanOptionButton — 34pt translucent pill used in the form header (Scan / Tap).",
       "props": [
         "icon",
@@ -4251,7 +4271,7 @@
       "flow": "cards",
       "name": "EnterManuallyField",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 140,
+      "line": 141,
       "doc": "components/PaymentEnterManuallyField — faux input inside the \"Enter details manually\" card.",
       "props": [
         "text"
@@ -4261,7 +4281,7 @@
       "flow": "cards",
       "name": "LockNote",
       "file": "src/flows/cards/components/Bits.tsx",
-      "line": 149,
+      "line": 150,
       "doc": "lock + muted copy (ManualAddition message / form secure message)",
       "props": [
         "text",
@@ -4278,7 +4298,7 @@
       "flow": "cards",
       "name": "EmptyCards",
       "file": "src/flows/cards/components/EmptyCards.tsx",
-      "line": 8,
+      "line": 9,
       "doc": "components/PaymentEmptyCardsScreen — rendered by the list's FeedbackView when `cards.length === 0`.",
       "props": [
         "onBack",
@@ -4289,7 +4309,7 @@
       "flow": "cards",
       "name": "PaymentTextInputV2",
       "file": "src/flows/cards/components/Form.tsx",
-      "line": 24,
+      "line": 25,
       "doc": "Floating-label filled input: label 13 → 11pt and −12pt in 60ms when focused or filled.",
       "props": [
         "label",
@@ -4303,7 +4323,7 @@
       "flow": "cards",
       "name": "PaymentSwitchV2",
       "file": "src/flows/cards/components/Form.tsx",
-      "line": 70,
+      "line": 71,
       "props": [
         "label",
         "value",
@@ -4314,7 +4334,7 @@
       "flow": "cards",
       "name": "PaymentCardFormV2",
       "file": "src/flows/cards/components/Form.tsx",
-      "line": 120,
+      "line": 121,
       "props": [
         "isAdditionLoading",
         "onSubmit",
@@ -4440,7 +4460,7 @@
       "flow": "cart",
       "name": "CartFooter",
       "file": "src/flows/cart/components/CartFooter.tsx",
-      "line": 25,
+      "line": 26,
       "doc": "The Cart tab gets the floating Liquid Glass card (CartGlassFooter); a pushed cart keeps the bappzaar footer.",
       "props": [
         "totals",
@@ -4455,7 +4475,7 @@
       "flow": "cart",
       "name": "CartGlassFooter",
       "file": "src/flows/cart/components/CartGlassFooter.tsx",
-      "line": 32,
+      "line": 31,
       "doc": "Cart-tab sticky footer on Liquid Glass (bappzaar liquid-upgrade NoonCartScreen `isLiquidGlass`): a floating glass card as wide as the tab bar with the savings t",
       "props": [
         "totals",
@@ -4469,7 +4489,7 @@
       "flow": "cart",
       "name": "CartGroup",
       "file": "src/flows/cart/components/CartGroup.tsx",
-      "line": 35,
+      "line": 36,
       "doc": "NoonCartGroup, restyled to Figma Cart 2.0 marketplace groups (Express 10575:94104, Global 10575:94090, market 10575:94119; supermall from All flows Af34gfmhQ1D0",
       "props": [
         "type",
@@ -4531,7 +4551,7 @@
       "flow": "cart",
       "name": "CartItem",
       "file": "src/flows/cart/components/CartItem.tsx",
-      "line": 43,
+      "line": 44,
       "doc": "NoonCartItem, restyled to Figma Cart 2.0 \"Cart item\" (Component 120, e.g.",
       "props": [
         "line",
@@ -4552,7 +4572,7 @@
       "flow": "cart",
       "name": "CartSnackBar",
       "file": "src/flows/cart/components/CartSnackBar.tsx",
-      "line": 11,
+      "line": 12,
       "doc": "NoonSnackBar (wishlist_v2 move-to-wishlist): white r16 card (1px newBorderColor, padding 12, margin 12) over a soft blue gradient; 36×48 product image in a #F2F",
       "props": [
         "product",
@@ -4608,7 +4628,7 @@
       "flow": "cart",
       "name": "DynamicInvoice",
       "file": "src/flows/cart/components/DynamicInvoice.tsx",
-      "line": 12,
+      "line": 13,
       "doc": "NoonDynamicInvoice: sections (paddingVertical 15, first has no top / last no bottom padding) split by a 2px #D0D4DD 5/4 dashed line; entries are title (15 slate",
       "props": [
         "sections",
@@ -4625,7 +4645,7 @@
       "flow": "cart",
       "name": "FreeGifts",
       "file": "src/flows/cart/components/FreeGifts.tsx",
-      "line": 17,
+      "line": 18,
       "doc": "Figma \"OOS style freebies\" (11316:46017): 1px Border/secondary-alpha r16 card on a #F6FEFD → white wash; header p12 (20px gift + 16/24 bold #101628); freebie ro",
       "props": [
         "product",
@@ -4637,7 +4657,7 @@
       "flow": "cart",
       "name": "GroupProgressBar",
       "file": "src/flows/cart/components/GroupProgressBar.tsx",
-      "line": 21,
+      "line": 22,
       "doc": "NoonCartGroupProgressBar, Figma \"Progress bars\" (e.g.",
       "props": [
         "message",
@@ -4663,7 +4683,7 @@
       "flow": "cart",
       "name": "InactiveGroup",
       "file": "src/flows/cart/components/InactiveGroup.tsx",
-      "line": 23,
+      "line": 24,
       "doc": "NoonCartInactiveGroup (secondary_groups → inactive): 1px newBorderColor r12 box (margin 8 / 12 from the screen), gradient header (icon 20, 16/700 title in title",
       "props": [
         "onMovedToWishlist"
@@ -4722,7 +4742,7 @@
       "flow": "cart",
       "name": "QuantitySelector",
       "file": "src/flows/cart/components/QuantitySelector.tsx",
-      "line": 15,
+      "line": 16,
       "doc": "NoonCartItemQuantitySelector, Figma \"Stepper Button\" (7280:20584): 92×38 white, 1px #EBEBEB, r8, 16px icons, 14/18 bold value.",
       "props": [
         "qty",
@@ -4901,7 +4921,7 @@
       "flow": "checkout",
       "name": "NewBadge",
       "file": "src/flows/checkout/components/BurnSection.tsx",
-      "line": 45,
+      "line": 46,
       "doc": "Figma red \"NEW\" badge (#FA0000 r12, px 6, 12/16.6 SemiBold white, 30% texture overlay)",
       "props": [
         "className"
@@ -4911,7 +4931,7 @@
       "flow": "checkout",
       "name": "BurnSection",
       "file": "src/flows/checkout/components/BurnSection.tsx",
-      "line": 85,
+      "line": 86,
       "doc": "Figma \"🚧 Checkout 2.0\" Credits & points (14288:184049) — top block of the payment card: \"Points & Vouchers\" 16/20 Bold + \"Need credits? Top up now!\" 12/14 Medi",
       "props": [],
       "variants": {}
@@ -4968,7 +4988,7 @@
       "flow": "checkout",
       "name": "CouponStatus",
       "file": "src/flows/checkout/components/CouponStatus.tsx",
-      "line": 25,
+      "line": 26,
       "doc": "NoonCheckoutCouponStatus (FeatureFlags.isCouponsOnCheckoutEnabled, `coupon_status` section): 2px white frame around a r14 gradient card — status icon, title (de",
       "props": [],
       "variants": {}
@@ -5028,7 +5048,7 @@
       "flow": "checkout",
       "name": "DynamicInvoice",
       "file": "src/flows/checkout/components/DynamicInvoice.tsx",
-      "line": 44,
+      "line": 53,
       "doc": "NoonDynamicInvoice in the checkout \"invoice\" section: white r16 card (sectionsContainer), paddingVertical 16, sections with 15 margin, entries 15px slate600 / a",
       "props": [
         "sections"
@@ -5103,7 +5123,7 @@
       "flow": "checkout",
       "name": "PaymentSummary",
       "file": "src/flows/checkout/components/PaymentSummary.tsx",
-      "line": 50,
+      "line": 51,
       "doc": "Figma \"🚧 Checkout 2.0\" Payment Summary (14288:184228): white card (r12 top / r16 bottom, 2px wider than the other sections, pb 12 below) — \"Payment summary\" 16",
       "props": [
         "totals",
@@ -5124,7 +5144,7 @@
       "flow": "checkout",
       "name": "DynamicBackground",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 17,
+      "line": 18,
       "doc": "NoonDynamicBackground: solid for 1 colour, gradient for more (default top → bottom).",
       "props": [
         "colors",
@@ -5138,7 +5158,7 @@
       "flow": "checkout",
       "name": "ProviderHeader",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 28,
+      "line": 29,
       "doc": "NoonCheckoutProviderHeader — only when the page has a header (title + optional CTA pill).",
       "props": [
         "header",
@@ -5149,7 +5169,7 @@
       "flow": "checkout",
       "name": "FormTitle",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 45,
+      "line": 46,
       "doc": "NoonCheckoutProviderFormTitle — 130×58 logo, crescent arc under it for loyalty providers, 18/700 title.",
       "props": [
         "title",
@@ -5162,7 +5182,7 @@
       "flow": "checkout",
       "name": "FormFields",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 79,
+      "line": 80,
       "doc": "NoonCheckoutProviderFormFields — voucher code (with paste) and/or phone number with the dial code prefix.",
       "props": [
         "values",
@@ -5177,7 +5197,7 @@
       "flow": "checkout",
       "name": "SubmitButton",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 148,
+      "line": 149,
       "doc": "FormikSubmitButton / Button with isLoading: NoonButton metrics with the provider's colours (customBackgroundColor), padding 14/16; disabled → disabledBackground",
       "props": [
         "text",
@@ -5194,7 +5214,7 @@
       "flow": "checkout",
       "name": "AmountTicket",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 168,
+      "line": 169,
       "doc": "NoonCheckoutProviderAmountTicket — voucher amount ticket: 75px logo stub with notches + dashed seam, amount, edit pill.",
       "props": [
         "logo",
@@ -5210,7 +5230,7 @@
       "flow": "checkout",
       "name": "AmountEntry",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 193,
+      "line": 194,
       "doc": "NoonCheckoutProviderAmountEntry — pill input with the currency, red outer ring when out of range.",
       "props": [
         "amount",
@@ -5227,7 +5247,7 @@
       "flow": "checkout",
       "name": "AvailableBalance",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 222,
+      "line": 223,
       "doc": "NoonCheckoutProviderAvailableBalance — checkbox + \"Available {provider} balance\" + price",
       "props": [
         "checked",
@@ -5241,7 +5261,7 @@
       "flow": "checkout",
       "name": "VerifyOtp",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 233,
+      "line": 234,
       "doc": "NoonCheckoutProviderVerifyOtp — segmented 44×44 boxes (r12, gray400 / theme colour when focused / red on error), timer + Resend OTP.",
       "props": [
         "value",
@@ -5260,7 +5280,7 @@
       "flow": "checkout",
       "name": "TermsNote",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 300,
+      "line": 301,
       "doc": "termsInfo tinted with the provider colour + 12px note",
       "props": [
         "text",
@@ -5271,7 +5291,7 @@
       "flow": "checkout",
       "name": "OtpLoading",
       "file": "src/flows/checkout/components/ProviderForm.tsx",
-      "line": 310,
+      "line": 311,
       "doc": "NoonCheckoutProviderOtpLoading — white 60% veil with a spinner",
       "props": [
         "isLoading"
@@ -5613,7 +5633,7 @@
       "flow": "home",
       "name": "EidBanners",
       "file": "src/flows/home/components/EidBanners.tsx",
-      "line": 21,
+      "line": 22,
       "doc": "Hero Section Widgets carousel (Figma Af34gfmhQ1D0wstXUEHSIF · 89:34722 creatives), sized like bappzaar's NoonDynamicCarouselModule with the live home CMS layout",
       "props": [],
       "variants": {}
@@ -5622,7 +5642,7 @@
       "flow": "home",
       "name": "EidAdBanner",
       "file": "src/flows/home/components/EidBanners.tsx",
-      "line": 127,
+      "line": 129,
       "doc": "89:34782 — full-width ad banner (bappzaar AdBannerModule → BannerModule): one creative at the CMS ratio, 351×88 r16 with a 12 gutter (Figma; bappzaar pads 15 an",
       "props": [],
       "variants": {}
@@ -5631,7 +5651,7 @@
       "flow": "home",
       "name": "ExperienceSwitcher",
       "file": "src/flows/home/components/ExperienceSwitcher.tsx",
-      "line": 9,
+      "line": 10,
       "doc": "ExperienceSwitcher (src/components/ExperienceSwitcher + ExperienceSwitcherItem + useExperienceSwitcher).",
       "props": [
         "expanded",
@@ -5651,7 +5671,7 @@
       "flow": "home",
       "name": "HeroCarousel",
       "file": "src/flows/home/components/HeroCarousel.tsx",
-      "line": 14,
+      "line": 16,
       "doc": "Hero carousel as on the live noon home: portrait cards (244×366), centred with neighbours peeking, snap scrolling, auto-advance every 4s (paused while the user ",
       "props": [
         "onPress"
@@ -5661,7 +5681,7 @@
       "flow": "home",
       "name": "HomeHeader",
       "file": "src/flows/home/components/HomeHeader.tsx",
-      "line": 27,
+      "line": 28,
       "doc": "Homepage Revamp 2025 header (Figma 1337:6688): light-blue radial gradient with a cyan glow, a white swoosh and star dots, r12 bottom corners.",
       "props": [
         "collapsed"
@@ -5857,7 +5877,7 @@
       "flow": "membership",
       "name": "VipButton",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 14,
+      "line": 15,
       "doc": "VIPButton — Pressable that scales 1 → 0.97 (withTiming 100ms in / 200ms out) and fires onPress after 200ms (`setTimeout(onPress, 200)`).",
       "props": [
         "onPress",
@@ -5871,7 +5891,7 @@
       "flow": "membership",
       "name": "DashedLine",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 50,
+      "line": 51,
       "doc": "VIPDashedBorder — rounded rects `strokeWidth` long every `strokeSpacing`, `strokeHeight` tall (rx = h/2).",
       "props": [
         "strokeWidth",
@@ -5885,7 +5905,7 @@
       "flow": "membership",
       "name": "VipBackButton",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 65,
+      "line": 66,
       "doc": "Rounded back button used by every full-screen VIP page: 40×40 white circle, 1px surfaceTertiary border, chevron 9×18.",
       "props": [
         "onPress",
@@ -5898,7 +5918,7 @@
       "flow": "membership",
       "name": "RowChevron",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 74,
+      "line": 75,
       "doc": "\"→\" chevron used on manage rows: chevron-left-rounded 7×12 rotated 180° (0° in RTL).",
       "props": [
         "className"
@@ -5908,7 +5928,7 @@
       "flow": "membership",
       "name": "MemberAvatar",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 83,
+      "line": 84,
       "doc": "ManageFamilyMembersSection avatar: circle in VIPPlanMemberColors[i], 1.5px borderPrimary ring, white bold initial.",
       "props": [
         "name",
@@ -5920,7 +5940,7 @@
       "flow": "membership",
       "name": "MemberHexagon",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 96,
+      "line": 97,
       "doc": "VIPMemberInitialHexagon — 64×62 default, fill #FED2D2, text #C45C5C, white 0.8 stroke, font = width / 2.3.",
       "props": [
         "initial",
@@ -5937,7 +5957,7 @@
       "flow": "membership",
       "name": "SuccessAnim",
       "file": "src/flows/membership/components/primitives.tsx",
-      "line": 137,
+      "line": 138,
       "doc": "VIPTransitionAnim (success) — full-screen vip-landing-success-animation Lottie over the page; at 70% / 72.5% of 4s the title (24/800, -0.4) and subtitle (15/500",
       "props": [
         "title",
@@ -6085,7 +6105,7 @@
       "flow": "noonone",
       "name": "LottieBox",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 17,
+      "line": 18,
       "doc": "DotLottie with RN LottieView `resizeMode` (contain | cover).",
       "props": [
         "src",
@@ -6106,7 +6126,7 @@
       "flow": "noonone",
       "name": "ModuleBox",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 40,
+      "line": 41,
       "doc": "ModuleWrapper (noon newUI: no inner padding, marginBottom 24) + ModuleHeader customTitleNode (paddingHorizontal 15, marginBottom 12; VIP title row: 20px icons e",
       "props": [
         "title",
@@ -6118,7 +6138,7 @@
       "flow": "noonone",
       "name": "BenefitsModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 58,
+      "line": 59,
       "doc": "VIPBenefitsModule (landing variant, hideModuleWrapper false)",
       "props": [
         "title",
@@ -6129,7 +6149,7 @@
       "flow": "noonone",
       "name": "GuideStepsModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 87,
+      "line": 88,
       "doc": "VIPGuideStepsModule",
       "props": [
         "title",
@@ -6141,7 +6161,7 @@
       "flow": "noonone",
       "name": "Slider",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 115,
+      "line": 116,
       "doc": "VIPSlider (features/vip/components/VIPSlider): infinite ring, centre slide scale 1, neighbours scale .5 pushed out by (w − w·s)/2; labels stacked vertically and",
       "props": [
         "views",
@@ -6157,7 +6177,7 @@
       "flow": "noonone",
       "name": "MpBenefitsCarousel",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 205,
+      "line": 206,
       "doc": "VIPMarketplaceBenefitsCarouselModule (default ModuleWrapper, no header)",
       "props": [
         "items"
@@ -6167,7 +6187,7 @@
       "flow": "noonone",
       "name": "BannerModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 226,
+      "line": 227,
       "doc": "VIPBannerModule — single banner (width screen − 32, height = width × ratio / 100), lottie when lottieUrl",
       "props": [
         "lottieUrl",
@@ -6179,7 +6199,7 @@
       "flow": "noonone",
       "name": "PlanMembers",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 238,
+      "line": 239,
       "doc": "VIPPlanMembers (default variant): stroke 1.6, overlap, empty seats with a 10 × 1.5 plus",
       "props": [
         "members",
@@ -6193,7 +6213,7 @@
       "flow": "noonone",
       "name": "FamilyPlanModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 272,
+      "line": 273,
       "doc": "VIPFamilyPlanModule (subtitle present → members under the title)",
       "props": [
         "title",
@@ -6209,7 +6229,7 @@
       "flow": "noonone",
       "name": "FaqModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 321,
+      "line": 322,
       "doc": "VIPExpandableTextModule variant \"grouped\" (landing FAQ): rows start collapsed, 300ms expand, chevron −180°.",
       "props": [
         "title",
@@ -6220,7 +6240,7 @@
       "flow": "noonone",
       "name": "StatusIndicator",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 369,
+      "line": 370,
       "doc": "VIPStatusIndicator: dot (12 × scale) + pulsing radial ring (36 × scale), 91-frame loop.",
       "props": [
         "size",
@@ -6231,7 +6251,7 @@
       "flow": "noonone",
       "name": "MembershipOverviewModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 408,
+      "line": 409,
       "doc": "VIPMembershipOverviewModule — header lottie, name + message, current plan (status tag, title, members, billing), footer row.",
       "props": [
         "lottieUrl",
@@ -6246,7 +6266,7 @@
       "flow": "noonone",
       "name": "SavingsOverviewModule",
       "file": "src/flows/noonone/components/landing/modules.tsx",
-      "line": 485,
+      "line": 486,
       "doc": "VIPSavingsOverviewModule (V1 — live: isVIPSavingsWidgetV2Enabled() is false without the flag), customerState 'new' variant.",
       "props": [
         "title",
@@ -7224,7 +7244,7 @@
       "flow": "plp",
       "name": "CatalogNavPill",
       "file": "src/flows/plp/components/CatalogNavPill.tsx",
-      "line": 42,
+      "line": 43,
       "props": [
         "kind",
         "label",
@@ -7246,7 +7266,7 @@
       "flow": "plp",
       "name": "MarketplaceStrip",
       "file": "src/flows/plp/components/MarketplaceStrip.tsx",
-      "line": 37,
+      "line": 38,
       "doc": "NoonFulfillmentTabs (bappzaar marketplaces/noon/components/NoonFulfillmentTabs), 1:1: white strip, paddingTop 8; horizontal row of 110-wide tabs, gap 12, paddin",
       "props": [
         "active",
@@ -8344,7 +8364,7 @@
       "flow": "search",
       "name": "RecentSearches",
       "file": "src/flows/search/components/RecentSearches.tsx",
-      "line": 18,
+      "line": 19,
       "doc": "NoonRecentlySearchedModule: items = screen ÷ 5.2 wide, image h = w × 1.2, r = w ÷ 10.",
       "props": [
         "items",
@@ -8422,7 +8442,7 @@
       "flow": "wishlist",
       "name": "WishlistAtc",
       "file": "src/flows/wishlist/components/WishlistAtc.tsx",
-      "line": 19,
+      "line": 20,
       "doc": "NoonProductBoxWishlistAddToCart (V2): soft \"+ Add to cart\" (h 38) that becomes the soft stepper (h 36, 1.2px paleAzure): trash at qty 1 / minus above, the quant",
       "props": [
         "productId"

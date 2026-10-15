@@ -1,4 +1,5 @@
 import type { TokenOverrides } from '../../foundations/tokens';
+import { duration as motionDuration } from '../../motion/presets';
 import { homeEidFlowTokens } from './tokens.eid';
 import { homeFeedFlowTokens } from './tokens.feed';
 import { homeHeaderFlowTokens } from './tokens.header';
@@ -36,7 +37,7 @@ export const switcherMetrics = {
   gap: 8,
   bottomMargin: 8,
   topOffset: 5, // homeSwitcherTopOffset: status bar + 5 (iOS)
-  duration: 0.3,
+  duration: motionDuration.medium, // Test01 medium, in step with the header fold
 } as const;
 
 /** Homepage Revamp 2025 values (Figma iRE9RwO94eMAyW3j3XKNXW · 1337:5102). */

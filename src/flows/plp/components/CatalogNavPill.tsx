@@ -3,6 +3,7 @@ import { animate, motion, useMotionValue, useTransform } from 'motion/react';
 import { useReduceMotion } from '../../../motion/reducedMotion';
 import { forwardRef, useImperativeHandle, useRef, type ReactNode } from 'react';
 import { haptic } from '../../../motion/haptics';
+import { easing } from '../../../motion/presets';
 import filterPillLottie from '@assets/lotties/filter-pill.lottie';
 // the same Lottie with its stroke recoloured #475067 → #0F61FF (bappzaar FILTER_PILL_SELECTED_COLOR_FILTERS)
 import filterPillLottieSelected from '@assets/lotties/filter-pill-selected.lottie';
@@ -149,7 +150,7 @@ const FilterPillAttention = forwardRef<FilterPillAttentionHandle, { children: Re
       animate(attention, [0, 0, 1, 0], {
         duration: 0.396 + 0.44 + 0.633,
         times: [0, 0.396 / 1.469, (0.396 + 0.44) / 1.469, 1],
-        ease: ['linear', [0.33, 1, 0.68, 1], [0.65, 0, 0.35, 1]],
+        ease: ['linear', easing.out, easing.inOut],
       });
     },
   }));
